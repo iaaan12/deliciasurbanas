@@ -22,9 +22,9 @@
 {
   "imports": {
     "@google/genai": "https://esm.sh/@google/genai@0.1.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
@@ -342,20 +342,22 @@
                         </button>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                            <div class="bg-white p-1.5 rounded-lg shadow-sm text-slate-400"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
+                        <!-- Address Link -->
+                        <a id="checkout-address-link" href="#" target="_blank" class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 hover:bg-orange-50 hover:border-orange-200 transition-all group">
+                            <div class="bg-white p-1.5 rounded-lg shadow-sm text-slate-400 group-hover:text-orange-500 transition-colors"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
                             <div class="flex flex-col overflow-hidden">
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Dirección</span>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 group-hover:text-orange-500 transition-colors">Dirección</span>
                                 <span class="text-xs font-bold text-slate-800 truncate leading-none" id="checkout-address"></span>
                             </div>
-                        </div>
-                        <div class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                            <div class="bg-white p-1.5 rounded-lg shadow-sm text-slate-400"><i data-lucide="phone" class="w-4 h-4"></i></div>
+                        </a>
+                        <!-- Phone Link -->
+                        <a id="checkout-phone-link" href="#" target="_blank" class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200 hover:bg-green-50 hover:border-green-200 transition-all group">
+                            <div class="bg-white p-1.5 rounded-lg shadow-sm text-slate-400 group-hover:text-green-500 transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i></div>
                             <div class="flex flex-col overflow-hidden">
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Contacto</span>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 group-hover:text-green-600 transition-colors">WhatsApp</span>
                                 <span class="text-xs font-bold text-slate-800 truncate leading-none" id="checkout-phone"></span>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
@@ -502,7 +504,10 @@
             document.getElementById('footer-instagram-link').href = SHOP_INFO.instagram;
 
             document.getElementById('checkout-address').innerText = SHOP_INFO.address;
+            document.getElementById('checkout-address-link').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SHOP_INFO.addressFull)}`;
+            
             document.getElementById('checkout-phone').innerText = SHOP_INFO.phoneDisplay;
+            document.getElementById('checkout-phone-link').href = `https://wa.me/${SHOP_INFO.phone}`;
 
             // Listener de búsqueda
             document.getElementById('search-input').addEventListener('input', (e) => {
