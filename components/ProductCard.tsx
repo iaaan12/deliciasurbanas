@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, ArrowRight } from 'lucide-react';
+import { Plus, ArrowRight, Share2 } from 'lucide-react';
 import { Product } from '../types';
 
 interface ProductCardProps {
@@ -8,6 +8,23 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+  
+  const handleShare = () => {
+    const text = `¡Mirá este ${product.name} a $${product.price.toLocaleString('es-AR')}!`;
+    const url = `https://delicias-urbanas.com/producto/${product.id}`;
+
+    if (navigator.share) {
+      navigator.share({
+        title: 'Delicias Urbanas',
+        text: text,
+        url: url
+      }).catch(console.error);
+    } else {
+      // Fallback solicitado
+      alert(`¡Compartí este producto!\n\n${text}\n\nEnlace simulado: ${url}`);
+    }
+  };
+
   return (
     <div className="group relative bg-white rounded-[2rem] p-6 border border-slate-200/60 shadow-sm hover:shadow-2xl hover:shadow-orange-500/10 hover:border-orange-500/30 transition-all duration-300 flex flex-col justify-between h-full min-h-[240px]">
       
@@ -19,6 +36,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }
           <span className="inline-block px-3 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:bg-orange-100 group-hover:text-orange-600 transition-colors duration-300">
             {product.category}
           </span>
+          <button 
+            onClick={handleShare}
+            className="p-2 text-slate-300 hover:text-orange-500 transition-colors z-20 relative hover:bg-orange-50 rounded-full active:scale-95" 
+            title="Compartir"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
         </div>
 
         <h3 className="text-2xl font-black text-slate-900 italic uppercase leading-none tracking-tight mb-3 group-hover:text-orange-600 transition-colors duration-300">

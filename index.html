@@ -8,6 +8,9 @@
     <title>Delicias Urbanas | Pollos al Spiedo y Sándwiches en Salta</title>
     <meta name="description" content="Pedí online los mejores pollos al spiedo, sándwiches de miga y bebidas en Salta. Retiro rápido por nuestro local.">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://i.imgur.com/RUVPwCt.png">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -64,7 +67,7 @@
             phoneDisplay: "+54 9 387 502-0884",
             address: "Av. San Martín 532, Salta",
             addressFull: "Av. San Martín 532, Salta, Argentina",
-            logoUrl: "https://lh3.googleusercontent.com/d/1hRktdsvA2ed5jfrkQRQ3xbbotozlgTBl",
+            logoUrl: "https://i.imgur.com/RUVPwCt.png",
             instagram: "https://instagram.com/delicias.urbanas",
             instagramUser: "@delicias.urbanas"
         };
@@ -569,10 +572,13 @@
                 <div class="group relative bg-white rounded-[2rem] p-6 border border-slate-200/60 shadow-sm hover:shadow-2xl hover:shadow-orange-500/10 hover:border-orange-500/30 transition-all duration-300 flex flex-col justify-between h-full min-h-[240px]">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-[100%] rounded-tr-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                     <div class="relative z-10">
-                        <div class="mb-4">
+                        <div class="mb-4 flex justify-between items-start">
                             <span class="inline-block px-3 py-1 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:bg-orange-100 group-hover:text-orange-600 transition-colors duration-300">
                                 ${item.category}
                             </span>
+                            <button onclick="shareProduct('${item.id}')" class="p-1.5 text-slate-300 hover:text-orange-500 transition-colors z-20 relative hover:bg-orange-50 rounded-full active:scale-95" title="Compartir">
+                                <i data-lucide="share-2" class="w-5 h-5"></i>
+                            </button>
                         </div>
                         <h3 class="text-2xl font-black text-slate-900 italic uppercase leading-none tracking-tight mb-3 group-hover:text-orange-600 transition-colors duration-300">
                             ${item.name}
@@ -591,6 +597,24 @@
                 </div>
             `).join('');
             lucide.createIcons();
+        }
+
+        function shareProduct(id) {
+            const item = MENU_ITEMS.find(i => i.id === id);
+            if(!item) return;
+            
+            const link = `https://delicias-urbanas.com/producto/${id}`;
+            const text = `¡Mirá este ${item.name} a $${item.price.toLocaleString('es-AR')}!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Delicias Urbanas',
+                    text: text,
+                    url: link
+                }).catch(console.error);
+            } else {
+                alert(`¡Compartí este producto!\n\n${text}\n\nEnlace simulado: ${link}`);
+            }
         }
 
         // --- LÓGICA DEL CARRITO ---

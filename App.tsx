@@ -19,8 +19,8 @@ const App: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // URL optimizada para Google Drive (Requiere que el archivo sea Público)
-  const logoUrl = "https://lh3.googleusercontent.com/d/1hRktdsvA2ed5jfrkQRQ3xbbotozlgTBl";
+  // URL optimizada
+  const logoUrl = "https://i.imgur.com/RUVPwCt.png";
 
   useEffect(() => {
     const savedOrders = localStorage.getItem('delicias_urbanas_orders');
