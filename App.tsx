@@ -152,7 +152,7 @@ const App: React.FC = () => {
         rel="noreferrer"
         className="block w-full bg-[#1c4532] hover:bg-[#255b42] text-white text-[10px] sm:text-xs font-bold text-center py-2.5 px-4 transition-colors tracking-wide uppercase border-b border-[#2a6b4d]"
       >
-        Para pedidos más grandes o tortas saladas, comunicarse directamente al WhatsApp
+        Para pedidos más grandes o tortas saladas, comunicarse directamente por WhatsApp
       </a>
 
       <Header 

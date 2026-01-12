@@ -27,11 +27,14 @@ export interface CartItem extends Product {
   selectedFlavors?: string; // Texto formateado: "6x Jamón, 6x Queso"
 }
 
+export type PaymentMethod = 'Efectivo' | 'Transferencia';
+
 export interface OrderDetails {
   customerName: string;
   phone: string;
   pickupTime: string;
   notes?: string;
+  paymentMethod: PaymentMethod;
 }
 
 export interface Order {

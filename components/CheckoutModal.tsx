@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, CheckCircle2, Clock, Phone, User, MessageCircle, AlertCircle, MapPin, ExternalLink, Store, Loader2 } from 'lucide-react';
-import { CartItem, OrderDetails } from '../types';
+import { X, CheckCircle2, Clock, Phone, User, MessageCircle, AlertCircle, MapPin, ExternalLink, Store, Loader2, Banknote, QrCode, Copy } from 'lucide-react';
+import { CartItem, OrderDetails, PaymentMethod } from '../types';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -20,23 +20,35 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     customerName: '',
     phone: '',
     pickupTime: '',
-    notes: ''
+    notes: '',
+    paymentMethod: 'Efectivo'
   });
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [whatsappSent, setWhatsappSent] = useState(false);
   const [timeError, setTimeError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copied, setCopied] = useState(false);
   
   const shopAddress = "Av. San Martín 532, Salta";
   const shopPhoneDisplay = "+54 9 387 502-0884";
   const shopPhoneLink = "5493875020884";
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Av. San Martín 532, Salta, Argentina")}`;
+  
+  // Datos de pago
+  const MP_ALIAS = "deliciasurbanas13";
+  const MP_HOLDER = "Nahida Esther Leonor Zamar";
 
   const [orderSummary, setOrderSummary] = useState<{ items: CartItem[], total: number } | null>(null);
 
   const currentTotal = useMemo(() => 
     cartItems.reduce((s, i) => s + (i.price * i.quantity), 0)
   , [cartItems]);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Validar horario al abrir el modal o cambiar la hora
   const validateTime = (time: string) => {
@@ -109,6 +121,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       })
       .join('%0A');
 
+    const paymentInfo = details.paymentMethod === 'Transferencia' 
+        ? `💳 *Pago:* Transferencia/MP (Adjunto comprobante)`
+        : `💵 *Pago:* Efectivo en el local`;
+
     const message = `¡Hola Delicias Urbanas! 👋%0A%0A` +
       `*NUEVO PEDIDO PARA RETIRAR*%0A` +
       `----------------------------------%0A` +
@@ -119,6 +135,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       `*PRODUCTOS:*%0A${itemsText}%0A` +
       `----------------------------------%0A` +
       `💰 *TOTAL: $${orderSummary.total.toLocaleString('es-AR')}*%0A` +
+      `${paymentInfo}%0A` +
       (details.notes ? `%0A📝 *Notas:* ${details.notes}` : '');
 
     window.open(`https://wa.me/${shopPhoneLink}?text=${message}`, '_blank');
@@ -271,6 +288,61 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   )}
                 </div>
 
+                {/* Selección de Método de Pago */}
+                <div>
+                   <label className="block text-sm font-bold text-slate-300 mb-2 ml-1">
+                    Método de Pago
+                   </label>
+                   <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setDetails({...details, paymentMethod: 'Efectivo'})}
+                        className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 ${details.paymentMethod === 'Efectivo' ? 'bg-orange-500/10 border-orange-500 text-white' : 'bg-[#0f1113] border-white/5 text-slate-400 hover:bg-[#1f2125]'}`}
+                      >
+                         <Banknote className={`w-6 h-6 ${details.paymentMethod === 'Efectivo' ? 'text-orange-500' : 'text-slate-500'}`} />
+                         <span className="text-xs font-bold uppercase">Efectivo al Retirar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDetails({...details, paymentMethod: 'Transferencia'})}
+                        className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 ${details.paymentMethod === 'Transferencia' ? 'bg-orange-500/10 border-orange-500 text-white' : 'bg-[#0f1113] border-white/5 text-slate-400 hover:bg-[#1f2125]'}`}
+                      >
+                         <QrCode className={`w-6 h-6 ${details.paymentMethod === 'Transferencia' ? 'text-orange-500' : 'text-slate-500'}`} />
+                         <span className="text-xs font-bold uppercase">Transferencia / MP</span>
+                      </button>
+                   </div>
+
+                   {/* Datos para Transferencia */}
+                   {details.paymentMethod === 'Transferencia' && (
+                     <div className="mt-4 p-4 bg-[#0f1113] rounded-xl border border-orange-500/30 animate-in slide-in-from-top-2">
+                        <div className="flex items-center gap-2 mb-3 text-orange-400">
+                           <AlertCircle className="w-4 h-4" />
+                           <p className="text-xs font-bold uppercase">Asegurá tu pedido pagando ahora</p>
+                        </div>
+                        <div className="space-y-3">
+                           <div className="bg-[#18181b] p-3 rounded-lg border border-white/5">
+                              <div className="mb-2 border-b border-white/5 pb-2 flex justify-between items-center">
+                                 <div>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase">Alias</p>
+                                    <p className="text-sm font-mono text-white tracking-wide select-all">{MP_ALIAS}</p>
+                                 </div>
+                                 <button type="button" onClick={() => copyToClipboard(MP_ALIAS)} className="p-2 text-slate-400 hover:text-white transition-colors">
+                                    {copied ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                 </button>
+                              </div>
+                              <div>
+                                 <p className="text-[10px] text-slate-500 font-bold uppercase">Titular</p>
+                                 <p className="text-xs font-medium text-white">{MP_HOLDER}</p>
+                              </div>
+                           </div>
+                           <p className="text-[10px] text-slate-400 text-center italic">
+                             Envia el comprobante junto al pedido por WhatsApp
+                           </p>
+                        </div>
+                     </div>
+                   )}
+                </div>
+
                 <div>
                   <label className="block text-sm font-bold text-slate-300 mb-1.5 ml-1">
                     Notas adicionales (Opcional)
@@ -344,6 +416,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     : `Hacé clic abajo para enviar el pedido por WhatsApp.`
                   }
                 </p>
+                {details.paymentMethod === 'Transferencia' && !whatsappSent && (
+                    <p className="text-xs text-orange-400 font-bold mt-2">No olvides adjuntar el comprobante</p>
+                )}
               </div>
               
               <button

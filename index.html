@@ -59,7 +59,7 @@
 
     <!-- TOP BANNER (ANNOUNCEMENT) -->
     <a href="https://wa.me/5493875020884" target="_blank" class="block w-full bg-[#1c4532] hover:bg-[#255b42] text-white text-[10px] sm:text-xs font-bold text-center py-2.5 px-4 transition-colors tracking-wide uppercase border-b border-[#2a6b4d] relative z-[60]">
-        Para pedidos más grandes o tortas saladas, comunicarse directamente al WhatsApp
+        Para pedidos más grandes o tortas saladas, comunicarse directamente por WhatsApp
     </a>
 
     <!-- DATA STORE -->
@@ -74,6 +74,11 @@
             instagram: "https://instagram.com/delicias.urbanas",
             instagramUser: "@delicias.urbanas"
         };
+        
+        // DATOS DE TRANSFERENCIA
+        const MP_ALIAS = "deliciasurbanas13";
+        const MP_HOLDER = "Nahida Esther Leonor Zamar";
+        const TRANSFER_LIMIT = 15000; // Límite para obligar a transferencia
 
         const SABORES_COMUNES = ['Jamón y Queso', 'Salame y Queso'];
         const SABORES_ESPECIALES = ['Ternera, Tomate y Huevo', 'Aceituna, Huevo y Queso', 'Roquefort y Jamón', 'Jamón Crudo y Queso'];
@@ -182,6 +187,9 @@
         let selectedCategory = 'Todos';
         let searchQuery = '';
         let confirmingOrderId = null; // Para control de UI en cancelación
+        
+        // Estado Checkout (Vanilla)
+        let selectedPaymentMethod = 'Efectivo';
         
         // Estado Modal Sabores
         let flavorModalOpen = false;
@@ -416,7 +424,7 @@
         <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeCheckout()"></div>
         <div class="relative bg-[#18181b] sm:rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden h-full sm:h-auto sm:max-h-[95vh] flex flex-col animate-fade-in border border-white/5">
             <!-- Step 1: Formulario -->
-            <form id="checkout-form" class="flex flex-col h-full" onsubmit="handleCheckoutSubmit(event)">
+            <form id="checkout-form" class="flex flex-col h-full overflow-hidden" onsubmit="handleCheckoutSubmit(event)">
                 <div class="px-6 py-5 border-b border-white/5 bg-[#18181b] z-20 shadow-sm flex-shrink-0">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-2xl font-extrabold text-white italic uppercase tracking-tighter flex items-center gap-2 font-heading">
@@ -469,9 +477,57 @@
                         </div>
                         <p id="time-error" class="hidden text-xs font-bold text-red-400 mt-2 bg-red-900/20 p-2 rounded-lg border border-red-500/20"></p>
                     </div>
+                    
+                    <!-- Selector de Pago -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Método de Pago</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" onclick="selectPayment('Efectivo')" id="btn-pay-efectivo" class="p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-orange-500/10 border-orange-500 text-white">
+                                <i data-lucide="banknote" class="w-6 h-6 text-orange-500"></i>
+                                <span class="text-xs font-bold uppercase">Efectivo al Retirar</span>
+                            </button>
+                            <button type="button" onclick="selectPayment('Transferencia')" id="btn-pay-transfer" class="p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-[#0f1113] border-white/5 text-slate-400 hover:bg-[#1f2125]">
+                                <i data-lucide="qr-code" class="w-6 h-6 text-slate-500"></i>
+                                <span class="text-xs font-bold uppercase">Transferencia / MP</span>
+                            </button>
+                        </div>
+                        <div id="transfer-data" class="hidden mt-4 p-4 bg-[#0f1113] rounded-xl border border-orange-500/30 animate-fade-in">
+                            <div class="flex items-center gap-2 mb-3 text-orange-400">
+                                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                <p class="text-xs font-bold uppercase">Asegurá tu pedido pagando ahora</p>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="bg-[#18181b] p-3 rounded-lg border border-white/5">
+                                    <div class="mb-2 border-b border-white/5 pb-2">
+                                        <p class="text-[10px] text-slate-500 font-bold uppercase">Alias</p>
+                                        <p class="text-sm font-mono text-white tracking-wide select-all">deliciasurbanas13</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] text-slate-500 font-bold uppercase">Titular</p>
+                                        <p class="text-xs font-medium text-white">Nahida Esther Leonor Zamar</p>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-400 text-center italic">Envia el comprobante junto al pedido por WhatsApp</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Limit Warning -->
+                        <div id="limit-warning" class="hidden mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-3">
+                            <i data-lucide="info" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
+                            <p class="text-xs text-amber-200 font-medium">Por seguridad, los pedidos superiores a <span class="font-bold text-white">$15.000</span> solo se aceptan con transferencia previa.</p>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-bold text-slate-300 mb-1.5 ml-1">Notas (Opcional)</label>
                         <textarea id="cust-notes" class="w-full bg-[#0f1113] text-white border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500/30 min-h-[80px] resize-none font-medium text-sm placeholder-slate-600" placeholder="¿Alguna aclaración?"></textarea>
+                    </div>
+                    
+                    <!-- Cancellation Warning -->
+                    <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                        <p class="text-[10px] text-red-200 font-medium leading-relaxed">
+                            <strong class="text-red-400 uppercase">⚠️ Importante:</strong> Una vez confirmado, el pedido se comienza a elaborar. Si necesitás cancelar, hacelo inmediatamente por WhatsApp para evitar desperdicio de comida.
+                        </p>
                     </div>
                 </div>
 
@@ -499,6 +555,7 @@
                     <div>
                         <h2 class="text-3xl font-extrabold text-white mb-2 tracking-tighter italic uppercase font-heading">CASI LISTO...</h2>
                         <p class="text-slate-400 font-medium">Hacé clic abajo para enviar el pedido por WhatsApp.</p>
+                        <p id="success-payment-msg" class="text-xs text-orange-400 font-bold mt-2 hidden">No olvides adjuntar el comprobante</p>
                     </div>
                     <button id="btn-send-whatsapp" class="w-full bg-green-600 text-white font-black py-5 rounded-2xl transition-all duration-300 hover:scale-105 shadow-xl shadow-green-600/30 flex items-center justify-center gap-3 animate-pulse">
                         <i data-lucide="message-circle" class="w-7 h-7"></i> ENVIAR POR WHATSAPP
@@ -993,9 +1050,7 @@
                             ${recommendations.map(rec => `
                                 <div class="flex items-center justify-between p-3 rounded-2xl bg-[#0f1113] border border-white/5 hover:border-orange-500/30 transition-all group">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-lg overflow-hidden bg-white/5">
-                                            <img src="${rec.image}" alt="${rec.name}" class="w-full h-full object-cover">
-                                        </div>
+                                        <!-- Imagen removida por solicitud -->
                                         <div class="flex flex-col">
                                             <span class="text-xs font-bold text-white leading-tight group-hover:text-orange-500 transition-colors">${rec.name}</span>
                                             <span class="text-[10px] text-slate-500 font-bold">$${rec.price.toLocaleString('es-AR')}</span>
@@ -1055,16 +1110,34 @@
             document.getElementById('cust-time').value = "";
             document.getElementById('time-error').classList.add('hidden');
             
-            // Reset
+            // Lógica de Límite de Pago
+            const isHighValue = totalMoney > TRANSFER_LIMIT;
+            const limitWarning = document.getElementById('limit-warning');
+            
+            if (isHighValue) {
+                selectedPaymentMethod = 'Transferencia';
+                limitWarning.classList.remove('hidden');
+            } else {
+                selectedPaymentMethod = 'Efectivo';
+                limitWarning.classList.add('hidden');
+            }
+            
+            updatePaymentUI();
+            
             document.getElementById('checkout-form').classList.remove('hidden');
             document.getElementById('checkout-success').classList.remove('flex');
             document.getElementById('checkout-success').classList.add('hidden');
+            
+            // LOCK SCROLL
+            document.body.style.overflow = 'hidden';
             
             modal.classList.add('modal-open');
         }
 
         function closeCheckout() {
             document.getElementById('checkout-modal').classList.remove('modal-open');
+            // UNLOCK SCROLL
+            document.body.style.overflow = '';
         }
 
         function validateTime(input) {
@@ -1103,6 +1176,54 @@
             return true;
         }
 
+        // Payment Selection Logic (Vanilla)
+        function selectPayment(method) {
+            const totalMoney = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            // Evitar seleccionar efectivo si supera el límite
+            if (method === 'Efectivo' && totalMoney > TRANSFER_LIMIT) return;
+            
+            selectedPaymentMethod = method;
+            updatePaymentUI();
+        }
+
+        function updatePaymentUI() {
+            const totalMoney = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            const isHighValue = totalMoney > TRANSFER_LIMIT;
+
+            const btnCash = document.getElementById('btn-pay-efectivo');
+            const btnTransfer = document.getElementById('btn-pay-transfer');
+            const transferData = document.getElementById('transfer-data');
+            
+            // Re-inject HTML to restore <i> tags for Lucide
+            
+            // Configurar botón Efectivo (Deshabilitado si supera limite)
+            if (isHighValue) {
+                btnCash.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-[#0f1113] border-white/5 text-slate-600 opacity-50 cursor-not-allowed";
+                btnCash.innerHTML = `<i data-lucide="banknote" class="w-6 h-6 text-slate-600"></i><span class="text-xs font-bold uppercase">Efectivo al Retirar</span>`;
+                // Forzar transferencia si estaba en efectivo
+                if(selectedPaymentMethod === 'Efectivo') selectedPaymentMethod = 'Transferencia';
+            } else if (selectedPaymentMethod === 'Efectivo') {
+                btnCash.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-orange-500/10 border-orange-500 text-white";
+                btnCash.innerHTML = `<i data-lucide="banknote" class="w-6 h-6 text-orange-500"></i><span class="text-xs font-bold uppercase">Efectivo al Retirar</span>`;
+            } else {
+                btnCash.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-[#0f1113] border-white/5 text-slate-400 hover:bg-[#1f2125]";
+                btnCash.innerHTML = `<i data-lucide="banknote" class="w-6 h-6 text-slate-500"></i><span class="text-xs font-bold uppercase">Efectivo al Retirar</span>`;
+            }
+
+            // Configurar botón Transferencia
+            if (selectedPaymentMethod === 'Transferencia') {
+                btnTransfer.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-orange-500/10 border-orange-500 text-white";
+                btnTransfer.innerHTML = `<i data-lucide="qr-code" class="w-6 h-6 text-orange-500"></i><span class="text-xs font-bold uppercase">Transferencia / MP</span>`;
+                transferData.classList.remove('hidden');
+            } else {
+                btnTransfer.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-[#0f1113] border-white/5 text-slate-400 hover:bg-[#1f2125]";
+                btnTransfer.innerHTML = `<i data-lucide="qr-code" class="w-6 h-6 text-slate-500"></i><span class="text-xs font-bold uppercase">Transferencia / MP</span>`;
+                transferData.classList.add('hidden');
+            }
+            
+            lucide.createIcons();
+        }
+
         function handleCheckoutSubmit(e) {
             e.preventDefault();
             const timeInput = document.getElementById('cust-time');
@@ -1120,7 +1241,8 @@
                     name: document.getElementById('cust-name').value,
                     phone: document.getElementById('cust-phone').value,
                     time: timeInput.value,
-                    notes: document.getElementById('cust-notes').value
+                    notes: document.getElementById('cust-notes').value,
+                    paymentMethod: selectedPaymentMethod
                 };
 
                 // Guardar local
@@ -1144,7 +1266,11 @@
                     return text;
                 }).join('%0A');
                 
-                const msg = `¡Hola Delicias Urbanas! 👋%0A%0A*NUEVO PEDIDO*%0A------------------%0A👤 ${tempOrderDetails.name}%0A📞 ${tempOrderDetails.phone}%0A🕒 Retiro: ${tempOrderDetails.time} hs%0A------------------%0A${itemsText}%0A------------------%0A💰 TOTAL: $${totalMoney.toLocaleString('es-AR')}` + (tempOrderDetails.notes ? `%0A📝 ${tempOrderDetails.notes}` : '');
+                const paymentText = tempOrderDetails.paymentMethod === 'Transferencia' 
+                    ? `💳 *Pago:* Transferencia/MP (Adjunto comprobante)` 
+                    : `💵 *Pago:* Efectivo en el local`;
+
+                const msg = `¡Hola Delicias Urbanas! 👋%0A%0A*NUEVO PEDIDO*%0A------------------%0A👤 ${tempOrderDetails.name}%0A📞 ${tempOrderDetails.phone}%0A🕒 Retiro: ${tempOrderDetails.time} hs%0A------------------%0A${itemsText}%0A------------------%0A💰 TOTAL: $${totalMoney.toLocaleString('es-AR')}%0A${paymentText}` + (tempOrderDetails.notes ? `%0A📝 ${tempOrderDetails.notes}` : '');
                 
                 const waBtn = document.getElementById('btn-send-whatsapp');
                 waBtn.onclick = () => {
@@ -1152,6 +1278,14 @@
                     cart = []; // Limpiar carrito al enviar
                     renderCart();
                 };
+
+                // Mostrar recordatorio de comprobante
+                const successMsg = document.getElementById('success-payment-msg');
+                if (tempOrderDetails.paymentMethod === 'Transferencia') {
+                    successMsg.classList.remove('hidden');
+                } else {
+                    successMsg.classList.add('hidden');
+                }
 
                 // Resumen de éxito
                 const summaryList = document.getElementById('success-summary');

@@ -138,14 +138,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       <div className="space-y-3">
                         {recommendations.map(rec => (
                           <div key={rec.id} className="flex items-center justify-between p-3 rounded-2xl bg-[#0f1113] border border-white/5 hover:border-orange-500/30 transition-all group">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5">
-                                <img src={rec.image} alt={rec.name} className="w-full h-full object-cover" />
-                              </div>
-                              <div className="flex flex-col">
+                            <div className="flex flex-col">
                                 <span className="text-xs font-bold text-white leading-tight group-hover:text-orange-500 transition-colors">{rec.name}</span>
                                 <span className="text-[10px] text-slate-500 font-bold">${rec.price.toLocaleString('es-AR')}</span>
-                              </div>
                             </div>
                             <button 
                               onClick={() => onAddItem(rec)}
