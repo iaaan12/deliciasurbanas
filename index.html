@@ -57,6 +57,11 @@
 </head>
 <body class="bg-[#0f1113] text-slate-200 overflow-x-hidden relative">
 
+    <!-- TOP BANNER (ANNOUNCEMENT) -->
+    <a href="https://wa.me/5493875020884" target="_blank" class="block w-full bg-[#1c4532] hover:bg-[#255b42] text-white text-[10px] sm:text-xs font-bold text-center py-2.5 px-4 transition-colors tracking-wide uppercase border-b border-[#2a6b4d] relative z-[60]">
+        Para pedidos más grandes o tortas saladas, comunicarse directamente al WhatsApp
+    </a>
+
     <!-- DATA STORE -->
     <script>
         const SHOP_INFO = {
@@ -205,9 +210,13 @@
 
                 <!-- Botones Header -->
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleOrders(true)" class="p-3 text-slate-400 hover:text-orange-500 transition-all duration-300 ease-out group flex flex-col items-center hover:bg-white/5 rounded-2xl active:scale-95 hover:scale-105" title="Mis Pedidos">
+                    <button onclick="toggleOrders(true)" class="relative p-3 text-slate-400 hover:text-orange-500 transition-all duration-300 ease-out group flex flex-col items-center hover:bg-white/5 rounded-2xl active:scale-95 hover:scale-105" title="Mis Pedidos">
                         <i data-lucide="clipboard-list" class="w-6 h-6"></i>
                         <span class="text-[10px] font-black uppercase hidden sm:block mt-1">Mis Pedidos</span>
+                        <span id="orders-badge" class="hidden absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-[10px] font-black leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full shadow-lg border-2 border-white/20 animate-in zoom-in">
+                            0
+                            <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
+                        </span>
                     </button>
                     
                     <button onclick="toggleCart(true)" class="relative p-3 text-slate-400 hover:text-orange-500 transition-all duration-300 ease-out group flex flex-col items-center hover:bg-white/5 rounded-2xl active:scale-95 hover:scale-105" title="Mi Carrito">
@@ -305,34 +314,6 @@
             </div>
         </div>
     </main>
-
-    <!-- STATUS & WHATSAPP SECTION -->
-    <section class="flex min-h-[60vh] items-center justify-center px-6 py-20 bg-[#0f1113] overflow-hidden border-t border-white/5">
-        <div class="relative flex flex-col items-center gap-12 max-w-4xl w-full">
-             
-             <!-- Indicador de Estado -->
-             <div class="flex items-center gap-3 transition-all duration-500 bg-[#18181b] px-4 py-2 rounded-full border border-white/5 shadow-sm" id="status-badge">
-                <span class="relative flex size-2">
-                    <span id="status-dot-ping" class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 bg-slate-400"></span>
-                    <span id="status-dot" class="relative inline-flex size-2 rounded-full transition-colors duration-500 bg-slate-500"></span>
-                </span>
-                <span id="status-text" class="text-xs sm:text-sm font-black tracking-widest uppercase text-slate-400 tabular-nums">Cargando...</span>
-            </div>
-
-            <!-- Botón Grande -->
-            <div class="group relative cursor-pointer" onclick="openWhatsApp()">
-                <div class="flex flex-col items-center gap-6">
-                    <h2 class="relative text-center text-5xl font-black tracking-tighter text-white sm:text-6xl md:text-7xl lg:text-8xl uppercase italic font-heading hover:scale-105 transition-transform duration-500">
-                        <span class="block">¿Hacemos</span>
-                        <span class="block text-orange-500">un pedido?</span>
-                    </h2>
-                    <div class="relative mt-4 flex size-16 items-center justify-center sm:size-20 bg-orange-500 rounded-full text-white shadow-xl hover:bg-white hover:text-black transition-colors duration-300">
-                        <i data-lucide="arrow-up-right" class="size-8"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- FOOTER -->
     <footer class="bg-[#0f1113] text-slate-500 py-20 border-t border-white/5">
@@ -561,9 +542,7 @@
             renderMenu();
             renderCart();
             renderOrders();
-            checkShopStatus();
             lucide.createIcons();
-            setInterval(checkShopStatus, 1000);
         });
 
         function initUI() {
@@ -665,7 +644,7 @@
                 let itemsHtml = items.map(item => {
                     const isPromo = item.id.startsWith('p'); 
                     const hasCustomization = !!item.customization;
-                    const buttonAction = hasCustomization ? `openFlavorModal('${item.id}')` : `addToCart('${item.id}')`;
+                    const buttonAction = hasCustomization ? `openFlavorModal('${item.id}')` : `addToCart('${item.id}', this)`;
                     const buttonIcon = hasCustomization ? `<i data-lucide="list-plus" class="w-5 h-5 absolute transition-all duration-300 group-hover/btn:scale-110"></i>` : `
                         <i data-lucide="plus" class="w-5 h-5 transition-all duration-300 group-hover/btn:rotate-90 group-hover/btn:scale-0 opacity-100 group-hover/btn:opacity-0 absolute"></i>
                         <i data-lucide="arrow-right" class="w-5 h-5 transition-all duration-300 -rotate-90 scale-0 opacity-0 group-hover/btn:rotate-0 group-hover/btn:scale-100 group-hover/btn:opacity-100 absolute"></i>
@@ -864,21 +843,31 @@
         function confirmFlavors() {
             if (!currentCustomProduct) return;
             
-            const flavorTextParts = [];
-            Object.entries(flavorSelections).forEach(([groupTitle, opts]) => {
-                const activeOpts = Object.entries(opts).filter(([_, qty]) => qty > 0);
-                if (activeOpts.length > 0) {
-                    const groupDesc = activeOpts.map(([name, qty]) => `${qty}x ${name}`).join(', ');
-                    flavorTextParts.push(groupDesc);
-                }
-            });
+            // Visual feedback
+            const btn = document.getElementById('flavor-confirm-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check" class="w-5 h-5"></i> ¡Agregado!`;
+            btn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+            btn.classList.add('bg-green-500', 'hover:bg-green-600');
+            lucide.createIcons();
 
-            addToCartWithCustomization(currentCustomProduct.id, flavorTextParts.join(' + '));
-            closeFlavorModal();
+            setTimeout(() => {
+                const flavorTextParts = [];
+                Object.entries(flavorSelections).forEach(([groupTitle, opts]) => {
+                    const activeOpts = Object.entries(opts).filter(([_, qty]) => qty > 0);
+                    if (activeOpts.length > 0) {
+                        const groupDesc = activeOpts.map(([name, qty]) => `${qty}x ${name}`).join(', ');
+                        flavorTextParts.push(groupDesc);
+                    }
+                });
+
+                addToCartWithCustomization(currentCustomProduct.id, flavorTextParts.join(' + '));
+                closeFlavorModal();
+            }, 500);
         }
 
         // --- LÓGICA DEL CARRITO ---
-        function addToCart(id) {
+        function addToCart(id, btn) {
             const product = MENU_ITEMS.find(p => p.id === id);
             const existing = cart.find(i => i.id === id && !i.selectedFlavors); // Solo si no es custom
             
@@ -888,6 +877,26 @@
                 cart.push({ ...product, quantity: 1 });
             }
             renderCart();
+
+            // Visual feedback
+            if(btn) {
+                const originalHTML = btn.innerHTML;
+                const originalClass = btn.className;
+                
+                // Remove existing content temporarily
+                btn.innerHTML = `<i data-lucide="check" class="w-6 h-6 text-white animate-in zoom-in duration-300"></i>`;
+                
+                // Change style to green circle
+                btn.className = "group/btn relative overflow-hidden w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-green-500 scale-110 shadow-green-500/30";
+                
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.className = originalClass;
+                    lucide.createIcons();
+                }, 1500);
+            }
         }
 
         function addToCartWithCustomization(id, flavorText) {
@@ -992,7 +1001,7 @@
                                             <span class="text-[10px] text-slate-500 font-bold">$${rec.price.toLocaleString('es-AR')}</span>
                                         </div>
                                     </div>
-                                    <button onclick="addToCart('${rec.id}')" class="p-2 bg-[#18181b] text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all border border-white/5">
+                                    <button onclick="addToCart('${rec.id}', this)" class="p-2 bg-[#18181b] text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition-all border border-white/5">
                                         <i data-lucide="plus" class="w-4 h-4"></i>
                                     </button>
                                 </div>
@@ -1167,6 +1176,15 @@
 
         // --- PEDIDOS ---
         function renderOrders() {
+            // Actualizar Badge
+            const activeCount = orders.filter(o => o.status === 'Pendiente').length;
+            const badge = document.getElementById('orders-badge');
+            if (badge) {
+                badge.childNodes[0].nodeValue = activeCount; // Text node
+                if(activeCount > 0) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            }
+
             const container = document.getElementById('orders-list');
             if (orders.length === 0) {
                 container.innerHTML = `<p class="text-center text-slate-500">No hay pedidos recientes.</p>`;
@@ -1264,31 +1282,22 @@
         function notifyCancelWhatsApp(id) {
             const order = orders.find(o => o.id === id);
             if(order) {
-                const msg = `⚠️ *CANCELACIÓN*%0AOrden #${id.slice(-6)}%0ADisculpen las molestias.`;
-                window.open(`https://wa.me/${SHOP_INFO.phone}?text=${msg}`, '_blank');
-            }
-        }
+                const itemsText = order.items.map(i => {
+                    let text = `• ${i.quantity}x ${i.name}`;
+                    if(i.selectedFlavors) text += ` (${i.selectedFlavors})`;
+                    return text;
+                }).join('\n'); // Usar \n
 
-        // --- ESTADO Y APERTURA ---
-        function checkShopStatus() {
-            const now = new Date();
-            const day = now.getDay();
-            const mins = now.getHours() * 60 + now.getMinutes();
-            // 8:00=480, 15:00=900, 17:30=1050, 21:00=1260
-            const isOpen = (day !== 0) && ((mins >= 480 && mins < 900) || (mins >= 1050 && mins < 1260));
-            
-            const dot = document.getElementById('status-dot');
-            const ping = document.getElementById('status-dot-ping');
-            const text = document.getElementById('status-text');
-
-            if (isOpen) {
-                dot.className = "relative inline-flex size-2 rounded-full bg-emerald-500";
-                ping.className = "absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 bg-emerald-400";
-                text.innerText = "¡ABIERTO AHORA!";
-            } else {
-                dot.className = "relative inline-flex size-2 rounded-full bg-red-500";
-                ping.className = "hidden";
-                text.innerText = "CERRADO";
+                const msg = `⚠️ *CANCELACIÓN DE PEDIDO*\n` +
+                            `----------------------------------\n` +
+                            `🆔 Orden: #${id.slice(-6)}\n` +
+                            `👤 Cliente: ${order.details.name}\n` +
+                            `🕒 Era para las: ${order.details.time || order.details.pickupTime} hs\n` +
+                            `----------------------------------\n` +
+                            `*ÍTEMS A CANCELAR:*\n${itemsText}\n` +
+                            `----------------------------------\n` +
+                            `Disculpen las molestias.`;
+                window.open(`https://wa.me/${SHOP_INFO.phone}?text=${encodeURIComponent(msg)}`, '_blank');
             }
         }
         

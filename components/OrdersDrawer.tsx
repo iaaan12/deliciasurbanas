@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { X, ClipboardList, Clock, AlertTriangle, PhoneCall, Check, RotateCcw, MessageCircle, Loader2 } from 'lucide-react';
 import { Order } from '../types';
@@ -26,16 +27,28 @@ export const OrdersDrawer: React.FC<OrdersDrawerProps> = ({
 
   const handleWhatsAppCancel = (order: Order) => {
     const shopPhone = "5493875020884";
-    const message = `⚠️ *CANCELACIÓN DE PEDIDO*%0A` +
-      `----------------------------------%0A` +
-      `Hola Delicias Urbanas, quiero *CANCELAR* mi pedido:%0A` +
-      `🆔 *Orden:* #${order.id.slice(-6)}%0A` +
-      `👤 *Cliente:* ${order.details.customerName}%0A` +
-      `🕒 *Era para las:* ${order.details.pickupTime} hs%0A` +
-      `----------------------------------%0A` +
+    
+    // Generar lista de ítems para el mensaje
+    const itemsText = order.items.map(i => {
+        let text = `• ${i.quantity}x ${i.name}`;
+        if(i.selectedFlavors) text += ` (${i.selectedFlavors})`;
+        return text;
+    }).join('\n'); // Usamos \n real para codificarlo después
+
+    // Construimos el mensaje con saltos de línea normales
+    const message = `⚠️ *CANCELACIÓN DE PEDIDO*\n` +
+      `----------------------------------\n` +
+      `Hola Delicias Urbanas, quiero *CANCELAR* mi pedido:\n` +
+      `🆔 *Orden:* #${order.id.slice(-6)}\n` +
+      `👤 *Cliente:* ${order.details.customerName}\n` +
+      `🕒 *Era para las:* ${order.details.pickupTime} hs\n` +
+      `----------------------------------\n` +
+      `*ÍTEMS A CANCELAR:*\n${itemsText}\n` +
+      `----------------------------------\n` +
       `Disculpen las molestias.`;
 
-    window.open(`https://wa.me/${shopPhone}?text=${message}`, '_blank');
+    // Usamos encodeURIComponent para asegurar que todo el texto viaje en la URL
+    window.open(`https://wa.me/${shopPhone}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const confirmCancel = async (order: Order) => {
@@ -47,7 +60,7 @@ export const OrdersDrawer: React.FC<OrdersDrawerProps> = ({
     setConfirmingId(null);
     setIsCancelling(false);
     
-    // Intentar abrir WhatsApp (puede ser bloqueado por popups si es async, pero lo intentamos)
+    // Intentar abrir WhatsApp
     handleWhatsAppCancel(order);
   };
 

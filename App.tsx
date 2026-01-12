@@ -5,11 +5,10 @@ import { ProductCard } from './components/ProductCard';
 import { CartDrawer } from './components/CartDrawer';
 import { OrdersDrawer } from './components/OrdersDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
-import { FlavorModal } from './components/FlavorModal'; // Nueva importación
+import { FlavorModal } from './components/FlavorModal';
 import { MENU_ITEMS } from './constants';
 import { Product, CartItem, Category, Order, OrderDetails } from './types';
-import { Search, Flame, Sandwich, IceCream, Pizza, Instagram, MapPin, Phone, MessageCircle, Clock, ShoppingCart } from 'lucide-react';
-import { LetsWorkTogether } from './components/ui/lets-work-section';
+import { Search, Flame, Sandwich, IceCream, Pizza, Instagram, MapPin, Phone, Clock, ShoppingCart } from 'lucide-react';
 
 const App: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -17,13 +16,11 @@ const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  // Nuevo estado para personalización
   const [customizingProduct, setCustomizingProduct] = useState<Product | null>(null);
   
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // URL optimizada
   const logoUrl = "https://i.imgur.com/RUVPwCt.png";
 
   useEffect(() => {
@@ -41,10 +38,12 @@ const App: React.FC = () => {
     localStorage.setItem('delicias_urbanas_orders', JSON.stringify(orders));
   }, [orders]);
 
+  const activeOrdersCount = useMemo(() => {
+    return orders.filter(o => o.status === 'Pendiente' || o.status === 'Preparando').length;
+  }, [orders]);
+
   const addToCart = (product: Product, selectedFlavors?: string) => {
     setCart(prev => {
-      // Si tiene sabores personalizados, se trata como item único si los sabores difieren
-      // Para simplificar, si tiene selectedFlavors, lo agregamos como nuevo item o buscamos coincidencia exacta
       if (selectedFlavors) {
           const existing = prev.find(item => item.id === product.id && item.selectedFlavors === selectedFlavors);
           if (existing) {
@@ -53,7 +52,6 @@ const App: React.FC = () => {
           return [...prev, { ...product, quantity: 1, selectedFlavors }];
       }
 
-      // Comportamiento normal
       const existing = prev.find(item => item.id === product.id && !item.selectedFlavors);
       if (existing) {
         return prev.map(item =>
@@ -64,28 +62,6 @@ const App: React.FC = () => {
     });
   };
 
-  const updateQuantity = (id: string, delta: number) => {
-    setCart(prev => {
-        return prev.map(item => {
-            if (item.id === id) { 
-                const newQty = Math.max(0, item.quantity + delta);
-                return { ...item, quantity: newQty };
-            }
-            return item;
-        }).filter(item => item.quantity > 0);
-    });
-  };
-  
-  const addToCartWithCustomization = (product: Product, selectedFlavors: string) => {
-      const customItem = {
-          ...product,
-          id: `${product.id}-${Date.now()}`, // ID único para el carrito
-          quantity: 1,
-          selectedFlavors
-      };
-      setCart(prev => [...prev, customItem]);
-  };
-  
   const updateQuantitySafe = (id: string, delta: number) => {
       setCart(prev => prev.map(item => {
           if (item.id === id) {
@@ -93,6 +69,16 @@ const App: React.FC = () => {
           }
           return item;
       }).filter(item => item.quantity > 0));
+  };
+  
+  const addToCartWithCustomization = (product: Product, selectedFlavors: string) => {
+      const customItem = {
+          ...product,
+          id: `${product.id}-${Date.now()}`,
+          quantity: 1,
+          selectedFlavors
+      };
+      setCart(prev => [...prev, customItem]);
   };
   
   const removeFromCart = (id: string) => {
@@ -133,7 +119,6 @@ const App: React.FC = () => {
     });
   }, [selectedCategory, searchQuery]);
 
-  // Group items by category for display
   const groupedItems = useMemo(() => {
     const groups: Record<string, Product[]> = {};
     filteredItems.forEach(item => {
@@ -145,7 +130,6 @@ const App: React.FC = () => {
     return groups;
   }, [filteredItems]);
 
-  // Define display order
   const displayCategories: Category[] = ['Pollo', 'Sándwiches', 'Guarniciones', 'Bebidas'];
 
   const categories: { name: Category | 'Todos'; icon: any }[] = [
@@ -161,8 +145,19 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-20 bg-[#0f1113] overflow-x-hidden relative">
+      {/* Top Banner */}
+      <a 
+        href="https://wa.me/5493875020884" 
+        target="_blank" 
+        rel="noreferrer"
+        className="block w-full bg-[#1c4532] hover:bg-[#255b42] text-white text-[10px] sm:text-xs font-bold text-center py-2.5 px-4 transition-colors tracking-wide uppercase border-b border-[#2a6b4d]"
+      >
+        Para pedidos más grandes o tortas saladas, comunicarse directamente al WhatsApp
+      </a>
+
       <Header 
-        cartCount={totalItems} 
+        cartCount={totalItems}
+        ordersCount={activeOrdersCount}
         onCartClick={() => setIsCartOpen(true)}
         onOrdersClick={() => setIsOrdersOpen(true)}
         logoUrl={logoUrl}
@@ -261,9 +256,7 @@ const App: React.FC = () => {
           ) : (
             <div className="space-y-16">
               {displayCategories.map(cat => {
-                // If specific category is selected, only show that one. If 'Todos', show all in order.
                 if (selectedCategory !== 'Todos' && selectedCategory !== cat) return null;
-                
                 const items = groupedItems[cat];
                 if (!items || items.length === 0) return null;
 
@@ -292,8 +285,6 @@ const App: React.FC = () => {
           )}
         </div>
       </main>
-
-      <LetsWorkTogether />
 
       <CartDrawer
         isOpen={isCartOpen}
@@ -326,7 +317,6 @@ const App: React.FC = () => {
         onConfirm={addToCartWithCustomization}
       />
 
-      {/* Floating Cart Button */}
       {totalItems > 0 && (
         <div className="fixed bottom-6 left-6 z-[90] animate-in slide-in-from-bottom-4 fade-in duration-500">
           <button

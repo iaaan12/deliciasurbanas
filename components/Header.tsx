@@ -1,14 +1,16 @@
+
 import React from 'react';
 import { ShoppingCart, ClipboardList } from 'lucide-react';
 
 interface HeaderProps {
   cartCount: number;
+  ordersCount: number; // Added orders count prop
   onCartClick: () => void;
   onOrdersClick: () => void;
   logoUrl: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ cartCount, onCartClick, onOrdersClick, logoUrl }) => {
+export const Header: React.FC<HeaderProps> = ({ cartCount, ordersCount, onCartClick, onOrdersClick, logoUrl }) => {
   return (
     <header className="sticky top-0 z-50 bg-[#0f1113]/80 backdrop-blur-md border-b border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,11 +40,17 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onCartClick, onOrders
           <div className="flex items-center gap-3">
             <button
               onClick={onOrdersClick}
-              className="p-3 text-slate-400 hover:text-orange-500 transition-all duration-300 ease-out group flex flex-col items-center hover:bg-white/5 rounded-2xl active:scale-95 hover:scale-105"
+              className="relative p-3 text-slate-400 hover:text-orange-500 transition-all duration-300 ease-out group flex flex-col items-center hover:bg-white/5 rounded-2xl active:scale-95 hover:scale-105"
               title="Mis Pedidos"
             >
               <ClipboardList className="w-6 h-6" />
               <span className="text-[10px] font-black uppercase hidden sm:block mt-1">Mis Pedidos</span>
+              {ordersCount > 0 && (
+                <span className="absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-[10px] font-black leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full shadow-lg border-2 border-white/20 animate-in zoom-in">
+                  {ordersCount}
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
+                </span>
+              )}
             </button>
             
             <button

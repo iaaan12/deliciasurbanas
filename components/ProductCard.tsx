@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Plus, ArrowRight, Sparkles, Flame, ListPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, ArrowRight, Sparkles, Flame, ListPlus, Check } from 'lucide-react';
 import { Product } from '../types';
 
 interface ProductCardProps {
@@ -10,7 +10,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onCustomize }) => {
-  // Identificamos la promo (p2) o cualquier item que empiece con PROMO (pero no docenas 'd')
+  const [isAdded, setIsAdded] = useState(false);
   const isPromo = product.id.startsWith('p');
   const hasCustomization = !!product.customization;
 
@@ -19,6 +19,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
       onCustomize(product);
     } else {
       onAddToCart(product);
+      // Trigger temporary success state
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 1500);
     }
   };
 
@@ -80,12 +83,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
         <button
           onClick={handleClick}
           className={`group/btn relative overflow-hidden w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-lg active:scale-95
-            ${isPromo 
-              ? 'bg-orange-500 text-white hover:bg-white hover:text-orange-600 shadow-orange-500/20' 
-              : 'bg-white hover:bg-orange-500 text-black hover:text-white shadow-black/20 hover:shadow-orange-500/30'
+            ${isAdded 
+                ? 'bg-green-500 text-white scale-110 shadow-green-500/30'
+                : isPromo 
+                    ? 'bg-orange-500 text-white hover:bg-white hover:text-orange-600 shadow-orange-500/20' 
+                    : 'bg-white hover:bg-orange-500 text-black hover:text-white shadow-black/20 hover:shadow-orange-500/30'
             }`}
         >
-          {hasCustomization ? (
+          {isAdded ? (
+             <Check className="w-6 h-6 animate-in zoom-in duration-300" />
+          ) : hasCustomization ? (
              <ListPlus className="w-5 h-5 absolute transition-all duration-300 group-hover/btn:scale-110" />
           ) : (
             <>
