@@ -1,0 +1,322 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { Header } from './components/Header';
+import { ProductCard } from './components/ProductCard';
+import { CartDrawer } from './components/CartDrawer';
+import { OrdersDrawer } from './components/OrdersDrawer';
+import { CheckoutModal } from './components/CheckoutModal';
+import { GeminiAssistant } from './components/GeminiAssistant';
+import { MENU_ITEMS } from './constants';
+import { Product, CartItem, Category, Order, OrderDetails } from './types';
+import { Search, Flame, Sandwich, IceCream, Pizza, Instagram, MapPin, Phone, MessageCircle, Clock, ShoppingCart } from 'lucide-react';
+import { LetsWorkTogether } from './components/ui/lets-work-section';
+
+const App: React.FC = () => {
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isOrdersOpen, setIsOrdersOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // URL optimizada para Google Drive (Requiere que el archivo sea Público)
+  const logoUrl = "https://lh3.googleusercontent.com/d/1hRktdsvA2ed5jfrkQRQ3xbbotozlgTBl";
+
+  useEffect(() => {
+    const savedOrders = localStorage.getItem('delicias_urbanas_orders');
+    if (savedOrders) {
+      try {
+        setOrders(JSON.parse(savedOrders));
+      } catch (e) {
+        console.error("Failed to load orders", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('delicias_urbanas_orders', JSON.stringify(orders));
+  }, [orders]);
+
+  const addToCart = (product: Product) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        return prev.map(item =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+  };
+
+  const updateQuantity = (id: string, delta: number) => {
+    setCart(prev =>
+      prev.map(item => {
+        if (item.id === id) {
+          const newQty = Math.max(0, item.quantity + delta);
+          return { ...item, quantity: newQty };
+        }
+        return item;
+      }).filter(item => item.quantity > 0)
+    );
+  };
+
+  const removeFromCart = (id: string) => {
+    setCart(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleCreateOrder = (details: OrderDetails) => {
+    const total = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
+    const newOrder: Order = {
+      id: Math.random().toString(36).substr(2, 9).toUpperCase(),
+      details,
+      items: [...cart],
+      total,
+      timestamp: Date.now(),
+      status: 'Pendiente'
+    };
+    
+    setOrders(prev => [newOrder, ...prev]);
+    setCart([]);
+  };
+
+  const handleCancelOrder = (orderId: string) => {
+    setOrders(prev => {
+      const updated = prev.map(order => 
+        order.id === orderId ? { ...order, status: 'Cancelado' as const } : order
+      );
+      localStorage.setItem('delicias_urbanas_orders', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const filteredItems = useMemo(() => {
+    return MENU_ITEMS.filter(item => {
+      const matchesCategory = selectedCategory === 'Todos' || item.category === selectedCategory;
+      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [selectedCategory, searchQuery]);
+
+  const categories: { name: Category | 'Todos'; icon: any }[] = [
+    { name: 'Todos', icon: Pizza },
+    { name: 'Pollo', icon: Flame },
+    { name: 'Sándwiches', icon: Sandwich },
+    { name: 'Guarniciones', icon: IceCream },
+    { name: 'Bebidas', icon: IceCream },
+  ];
+
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const currentTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  return (
+    <div className="min-h-screen pb-20 bg-slate-50 overflow-x-hidden relative">
+      <Header 
+        cartCount={totalItems} 
+        onCartClick={() => setIsCartOpen(true)}
+        onOrdersClick={() => setIsOrdersOpen(true)}
+        logoUrl={logoUrl}
+      />
+
+      <section className="bg-[#0f1113] text-white py-16 sm:py-24 overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-orange-600/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="flex flex-col md:flex-row items-center gap-10">
+            <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-orange-500 p-1 flex-shrink-0 bg-white overflow-hidden shadow-[0_0_50px_rgba(249,115,22,0.4)] transition-transform duration-700 hover:rotate-3 hover:scale-105">
+              <img 
+                src={logoUrl} 
+                alt="Logo Delicias Urbanas" 
+                className="w-full h-full object-contain p-2"
+                referrerPolicy="no-referrer"
+                onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400'; }}
+              />
+            </div>
+            <div className="text-center md:text-left">
+              <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tighter italic uppercase animate-in slide-in-from-left-4 duration-500">
+                  DELICIAS <span className="text-orange-500">URBANAS</span>
+                </h2>
+                <div className="flex gap-2">
+                  <span className="bg-slate-800 text-xs font-bold px-3 py-1 rounded-full text-slate-300">Restaurante</span>
+                  <span className="bg-orange-500 text-xs font-bold px-3 py-1 rounded-full text-white">Salta</span>
+                </div>
+              </div>
+              <p className="text-slate-400 text-lg sm:text-xl font-medium mb-6 max-w-xl leading-relaxed">
+                Somos Delicias Urbanas, un lugar en donde vas a encontrar una variedad de comidas y bebidas riquísimas. 🍗🥪🥗🥤
+              </p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-4">
+                 <div className="flex items-center gap-2 text-slate-300 bg-white/5 px-4 py-2 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 cursor-default hover:scale-105">
+                    <MapPin className="w-4 h-4 text-orange-500" />
+                    <span className="text-sm font-bold">Av. San Martín 532, Salta</span>
+                 </div>
+                 <a href="https://instagram.com/delicias.urbanas" target="_blank" className="flex items-center gap-2 text-slate-300 hover:text-white transition-all duration-300 bg-white/5 hover:bg-white/10 hover:scale-105 active:scale-95 px-4 py-2 rounded-xl border border-white/10">
+                    <Instagram className="w-4 h-4 text-pink-500" />
+                    <span className="text-sm font-bold">@delicias.urbanas</span>
+                 </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10">
+        <div className="bg-white rounded-[2.5rem] shadow-2xl p-4 sm:p-8 border border-slate-100">
+          <div className="flex flex-col md:flex-row gap-6 md:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="¿Qué delicia buscás hoy?"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-orange-500/10 font-medium text-lg transition-all"
+              />
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+              {categories.map((cat) => (
+                <button
+                  key={cat.name}
+                  onClick={() => setSelectedCategory(cat.name)}
+                  className={`px-6 py-3 rounded-2xl font-black transition-all duration-300 whitespace-nowrap flex items-center gap-3 text-sm active:scale-95 hover:scale-105 ${
+                    selectedCategory === cat.name
+                      ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/40'
+                      : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                  }`}
+                >
+                  <cat.icon className="w-4 h-4" />
+                  {cat.name.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="mb-10 flex items-center justify-between">
+          <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">
+            {selectedCategory === 'Todos' ? 'NUESTRO MENÚ' : selectedCategory.toUpperCase()}
+          </h2>
+        </div>
+
+        {filteredItems.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {filteredItems.map(item => (
+              <ProductCard key={item.id} product={item} onAddToCart={addToCart} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+            <p className="text-slate-400 text-lg font-bold">No encontramos esa delicia...</p>
+            <button
+              onClick={() => {setSearchQuery(''); setSelectedCategory('Todos');}}
+              className="mt-4 text-orange-600 font-extrabold hover:underline transition-all duration-300 hover:scale-105 inline-block"
+            >
+              Ver todo el menú
+            </button>
+          </div>
+        )}
+      </main>
+
+      <LetsWorkTogether />
+
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={cart}
+        onUpdateQuantity={updateQuantity}
+        onRemove={removeFromCart}
+        onCheckout={() => { setIsCartOpen(false); setIsCheckoutOpen(true); }}
+      />
+
+      <OrdersDrawer
+        isOpen={isOrdersOpen}
+        onClose={() => setIsOrdersOpen(false)}
+        orders={orders}
+        onCancelOrder={handleCancelOrder}
+      />
+
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cartItems={cart}
+        onConfirm={handleCreateOrder}
+      />
+
+      {/* Floating Cart Button */}
+      {totalItems > 0 && (
+        <div className="fixed bottom-6 left-6 z-[90] animate-in slide-in-from-bottom-4 fade-in duration-500">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="group flex items-center gap-3 bg-slate-900 text-white pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-slate-900/40 border border-slate-700 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-orange-500/20"
+          >
+            <div className="relative">
+              <div className="bg-orange-500 rounded-full p-2 text-white group-hover:bg-orange-400 transition-colors">
+                <ShoppingCart className="w-5 h-5" />
+              </div>
+              <span className="absolute -top-1 -right-1 bg-white text-orange-600 text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full border-2 border-slate-900">
+                {totalItems}
+              </span>
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Tu Pedido</span>
+              <span className="text-sm font-black text-white leading-none">${currentTotal.toLocaleString('es-AR')}</span>
+            </div>
+          </button>
+        </div>
+      )}
+
+      <GeminiAssistant />
+
+      <footer className="bg-[#0f1113] text-slate-500 py-20 mt-0 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 text-center sm:text-left">
+              <div>
+                 <div className="flex items-center gap-3 mb-6 justify-center sm:justify-start">
+                    <img src={logoUrl} className="w-10 h-10 rounded-full border border-orange-500" alt="logo" referrerPolicy="no-referrer" />
+                    <h1 className="text-white font-black italic uppercase text-xl">DELICIAS <span className="text-orange-500">URBANAS</span></h1>
+                 </div>
+                 <p className="text-sm text-slate-400">Sabores auténticos en el corazón de Salta.</p>
+              </div>
+
+              <div>
+                 <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs flex items-center gap-2 justify-center sm:justify-start">
+                    <Clock className="w-4 h-4 text-orange-500" /> Horarios
+                 </h4>
+                 <div className="space-y-2">
+                    <p className="text-sm text-slate-300 font-bold">Lunes a Sábado</p>
+                    <p className="text-sm text-slate-400">08:00 - 15:00 hs</p>
+                    <p className="text-sm text-slate-400">17:30 - 21:00 hs</p>
+                 </div>
+              </div>
+
+              <div>
+                 <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs flex items-center gap-2 justify-center sm:justify-start">
+                    <MapPin className="w-4 h-4 text-orange-500" /> Ubicación
+                 </h4>
+                 <p className="text-sm text-slate-400">Av. San Martín 532, Salta</p>
+              </div>
+
+              <div>
+                 <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs flex items-center gap-2 justify-center sm:justify-start">
+                    <Phone className="w-4 h-4 text-orange-500" /> Contacto
+                 </h4>
+                 <p className="text-sm text-slate-400 mb-2">+54 9 3875 02-0884</p>
+                 <a 
+                   href="https://instagram.com/delicias.urbanas" 
+                   target="_blank" 
+                   rel="noreferrer"
+                   className="text-sm text-orange-500 hover:text-white transition-colors flex items-center gap-2 justify-center sm:justify-start font-bold"
+                 >
+                    <Instagram className="w-4 h-4" /> Seguir en Instagram
+                 </a>
+              </div>
+           </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;

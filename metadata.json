@@ -1,0 +1,8 @@
+{
+  "name": "Delicias Urbanas - Pedidos Online",
+  "description": "Variedad de comidas y bebidas riquísimas en Salta. Realizá tu pedido online para retirar por nuestro local.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
