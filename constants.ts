@@ -1,10 +1,18 @@
 
 import { Product } from './types';
 
+const SABORES_COMUNES = ['Jamón y Queso', 'Salame y Queso'];
+const SABORES_ESPECIALES = [
+  'Ternera, Tomate y Huevo',
+  'Aceituna, Huevo y Queso',
+  'Roquefort y Jamón',
+  'Jamón Crudo y Queso'
+];
+
 export const MENU_ITEMS: Product[] = [
-  // POLLO (Fondo Claro/Blanco)
+  // --- SECCIÓN POLLO ---
   {
-    id: 'p1',
+    id: 'c1', // Cambiado de p1 a c1 para que no sea promo
     name: 'Pollo al Spiedo Entero',
     description: 'Nuestro clásico pollo asado lentamente al spiedo, tierno y sabroso.',
     price: 15000,
@@ -12,31 +20,65 @@ export const MENU_ITEMS: Product[] = [
     image: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&q=80&w=600'
   },
   {
+    id: 'p3',
+    name: 'PROMO: Pollo Entero + Arroz',
+    description: '¡Ideal familia! Pollo entero al spiedo con una guarnición de arroz incluida.',
+    price: 17000,
+    category: 'Pollo',
+    image: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&q=80&w=600'
+  },
+  {
     id: 'p2',
-    name: 'Medio Pollo al Spiedo',
-    description: 'La mitad de nuestro famoso pollo al spiedo.',
+    name: 'PROMO: Medio Pollo + Arroz',
+    description: '¡Oportunidad! Medio pollo al spiedo con una guarnición de arroz incluida.',
     price: 11000,
     category: 'Pollo',
     image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&q=80&w=600'
   },
-  // GUARNICIONES (Fondo Negro/Oscuro)
+
+  // --- SECCIÓN SÁNDWICHES (DOCENAS) ---
   {
-    id: 'g1',
-    name: 'Guarnición de Arroz',
-    description: 'Arroz blanco al dente, el acompañamiento ideal.',
-    price: 2000,
-    category: 'Guarniciones',
-    image: 'https://images.unsplash.com/photo-1539755530862-00f623c00f52?auto=format&fit=crop&q=80&w=600'
+    id: 'd1',
+    name: 'Docena Sándwiches Comunes',
+    description: '12 sándwiches de miga clásicos. Elegí entre Jamón y Queso o Salame y Queso.',
+    price: 16500,
+    category: 'Sándwiches',
+    image: 'https://images.unsplash.com/photo-1553909489-cd47e0907d3f?auto=format&fit=crop&q=80&w=600',
+    customization: {
+      groups: [
+        { title: 'Elegí 12 sabores (Min 4)', limit: 12, minSelection: 4, options: SABORES_COMUNES }
+      ]
+    }
   },
   {
-    id: 'g2',
-    name: 'Papas Doradas al Horno',
-    description: 'Papas cortadas en cubos, doradas al horno con un toque de romero.',
-    price: 3000,
-    category: 'Guarniciones',
-    image: 'https://images.unsplash.com/photo-1619684784943-415eb634e062?auto=format&fit=crop&q=80&w=600'
+    id: 'd2',
+    name: 'Docena Sándwiches Surtidos',
+    description: 'La combinación perfecta: 4 Especiales y 8 Comunes a elección.',
+    price: 20000,
+    category: 'Sándwiches',
+    image: 'https://images.unsplash.com/photo-1626078299034-75466d7412f1?auto=format&fit=crop&q=80&w=600',
+    customization: {
+      groups: [
+        { title: 'Elegí 4 sabores especiales (Min 2)', limit: 4, minSelection: 2, options: SABORES_ESPECIALES },
+        { title: 'Elegí 8 sabores comunes (Min 4)', limit: 8, minSelection: 4, options: SABORES_COMUNES }
+      ]
+    }
   },
-  // SANDWICHES (Imágenes genéricas representativas)
+  {
+    id: 'd3',
+    name: 'Docena Sándwiches Especiales',
+    description: '12 sándwiches premium. Ternera, Roquefort, Crudo y más.',
+    price: 27500,
+    category: 'Sándwiches',
+    image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=600',
+    customization: {
+      groups: [
+        { title: 'Elegí 12 sabores especiales (Min 4)', limit: 12, minSelection: 4, options: SABORES_ESPECIALES }
+      ]
+    }
+  },
+
+  // --- SECCIÓN SÁNDWICHES (INDIVIDUALES) ---
   {
     id: 's1',
     name: 'Sándwich Jamón y Queso',
@@ -115,17 +157,56 @@ export const MENU_ITEMS: Product[] = [
     description: 'Sándwich en pan baguette con ingredientes a elección.',
     price: 3000,
     category: 'Sándwiches',
-    image: 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&q=80&w=600'
+    image: 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&q=80&w=600',
+    customization: {
+      groups: [
+        {
+          title: 'Elegí el relleno',
+          limit: 1,
+          minSelection: 1,
+          options: ['Ternera, Tomate y Huevo', 'Ternera y Queso', 'Salame y Queso']
+        }
+      ]
+    }
   },
   {
     id: 's11',
     name: 'Pebete',
-    description: 'Clásico pan pebete suave con jamón y queso.',
+    description: 'Clásico pan pebete suave con relleno a elección.',
     price: 1000,
     category: 'Sándwiches',
-    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=600'
+    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=600',
+    customization: {
+      groups: [
+        {
+          title: 'Elegí el relleno',
+          limit: 1,
+          minSelection: 1,
+          options: ['Jamón y Queso', 'Salame y Queso']
+        }
+      ]
+    }
   },
-  // BEBIDAS
+
+  // --- SECCIÓN GUARNICIONES ---
+  {
+    id: 'g1',
+    name: 'Guarnición de Arroz',
+    description: 'Arroz blanco al dente, el acompañamiento ideal.',
+    price: 3000,
+    category: 'Guarniciones',
+    image: 'https://images.unsplash.com/photo-1539755530862-00f623c00f52?auto=format&fit=crop&q=80&w=600'
+  },
+  {
+    id: 'g2',
+    name: 'Papas Doradas al Horno',
+    description: 'Papas cortadas en cubos, doradas al horno con un toque de romero.',
+    price: 3000,
+    category: 'Guarniciones',
+    image: 'https://images.unsplash.com/photo-1619684784943-415eb634e062?auto=format&fit=crop&q=80&w=600'
+  },
+
+  // --- SECCIÓN BEBIDAS ---
   {
     id: 'b1',
     name: 'Coca Cola 250ml',

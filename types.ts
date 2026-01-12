@@ -1,7 +1,14 @@
 
-export type Category = 'Pollo' | 'Sándwiches' | 'Guarniciones' | 'Bebidas';
+export type Category = 'Pollo' | 'Sándwiches' | 'Guarniciones' | 'Bebidas' | 'Promociones';
 
 export type OrderStatus = 'Pendiente' | 'Cancelado' | 'Preparando';
+
+export interface FlavorGroup {
+  title: string;
+  limit: number;
+  minSelection?: number; // Minimum quantity required per flavor (e.g., 4)
+  options: string[];
+}
 
 export interface Product {
   id: string;
@@ -10,10 +17,14 @@ export interface Product {
   price: number;
   category: Category;
   image: string;
+  customization?: {
+    groups: FlavorGroup[];
+  };
 }
 
 export interface CartItem extends Product {
   quantity: number;
+  selectedFlavors?: string; // Texto formateado: "6x Jamón, 6x Queso"
 }
 
 export interface OrderDetails {

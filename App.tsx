@@ -1,10 +1,11 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ProductCard } from './components/ProductCard';
 import { CartDrawer } from './components/CartDrawer';
 import { OrdersDrawer } from './components/OrdersDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
-import { GeminiAssistant } from './components/GeminiAssistant';
+import { FlavorModal } from './components/FlavorModal'; // Nueva importación
 import { MENU_ITEMS } from './constants';
 import { Product, CartItem, Category, Order, OrderDetails } from './types';
 import { Search, Flame, Sandwich, IceCream, Pizza, Instagram, MapPin, Phone, MessageCircle, Clock, ShoppingCart } from 'lucide-react';
@@ -16,6 +17,9 @@ const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  // Nuevo estado para personalización
+  const [customizingProduct, setCustomizingProduct] = useState<Product | null>(null);
+  
   const [selectedCategory, setSelectedCategory] = useState<Category | 'Todos'>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -37,9 +41,20 @@ const App: React.FC = () => {
     localStorage.setItem('delicias_urbanas_orders', JSON.stringify(orders));
   }, [orders]);
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, selectedFlavors?: string) => {
     setCart(prev => {
-      const existing = prev.find(item => item.id === product.id);
+      // Si tiene sabores personalizados, se trata como item único si los sabores difieren
+      // Para simplificar, si tiene selectedFlavors, lo agregamos como nuevo item o buscamos coincidencia exacta
+      if (selectedFlavors) {
+          const existing = prev.find(item => item.id === product.id && item.selectedFlavors === selectedFlavors);
+          if (existing) {
+             return prev.map(item => item === existing ? { ...item, quantity: item.quantity + 1 } : item);
+          }
+          return [...prev, { ...product, quantity: 1, selectedFlavors }];
+      }
+
+      // Comportamiento normal
+      const existing = prev.find(item => item.id === product.id && !item.selectedFlavors);
       if (existing) {
         return prev.map(item =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
@@ -50,19 +65,38 @@ const App: React.FC = () => {
   };
 
   const updateQuantity = (id: string, delta: number) => {
-    setCart(prev =>
-      prev.map(item => {
-        if (item.id === id) {
-          const newQty = Math.max(0, item.quantity + delta);
-          return { ...item, quantity: newQty };
-        }
-        return item;
-      }).filter(item => item.quantity > 0)
-    );
+    setCart(prev => {
+        return prev.map(item => {
+            if (item.id === id) { 
+                const newQty = Math.max(0, item.quantity + delta);
+                return { ...item, quantity: newQty };
+            }
+            return item;
+        }).filter(item => item.quantity > 0);
+    });
   };
-
+  
+  const addToCartWithCustomization = (product: Product, selectedFlavors: string) => {
+      const customItem = {
+          ...product,
+          id: `${product.id}-${Date.now()}`, // ID único para el carrito
+          quantity: 1,
+          selectedFlavors
+      };
+      setCart(prev => [...prev, customItem]);
+  };
+  
+  const updateQuantitySafe = (id: string, delta: number) => {
+      setCart(prev => prev.map(item => {
+          if (item.id === id) {
+              return { ...item, quantity: Math.max(0, item.quantity + delta) };
+          }
+          return item;
+      }).filter(item => item.quantity > 0));
+  };
+  
   const removeFromCart = (id: string) => {
-    setCart(prev => prev.filter(item => item.id !== id));
+      setCart(prev => prev.filter(item => item.id !== id));
   };
 
   const handleCreateOrder = (details: OrderDetails) => {
@@ -99,6 +133,21 @@ const App: React.FC = () => {
     });
   }, [selectedCategory, searchQuery]);
 
+  // Group items by category for display
+  const groupedItems = useMemo(() => {
+    const groups: Record<string, Product[]> = {};
+    filteredItems.forEach(item => {
+      if (!groups[item.category]) {
+        groups[item.category] = [];
+      }
+      groups[item.category].push(item);
+    });
+    return groups;
+  }, [filteredItems]);
+
+  // Define display order
+  const displayCategories: Category[] = ['Pollo', 'Sándwiches', 'Guarniciones', 'Bebidas'];
+
   const categories: { name: Category | 'Todos'; icon: any }[] = [
     { name: 'Todos', icon: Pizza },
     { name: 'Pollo', icon: Flame },
@@ -111,7 +160,7 @@ const App: React.FC = () => {
   const currentTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   return (
-    <div className="min-h-screen pb-20 bg-slate-50 overflow-x-hidden relative">
+    <div className="min-h-screen pb-20 bg-[#0f1113] overflow-x-hidden relative">
       <Header 
         cartCount={totalItems} 
         onCartClick={() => setIsCartOpen(true)}
@@ -119,7 +168,7 @@ const App: React.FC = () => {
         logoUrl={logoUrl}
       />
 
-      <section className="bg-[#0f1113] text-white py-16 sm:py-24 overflow-hidden relative">
+      <section className="bg-[#0f1113] text-white py-16 sm:py-24 overflow-hidden relative border-b border-white/5">
         <div className="absolute top-0 right-0 w-80 h-80 bg-orange-600/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex flex-col md:flex-row items-center gap-10">
@@ -134,11 +183,11 @@ const App: React.FC = () => {
             </div>
             <div className="text-center md:text-left">
               <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-                <h2 className="text-4xl sm:text-5xl font-black tracking-tighter italic uppercase animate-in slide-in-from-left-4 duration-500">
+                <h2 className="text-4xl sm:text-5xl font-black tracking-tighter italic uppercase animate-in slide-in-from-left-4 duration-500 text-white">
                   DELICIAS <span className="text-orange-500">URBANAS</span>
                 </h2>
                 <div className="flex gap-2">
-                  <span className="bg-slate-800 text-xs font-bold px-3 py-1 rounded-full text-slate-300">Restaurante</span>
+                  <span className="bg-[#18181b] border border-white/10 text-xs font-bold px-3 py-1 rounded-full text-slate-300">Restaurante</span>
                   <span className="bg-orange-500 text-xs font-bold px-3 py-1 rounded-full text-white">Salta</span>
                 </div>
               </div>
@@ -161,16 +210,16 @@ const App: React.FC = () => {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10">
-        <div className="bg-white rounded-[2.5rem] shadow-2xl p-4 sm:p-8 border border-slate-100">
+        <div className="bg-[#18181b] rounded-[2.5rem] shadow-2xl p-4 sm:p-8 border border-white/5">
           <div className="flex flex-col md:flex-row gap-6 md:items-center">
             <div className="relative flex-1">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
               <input
                 type="text"
                 placeholder="¿Qué delicia buscás hoy?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-orange-500/10 font-medium text-lg transition-all"
+                className="w-full bg-[#0f1113] border border-white/5 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-orange-500/10 font-medium text-lg transition-all text-white placeholder-slate-600"
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
@@ -181,7 +230,7 @@ const App: React.FC = () => {
                   className={`px-6 py-3 rounded-2xl font-black transition-all duration-300 whitespace-nowrap flex items-center gap-3 text-sm active:scale-95 hover:scale-105 ${
                     selectedCategory === cat.name
                       ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/40'
-                      : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                      : 'bg-[#0f1113] text-slate-400 hover:bg-[#27272a]'
                   }`}
                 >
                   <cat.icon className="w-4 h-4" />
@@ -194,29 +243,54 @@ const App: React.FC = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="mb-10 flex items-center justify-between">
-          <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">
+        <div className="mb-10">
+          <h2 className="text-3xl font-black text-white tracking-tighter uppercase italic mb-8">
             {selectedCategory === 'Todos' ? 'NUESTRO MENÚ' : selectedCategory.toUpperCase()}
           </h2>
-        </div>
+          
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-20 bg-[#18181b] rounded-3xl border-2 border-dashed border-white/5">
+              <p className="text-slate-500 text-lg font-bold">No encontramos esa delicia...</p>
+              <button
+                onClick={() => {setSearchQuery(''); setSelectedCategory('Todos');}}
+                className="mt-4 text-orange-600 font-extrabold hover:underline transition-all duration-300 hover:scale-105 inline-block"
+              >
+                Ver todo el menú
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-16">
+              {displayCategories.map(cat => {
+                // If specific category is selected, only show that one. If 'Todos', show all in order.
+                if (selectedCategory !== 'Todos' && selectedCategory !== cat) return null;
+                
+                const items = groupedItems[cat];
+                if (!items || items.length === 0) return null;
 
-        {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredItems.map(item => (
-              <ProductCard key={item.id} product={item} onAddToCart={addToCart} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
-            <p className="text-slate-400 text-lg font-bold">No encontramos esa delicia...</p>
-            <button
-              onClick={() => {setSearchQuery(''); setSelectedCategory('Todos');}}
-              className="mt-4 text-orange-600 font-extrabold hover:underline transition-all duration-300 hover:scale-105 inline-block"
-            >
-              Ver todo el menú
-            </button>
-          </div>
-        )}
+                return (
+                  <div key={cat} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="flex items-center gap-4 mb-8">
+                       <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter shrink-0">
+                         {cat}
+                       </h3>
+                       <div className="h-px bg-gradient-to-r from-orange-500/50 to-transparent w-full"></div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                      {items.map(item => (
+                        <ProductCard 
+                          key={item.id} 
+                          product={item} 
+                          onAddToCart={addToCart} 
+                          onCustomize={(p) => setCustomizingProduct(p)} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </main>
 
       <LetsWorkTogether />
@@ -225,9 +299,10 @@ const App: React.FC = () => {
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         items={cart}
-        onUpdateQuantity={updateQuantity}
+        onUpdateQuantity={updateQuantitySafe}
         onRemove={removeFromCart}
         onCheckout={() => { setIsCartOpen(false); setIsCheckoutOpen(true); }}
+        onAddItem={addToCart}
       />
 
       <OrdersDrawer
@@ -244,30 +319,35 @@ const App: React.FC = () => {
         onConfirm={handleCreateOrder}
       />
 
+      <FlavorModal 
+        isOpen={!!customizingProduct}
+        onClose={() => setCustomizingProduct(null)}
+        product={customizingProduct}
+        onConfirm={addToCartWithCustomization}
+      />
+
       {/* Floating Cart Button */}
       {totalItems > 0 && (
         <div className="fixed bottom-6 left-6 z-[90] animate-in slide-in-from-bottom-4 fade-in duration-500">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="group flex items-center gap-3 bg-slate-900 text-white pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-slate-900/40 border border-slate-700 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-orange-500/20"
+            className="group flex items-center gap-3 bg-white text-black pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-black/50 border border-slate-700 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-orange-500/20"
           >
             <div className="relative">
               <div className="bg-orange-500 rounded-full p-2 text-white group-hover:bg-orange-400 transition-colors">
                 <ShoppingCart className="w-5 h-5" />
               </div>
-              <span className="absolute -top-1 -right-1 bg-white text-orange-600 text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full border-2 border-slate-900">
+              <span className="absolute -top-1 -right-1 bg-[#18181b] text-orange-600 text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
                 {totalItems}
               </span>
             </div>
             <div className="flex flex-col items-start">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Tu Pedido</span>
-              <span className="text-sm font-black text-white leading-none">${currentTotal.toLocaleString('es-AR')}</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none mb-1">Tu Pedido</span>
+              <span className="text-sm font-black text-black leading-none">${currentTotal.toLocaleString('es-AR')}</span>
             </div>
           </button>
         </div>
       )}
-
-      <GeminiAssistant />
 
       <footer className="bg-[#0f1113] text-slate-500 py-20 mt-0 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -302,7 +382,7 @@ const App: React.FC = () => {
                  <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs flex items-center gap-2 justify-center sm:justify-start">
                     <Phone className="w-4 h-4 text-orange-500" /> Contacto
                  </h4>
-                 <p className="text-sm text-slate-400 mb-2">+54 9 3875 02-0884</p>
+                 <p className="text-sm text-slate-400 mb-2">+54 9 387 502-0884</p>
                  <a 
                    href="https://instagram.com/delicias.urbanas" 
                    target="_blank" 

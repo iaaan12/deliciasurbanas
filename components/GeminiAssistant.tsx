@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { MessageSquare, Send, X, Bot, Loader2 } from 'lucide-react';
@@ -68,7 +67,7 @@ export const GeminiAssistant: React.FC = () => {
   return (
     <div className="fixed bottom-6 right-6 z-[80] flex flex-col items-end">
       {isOpen && (
-        <div className="mb-4 w-[320px] sm:w-[380px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[500px]">
+        <div className="mb-4 w-[320px] sm:w-[380px] bg-[#18181b] rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col h-[500px]">
           <div className="bg-orange-600 p-4 flex justify-between items-center text-white">
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5" />
@@ -85,7 +84,7 @@ export const GeminiAssistant: React.FC = () => {
                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${
                   m.role === 'user' 
                   ? 'bg-orange-500 text-white rounded-tr-none' 
-                  : 'bg-slate-100 text-slate-800 rounded-tl-none'
+                  : 'bg-[#0f1113] text-slate-200 border border-white/5 rounded-tl-none'
                 }`}>
                   {m.content}
                 </div>
@@ -93,7 +92,7 @@ export const GeminiAssistant: React.FC = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-slate-100 p-3 rounded-2xl rounded-tl-none text-slate-500">
+                <div className="bg-[#0f1113] p-3 rounded-2xl rounded-tl-none text-slate-400 border border-white/5">
                   <Loader2 className="w-4 h-4 animate-spin" />
                 </div>
               </div>
@@ -101,14 +100,14 @@ export const GeminiAssistant: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="p-4 border-t border-slate-100 flex gap-2">
+          <div className="p-4 border-t border-white/5 flex gap-2">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
               placeholder="¿Qué hay de rico hoy?"
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+              className="flex-1 bg-[#0f1113] border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 text-white placeholder-slate-600"
             />
             <button
               onClick={handleSend}

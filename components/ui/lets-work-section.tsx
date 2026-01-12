@@ -102,7 +102,7 @@ export function LetsWorkTogether() {
   };
 
   return (
-    <section className="flex min-h-[60vh] items-center justify-center px-6 py-20 bg-white overflow-hidden border-t border-slate-100">
+    <section className="flex min-h-[60vh] items-center justify-center px-6 py-20 bg-[#0f1113] overflow-hidden border-t border-white/5">
       <div className="relative flex flex-col items-center gap-12 max-w-4xl w-full">
         <div
           className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-8 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
@@ -114,7 +114,7 @@ export function LetsWorkTogether() {
         >
           <div className="flex flex-col items-center gap-2 text-center">
             <span
-              className="text-xs font-bold tracking-[0.3em] uppercase text-slate-400"
+              className="text-xs font-bold tracking-[0.3em] uppercase text-slate-500"
               style={{
                 transform: showSuccess ? "translateY(0)" : "translateY(10px)",
                 opacity: showSuccess ? 1 : 0,
@@ -123,7 +123,7 @@ export function LetsWorkTogether() {
               Excelente Elección
             </span>
             <h3
-              className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl italic uppercase"
+              className="text-3xl font-black tracking-tight text-white sm:text-4xl italic uppercase"
               style={{
                 transform: showSuccess ? "translateY(0)" : "translateY(10px)",
                 opacity: showSuccess ? 1 : 0,
@@ -139,19 +139,19 @@ export function LetsWorkTogether() {
             onMouseLeave={() => setIsButtonHovered(false)}
             className="group relative flex items-center gap-4 transition-all duration-500 cursor-pointer hover:scale-105"
           >
-            <div className="relative flex items-center gap-3 overflow-hidden rounded-full border px-6 py-3 transition-all duration-500 sm:px-8 sm:py-4 shadow-xl bg-orange-500 border-orange-500 hover:bg-[#0f1113] hover:border-[#0f1113] active:scale-95">
-              <Calendar className="size-4 sm:size-5 text-white" />
-              <span className="text-sm font-black tracking-wide text-white sm:text-base">
+            <div className="relative flex items-center gap-3 overflow-hidden rounded-full border px-6 py-3 transition-all duration-500 sm:px-8 sm:py-4 shadow-xl bg-orange-500 border-orange-500 hover:bg-white hover:border-white active:scale-95">
+              <Calendar className={`size-4 sm:size-5 transition-colors duration-300 ${isButtonHovered ? "text-black" : "text-white"}`} />
+              <span className={`text-sm font-black tracking-wide sm:text-base transition-colors duration-300 ${isButtonHovered ? "text-black" : "text-white"}`}>
                 Consultar Fecha
               </span>
-              <ArrowUpRight className="size-4 sm:size-5 text-white transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+              <ArrowUpRight className={`size-4 sm:size-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-colors duration-300 ${isButtonHovered ? "text-black" : "text-white"}`} />
             </div>
           </button>
         </div>
 
         {/* Indicador de estado dinámico */}
         <div
-          className="flex items-center gap-3 transition-all duration-500 bg-slate-50 px-4 py-2 rounded-full border border-slate-100 shadow-sm"
+          className="flex items-center gap-3 transition-all duration-500 bg-[#18181b] px-4 py-2 rounded-full border border-white/5 shadow-sm"
           style={{
             opacity: isClicked ? 0 : 1,
             transform: isClicked ? "translateY(-20px)" : "translateY(0)",
@@ -161,7 +161,7 @@ export function LetsWorkTogether() {
             <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${status.isOpen ? 'bg-emerald-400' : 'bg-red-400'}`} />
             <span className={`relative inline-flex size-2 rounded-full transition-colors duration-500 ${status.color}`} />
           </span>
-          <span className={`text-xs sm:text-sm font-black tracking-widest uppercase ${status.isOpen ? 'text-slate-600' : 'text-red-500/80'} tabular-nums`}>
+          <span className={`text-xs sm:text-sm font-black tracking-widest uppercase ${status.isOpen ? 'text-slate-400' : 'text-red-400'} tabular-nums`}>
             {status.text}
           </span>
         </div>
@@ -177,7 +177,7 @@ export function LetsWorkTogether() {
         >
           <div className="flex flex-col items-center gap-6">
             <h2
-              className="relative text-center text-5xl font-black tracking-tighter text-slate-900 sm:text-6xl md:text-7xl lg:text-8xl transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] uppercase italic"
+              className="relative text-center text-5xl font-black tracking-tighter text-white sm:text-6xl md:text-7xl lg:text-8xl transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] uppercase italic"
               style={{
                 opacity: isClicked ? 0 : 1,
                 transform: isClicked ? "translateY(-40px) scale(0.95)" : "translateY(0) scale(1)",
@@ -209,15 +209,15 @@ export function LetsWorkTogether() {
               <div
                 className="pointer-events-none absolute inset-0 rounded-full border transition-all duration-500 ease-out"
                 style={{
-                  borderColor: isHovered ? "#0f1113" : "#cbd5e1",
-                  backgroundColor: isHovered ? "#0f1113" : "transparent",
+                  borderColor: isHovered ? "#ffffff" : "#52525b",
+                  backgroundColor: isHovered ? "#ffffff" : "transparent",
                   transform: isHovered ? "scale(1.1)" : "scale(1)",
                 }}
               />
               <ArrowUpRight
                 className="size-6 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:size-7"
                 style={{
-                  color: isHovered ? "#ffffff" : "#0f1113",
+                  color: isHovered ? "#000000" : "#ffffff",
                   transform: isHovered ? "translate(2px, -2px)" : "translate(0, 0)",
                 }}
               />
