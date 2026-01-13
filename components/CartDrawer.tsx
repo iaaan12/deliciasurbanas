@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { X, Trash2, Minus, Plus, ShoppingBag, Utensils, ArrowRight, PlusCircle, AlignLeft } from 'lucide-react';
 import { CartItem, Product } from '../types';
@@ -37,7 +38,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] overflow-hidden">
-      <div className="absolute inset-0 bg-[#121212]/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
       
       <div className="absolute inset-y-0 right-0 max-w-full flex">
         <div className="w-screen max-w-md bg-[#18181b] shadow-2xl flex flex-col">
@@ -158,14 +159,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           </div>
 
           {items.length > 0 && (
-            <div className="border-t border-white/5 px-6 py-6 bg-[#18181b] shadow-[0_-10px_40px_rgba(18,18,18,0.2)] z-10">
+            <div className="border-t border-white/5 px-6 py-6 bg-[#18181b] shadow-[0_-10px_40px_rgba(0,0,0,0.2)] z-10">
               <div className="flex justify-between items-end mb-6">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Final</span>
                 <span className="text-3xl font-black text-white tracking-tighter">${total.toLocaleString('es-AR')}</span>
               </div>
               <button
                 onClick={onCheckout}
-                className="w-full bg-white text-[#1A1A1A] rounded-2xl py-5 font-black text-sm uppercase tracking-wider hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-xl shadow-[#121212]/20 hover:shadow-orange-600/30 active:scale-[0.98] flex items-center justify-center gap-2 group"
+                className="w-full bg-white text-black rounded-2xl py-5 font-black text-sm uppercase tracking-wider hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-xl shadow-black/20 hover:shadow-orange-600/30 active:scale-[0.98] flex items-center justify-center gap-2 group"
               >
                 Confirmar Pedido <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>

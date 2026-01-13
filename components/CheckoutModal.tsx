@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { X, CheckCircle2, Clock, Phone, User, MessageCircle, AlertCircle, MapPin, ExternalLink, Store, Loader2, Banknote, QrCode, Copy } from 'lucide-react';
 import { CartItem, OrderDetails, PaymentMethod } from '../types';
@@ -161,7 +162,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-0 sm:p-4">
-      <div className="absolute inset-0 bg-[#121212]/70 backdrop-blur-md" onClick={whatsappSent ? handleClose : undefined} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={whatsappSent ? handleClose : undefined} />
       
       <div className="relative bg-[#18181b] sm:rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden h-full sm:h-auto sm:max-h-[95vh] flex flex-col animate-in zoom-in-95 duration-200 border border-white/5">
         
@@ -408,10 +409,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <button
                 type="submit"
                 disabled={!!timeError || isSubmitting}
-                className={`w-full text-[#1A1A1A] font-black py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 ${
+                className={`w-full text-black font-black py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 ${
                   timeError || isSubmitting
                     ? 'bg-slate-700 cursor-not-allowed text-slate-400' 
-                    : 'bg-white shadow-[#121212]/20 hover:bg-orange-600 hover:text-white hover:shadow-orange-600/30'
+                    : 'bg-white shadow-black/20 hover:bg-orange-600 hover:text-white hover:shadow-orange-600/30'
                 }`}
               >
                 {isSubmitting ? (
@@ -513,7 +514,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               {whatsappSent ? (
                 <button
                   onClick={handleClose}
-                  className="w-full bg-white text-[#1A1A1A] font-black py-4 rounded-xl hover:bg-slate-200 transition-all duration-300 hover:scale-105 shadow-lg animate-in slide-in-from-bottom-4"
+                  className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-slate-200 transition-all duration-300 hover:scale-105 shadow-lg animate-in slide-in-from-bottom-4"
                 >
                   VOLVER AL INICIO
                 </button>

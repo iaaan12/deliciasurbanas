@@ -20,6 +20,9 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; }
         h1, h2, h3, h4, .font-heading { font-family: 'Poppins', sans-serif; }
@@ -33,6 +36,10 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
+        /* Utilidades de UI */
+        .drawer-open { transform: translateX(0) !important; }
+        .modal-open { display: flex !important; }
+        
         /* Animaciones */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
@@ -43,17 +50,1760 @@
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
     "@google/genai": "https://esm.sh/@google/genai@^1.35.0"
   }
 }
 </script>
 </head>
 <body class="bg-[#0f1113] text-slate-200 overflow-x-hidden relative">
-    <div id="root"></div>
-    <script type="module" src="./index.tsx"></script>
+
+    <!-- TOP BANNER (ANNOUNCEMENT) -->
+    <a href="https://wa.me/5493875020884" target="_blank" class="block w-full bg-[#1c4532] hover:bg-[#255b42] text-white text-[10px] sm:text-xs font-bold text-center py-2.5 px-4 transition-colors tracking-wide uppercase border-b border-[#2a6b4d] relative z-[60]">
+        Para pedidos más grandes o tortas saladas, comunicarse directamente por WhatsApp
+    </a>
+
+    <!-- DATA STORE & LOGIC -->
+    <script>
+        const SHOP_INFO = {
+            name: "Delicias Urbanas",
+            phone: "5493875020884", 
+            phoneDisplay: "+54 9 387 502-0884",
+            address: "Av. San Martín 532, Salta",
+            addressFull: "Av. San Martín 532, Salta, Argentina",
+            logoUrl: "https://i.imgur.com/RUVPwCt.png",
+            instagram: "https://instagram.com/delicias.urbanas",
+            instagramUser: "@delicias.urbanas"
+        };
+        
+        // DATOS DE TRANSFERENCIA
+        const MP_ALIAS = "deliciasurbanas13";
+        const MP_HOLDER = "Nahida Esther Leonor Zamar";
+        const TRANSFER_LIMIT = 15000; // Límite para obligar a transferencia
+
+        const SABORES_COMUNES = ['Jamón y Queso', 'Salame y Queso'];
+        const SABORES_ESPECIALES = ['Ternera, Tomate y Huevo', 'Aceituna, Huevo y Queso', 'Roquefort y Jamón', 'Jamón Crudo y Queso'];
+
+        // PRECIOS BASE
+        const MENU_ITEMS = [
+            // --- POLLO ---
+            { id: 'c1', name: 'Pollo al Spiedo Entero', description: 'Nuestro clásico pollo asado lentamente al spiedo, tierno y sabroso.', price: 15000, category: 'Pollo', image: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&q=80&w=600', tags: ['popular'] },
+            { id: 'p3', name: 'PROMO: Pollo Entero + Arroz', description: '¡Ideal familia! Pollo entero al spiedo con una guarnición de arroz incluida.', price: 17000, category: 'Pollo', image: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&q=80&w=600', tags: ['popular'] },
+            { id: 'p2', name: 'PROMO: Medio Pollo + Arroz', description: '¡Oportunidad! Medio pollo al spiedo con una guarnición de arroz incluida.', price: 11000, category: 'Pollo', image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&q=80&w=600', tags: [] },
+
+            // --- DOCENAS ---
+            { 
+              id: 'd1', 
+              name: 'Docena Sándwiches Comunes', 
+              description: '12 sándwiches de miga clásicos.', 
+              price: 16500, 
+              category: 'Sándwiches', 
+              image: 'https://images.unsplash.com/photo-1553909489-cd47e0907d3f?auto=format&fit=crop&q=80&w=600',
+              customization: {
+                groups: [ { title: 'Elegí 12 sabores (Min 4)', limit: 12, minSelection: 4, options: SABORES_COMUNES } ]
+              },
+              tags: ['popular']
+            },
+            { 
+              id: 'd2', 
+              name: 'Docena Sándwiches Surtidos', 
+              description: '4 Especiales y 8 Comunes a elección.', 
+              price: 20000, 
+              category: 'Sándwiches', 
+              image: 'https://images.unsplash.com/photo-1626078299034-75466d7412f1?auto=format&fit=crop&q=80&w=600',
+              customization: {
+                groups: [ 
+                  { title: 'Elegí 4 Especiales (Min 2)', limit: 4, minSelection: 2, options: SABORES_ESPECIALES },
+                  { title: 'Elegí 8 Comunes (Min 4)', limit: 8, minSelection: 4, options: SABORES_COMUNES }
+                ]
+              },
+              tags: ['popular']
+            },
+            { 
+              id: 'd3', 
+              name: 'Docena Sándwiches Especiales', 
+              description: '12 sándwiches premium surtidos.', 
+              price: 27500, 
+              category: 'Sándwiches', 
+              image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=600',
+              customization: {
+                groups: [ { title: 'Elegí 12 Especiales (Min 4)', limit: 12, minSelection: 4, options: SABORES_ESPECIALES } ]
+              },
+              tags: []
+            },
+
+            // --- SANDWICHES INDIVIDUALES ---
+            { id: 's1', name: 'Sándwich Jamón y Queso', description: 'Clásico sándwich con abundante jamón cocido y queso tybo.', price: 1500, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1553909489-cd47e0907d3f?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 's2', name: 'Sándwich Salame y Queso', description: 'Sabroso salame milán y queso en fetas en pan fresco.', price: 1500, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1626078299034-75466d7412f1?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 's3', name: 'Sándwich Ternera y Queso', description: 'Finas fetas de ternera con queso derretido o natural.', price: 2000, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1481070414801-51fd732d7184?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 's4', name: 'Sándwich Ternera y Lechuga', description: 'Ternera seleccionada con lechuga fresca y crocante.', price: 2000, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1509722747041-619f383b8326?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 's5', name: 'Ternera, Tomate y Huevo', description: 'Completo: ternera, tomate fresco y huevo duro picado.', price: 2500, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1547496502-ffa222d79a80?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 's6', name: 'Aceituna, Huevo y Queso', description: 'Opción vegetariana con aceitunas verdes, huevo y mucho queso.', price: 2500, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1539252554452-da37fa1d9357?auto=format&fit=crop&q=80&w=600', tags: ['veggie'] },
+            { id: 's7', name: 'Roquefort y Jamón', description: 'Para los amantes del sabor fuerte: roquefort premium y jamón.', price: 2500, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1559466273-d95e71deb58a?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 's8', name: 'Jamón Crudo y Queso', description: 'Jamón crudo estacionado y queso de campo.', price: 2500, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 's9', name: 'Sándwich de Milanesa', description: 'Clásico argentino: milanesa de carne en pan francés con lechuga y tomate.', price: 4500, category: 'Sándwiches', image: 'https://images.unsplash.com/photo-1619860860774-1e2e17343432?auto=format&fit=crop&q=80&w=600', tags: ['popular'] },
+            { 
+              id: 's10', 
+              name: 'Baguette Especial', 
+              description: 'Sándwich en pan baguette con ingredientes a elección.', 
+              price: 3000, 
+              category: 'Sándwiches', 
+              image: 'https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&q=80&w=600',
+              customization: {
+                groups: [
+                  { title: 'Elegí el relleno', limit: 1, minSelection: 1, options: ['Ternera, Tomate y Huevo', 'Ternera y Queso', 'Salame y Queso'] }
+                ]
+              },
+              tags: []
+            },
+            { 
+              id: 's11', 
+              name: 'Pebete', 
+              description: 'Clásico pan pebete suave con relleno a elección.', 
+              price: 1000, 
+              category: 'Sándwiches', 
+              image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=600',
+              customization: {
+                groups: [
+                  { title: 'Elegí el relleno', limit: 1, minSelection: 1, options: ['Jamón y Queso', 'Salame y Queso'] }
+                ]
+              },
+              tags: []
+            },
+
+            // --- GUARNICIONES ---
+            { id: 'g1', name: 'Guarnición de Arroz', description: 'Arroz blanco al dente, el acompañamiento ideal.', price: 3000, category: 'Guarniciones', image: 'https://images.unsplash.com/photo-1539755530862-00f623c00f52?auto=format&fit=crop&q=80&w=600', tags: ['veggie'] },
+            { id: 'g2', name: 'Papas Doradas al Horno', description: 'Papas cortadas en cubos, doradas al horno con un toque de romero.', price: 3000, category: 'Guarniciones', image: 'https://images.unsplash.com/photo-1619684784943-415eb634e062?auto=format&fit=crop&q=80&w=600', tags: ['veggie', 'popular'] },
+
+            // --- BEBIDAS ---
+            { id: 'b1', name: 'Coca Cola 250ml', description: 'Botella de vidrio o lata pequeña bien helada.', price: 1500, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 'b2', name: 'Fanta 250ml', description: 'Sabor naranja refrescante.', price: 1500, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1624517452488-04869289c4ca?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 'b3', name: 'Sprite 250ml', description: 'Sabor lima-limón.', price: 1500, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1625772290748-39093c022a16?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 'b4', name: 'Coca Cola 350ml', description: 'Lata clásica.', price: 2000, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 'b5', name: 'Fanta 350ml', description: 'Lata de Fanta naranja.', price: 2000, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 'b6', name: 'Sprite 350ml', description: 'Lata de Sprite lima-limón.', price: 2000, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1543253687-c931c8e01820?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 'b7', name: 'Coca Cola 600ml', description: 'Botella individual.', price: 2500, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1596803244618-8dce7f5067d8?auto=format&fit=crop&q=80&w=600', tags: ['popular'] },
+            { id: 'b8', name: 'Fanta 600ml', description: 'Botella individual de Fanta.', price: 2500, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 'b9', name: 'Sprite 600ml', description: 'Botella individual de Sprite.', price: 2500, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1625772290748-39093c022a16?auto=format&fit=crop&q=80&w=600', tags: [] },
+            { id: 'b10', name: 'Monster Energy', description: 'Cualquier sabor disponible (Original, Mango Loco, Ultra, etc).', price: 4500, category: 'Bebidas', image: 'https://images.unsplash.com/photo-1622543925917-763c34d1538c?auto=format&fit=crop&q=80&w=600', tags: [] }
+        ];
+
+        // Estado Global
+        let cart = [];
+        let orders = JSON.parse(localStorage.getItem('delicias_urbanas_orders') || '[]');
+        let selectedCategory = 'Todos';
+        let searchQuery = '';
+        let confirmingOrderId = null; // Para control de UI en cancelación
+        
+        // Estado Filtros
+        let filtersOpen = false;
+        let activeTags = []; // ['popular', 'veggie']
+        let priceRange = { min: null, max: null };
+
+        // Estado Checkout (Vanilla)
+        let selectedPaymentMethod = 'Efectivo';
+        
+        // Estado Modal Sabores
+        let flavorModalOpen = false;
+        let currentCustomProduct = null;
+        let flavorSelections = {};
+    </script>
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 bg-[#0f1113]/80 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 group cursor-pointer transition-transform duration-300 hover:scale-105" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+                    <div class="w-14 h-14 flex items-center justify-center">
+                        <img id="header-logo" src="" alt="Logo" class="w-full h-full object-contain drop-shadow-lg">
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight uppercase font-heading">
+                            DELICIAS URBANAS
+                        </h1>
+                        <p class="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">
+                            Comidas al Paso
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Botones Header -->
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleOrders(true)" class="relative p-3 text-slate-400 hover:text-orange-500 transition-all duration-300 ease-out group flex flex-col items-center hover:bg-white/5 rounded-2xl active:scale-95 hover:scale-105" title="Mis Pedidos">
+                        <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+                        <span class="text-[10px] font-black uppercase hidden sm:block mt-1">Mis Pedidos</span>
+                        <span id="orders-badge" class="hidden absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-[10px] font-black leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full shadow-lg border-2 border-white/20 animate-in zoom-in">
+                            0
+                            <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
+                        </span>
+                    </button>
+                    
+                    <button onclick="toggleCart(true)" class="relative p-3 text-slate-400 hover:text-orange-500 transition-all duration-300 ease-out group flex flex-col items-center hover:bg-white/5 rounded-2xl active:scale-95 hover:scale-105" title="Mi Carrito">
+                        <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+                        <span class="text-[10px] font-black uppercase hidden sm:block mt-1">Carrito</span>
+                        <span id="cart-badge" class="hidden absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-[10px] font-black leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-orange-600 rounded-full shadow-lg border-2 border-white/20">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- FLAVOR MODAL -->
+    <div id="flavor-modal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-[#121212]/80 backdrop-blur-sm" onclick="closeFlavorModal()"></div>
+        <div class="relative bg-[#18181b] w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/5 animate-fade-in">
+             <div class="p-5 border-b border-white/5 flex justify-between items-center bg-[#18181b]">
+                <div>
+                  <h3 id="flavor-modal-title" class="text-xl font-bold text-white leading-none"></h3>
+                  <p class="text-xs text-slate-400 font-bold mt-1">Armá tu docena a gusto</p>
+                </div>
+                <button onclick="closeFlavorModal()" class="p-2 bg-white/5 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white">
+                  <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+             </div>
+             <div id="flavor-modal-body" class="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-8"></div>
+             <div class="p-5 border-t border-white/5 bg-[#18181b]">
+                <button id="flavor-confirm-btn" onclick="confirmFlavors()" class="w-full py-4 rounded-xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all">
+                   Agregar al Pedido
+                </button>
+             </div>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="relative bg-[#0f1113] text-white py-20 sm:py-32 overflow-hidden border-b border-white/5">
+        
+        <!-- BACKGROUND IMAGE START -->
+        <div class="absolute inset-0 z-0">
+            <!-- La imagen ahora es visible por defecto y tiene fallback -->
+            <img id="hero-bg-image" src="https://i.imgur.com/ibEvRnc.jpeg" 
+                 alt="Fondo Delicias Urbanas" 
+                 class="w-full h-full object-cover opacity-0 transition-opacity duration-1000" 
+                 style="object-position: center 60%;"
+                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1600';"
+            >
+            <!-- Gradient Overlay Ajustado: más transparente para ver la imagen -->
+            <div class="absolute inset-0 bg-gradient-to-r from-[#0f1113]/90 via-[#0f1113]/70 to-[#0f1113]/30"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0f1113] via-transparent to-transparent"></div>
+        </div>
+        <!-- BACKGROUND IMAGE END -->
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row items-center gap-10">
+                <div class="w-48 h-48 sm:w-64 sm:h-64 flex-shrink-0 flex items-center justify-center relative z-20">
+                    <img id="hero-logo" src="" alt="Logo" class="w-full h-full object-contain drop-shadow-2xl">
+                </div>
+                <div class="text-center md:text-left">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 mb-4">
+                        <h2 class="text-4xl sm:text-5xl font-bold tracking-tight uppercase font-heading animate-fade-in drop-shadow-2xl text-white">
+                            DELICIAS URBANAS
+                        </h2>
+                    </div>
+                    
+                    <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                        <div class="flex items-center gap-2 text-slate-200 bg-white/5 px-4 py-2 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 cursor-default hover:scale-105 backdrop-blur-sm">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-orange-500"></i>
+                            <span class="text-sm font-bold" id="hero-address"></span>
+                        </div>
+                        <a id="hero-instagram" href="#" target="_blank" class="flex items-center gap-2 text-slate-200 hover:text-white transition-all duration-300 bg-white/5 hover:bg-white/10 hover:scale-105 active:scale-95 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-sm">
+                            <i data-lucide="instagram" class="w-4 h-4 text-pink-500"></i>
+                            <span class="text-sm font-bold" id="hero-instagram-user"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FILTERS & SEARCH -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10">
+        <div class="bg-[#18181b] rounded-[2.5rem] shadow-2xl p-4 sm:p-8 border border-white/5 space-y-6">
+            <div class="flex flex-col md:flex-row gap-6 md:items-center">
+                <div class="relative flex-1 flex gap-3">
+                    <div class="relative flex-1">
+                        <i data-lucide="search" class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                        <input type="text" id="search-input" placeholder="¿Qué delicia buscás hoy?" 
+                               class="w-full bg-[#0f1113] border border-white/5 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-orange-500/10 font-medium text-lg transition-all text-white placeholder-slate-600">
+                    </div>
+                    <button onclick="toggleFilters()" id="filter-btn" class="px-5 py-5 bg-[#0f1113] border border-white/5 hover:bg-[#202024] hover:border-orange-500/30 text-slate-400 hover:text-orange-500 rounded-2xl transition-all duration-300 flex items-center justify-center shadow-lg active:scale-95">
+                        <i data-lucide="sliders-horizontal" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div class="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar" id="category-container">
+                    <!-- Categorías inyectadas por JS -->
+                </div>
+            </div>
+
+            <!-- Panel de Filtros Avanzados (Oculto por defecto) -->
+            <div id="filter-panel" class="hidden overflow-hidden transition-all duration-300 ease-in-out">
+                <div class="pt-4 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                    <!-- Etiquetas -->
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i data-lucide="tag" class="w-3 h-3 text-orange-500"></i> Etiquetas
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="toggleTag('popular')" id="tag-popular" class="px-4 py-2 rounded-xl border border-white/10 bg-[#0f1113] text-slate-400 text-xs font-bold uppercase hover:border-orange-500/50 hover:text-white transition-all flex items-center gap-2">
+                                <i data-lucide="flame" class="w-3 h-3"></i> Más Vendidos
+                            </button>
+                            <button onclick="toggleTag('veggie')" id="tag-veggie" class="px-4 py-2 rounded-xl border border-white/10 bg-[#0f1113] text-slate-400 text-xs font-bold uppercase hover:border-green-500/50 hover:text-white transition-all flex items-center gap-2">
+                                <i data-lucide="leaf" class="w-3 h-3"></i> Vegetariano
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Rango de Precio -->
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i data-lucide="dollar-sign" class="w-3 h-3 text-orange-500"></i> Rango de Precio
+                        </h4>
+                        <div class="flex items-center gap-3">
+                            <div class="relative flex-1">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">$</span>
+                                <input type="number" id="price-min" placeholder="Mínimo" onchange="updatePrice()" 
+                                       class="w-full bg-[#0f1113] border border-white/10 rounded-xl py-2 pl-8 pr-4 text-sm text-white focus:outline-none focus:border-orange-500/50">
+                            </div>
+                            <span class="text-slate-600 font-bold">-</span>
+                            <div class="relative flex-1">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">$</span>
+                                <input type="number" id="price-max" placeholder="Máximo" onchange="updatePrice()" 
+                                       class="w-full bg-[#0f1113] border border-white/10 rounded-xl py-2 pl-8 pr-4 text-sm text-white focus:outline-none focus:border-orange-500/50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN MENU -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="mb-10">
+            <div class="flex justify-between items-end mb-8">
+                <h2 id="menu-title" class="text-3xl font-black text-white tracking-tighter uppercase italic font-heading">
+                    NUESTRO MENÚ
+                </h2>
+                <button onclick="clearFilters()" id="clear-filters-btn" class="hidden text-xs font-bold text-red-400 hover:text-red-300 uppercase tracking-wider flex items-center gap-1 bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20 transition-all hover:bg-red-500/20">
+                    <i data-lucide="x" class="w-3 h-3"></i> Limpiar Filtros
+                </button>
+            </div>
+            <div id="product-container" class="space-y-16">
+                <!-- Productos agrupados inyectados por JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#0f1113] text-slate-500 py-20 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 text-center sm:text-left">
+                <div>
+                    <div class="flex items-center gap-3 mb-6 justify-center sm:justify-start">
+                        <img id="footer-logo" src="" class="w-10 h-10 rounded-full border border-orange-500" alt="logo">
+                        <h1 class="text-white font-black italic uppercase text-xl font-heading">DELICIAS <span class="text-orange-500">URBANAS</span></h1>
+                    </div>
+                    <p class="text-sm text-slate-400">Sabores auténticos en el corazón de Salta.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-widest text-xs flex items-center gap-2 justify-center sm:justify-start">
+                        <i data-lucide="clock" class="w-4 h-4 text-orange-500"></i> Horarios
+                    </h4>
+                    <div class="space-y-2">
+                        <p class="text-sm text-slate-300 font-bold">Lunes a Sábado</p>
+                        <p class="text-sm text-slate-400">08:00 - 15:00 hs</p>
+                        <p class="text-sm text-slate-400">17:30 - 21:00 hs</p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-widest text-xs flex items-center gap-2 justify-center sm:justify-start">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-orange-500"></i> Ubicación
+                    </h4>
+                    <p class="text-sm text-slate-400" id="footer-address"></p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase tracking-widest text-xs flex items-center gap-2 justify-center sm:justify-start">
+                        <i data-lucide="phone" class="w-4 h-4 text-orange-500"></i> Contacto
+                    </h4>
+                    <p class="text-sm text-slate-400 mb-2" id="footer-phone"></p>
+                    <a id="footer-instagram-link" href="#" target="_blank" class="text-sm text-orange-500 hover:text-white transition-colors flex items-center gap-2 justify-center sm:justify-start font-bold">
+                        <i data-lucide="instagram" class="w-4 h-4"></i> Seguir en Instagram
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CART DRAWER -->
+    <div id="cart-drawer" class="fixed inset-0 z-[100] overflow-hidden hidden">
+        <div class="absolute inset-0 bg-[#121212]/60 backdrop-blur-sm transition-opacity" onclick="toggleCart(false)"></div>
+        <div class="absolute inset-y-0 right-0 max-w-full flex">
+            <div id="cart-drawer-panel" class="w-screen max-w-md bg-[#18181b] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+                <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6 custom-scrollbar">
+                    <div class="flex items-start justify-between mb-8">
+                        <div>
+                            <h2 class="text-2xl font-black text-white italic uppercase tracking-tighter flex items-center gap-2 font-heading">
+                                <i data-lucide="shopping-bag" class="w-6 h-6 text-orange-500"></i> Tu Pedido
+                            </h2>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Revisá tus ítems</p>
+                        </div>
+                        <button onclick="toggleCart(false)" class="p-2 bg-white/5 text-slate-400 hover:text-white rounded-xl hover:bg-white/10">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                    <div id="cart-items-container" class="animate-fade-in">
+                        <!-- Items -->
+                    </div>
+                    <!-- RECOMENDACIONES (Inyectado por JS) -->
+                    <div id="cart-recommendations" class="mt-8 pt-6 border-t border-white/5 hidden"></div>
+                </div>
+                <div id="cart-footer" class="border-t border-white/5 px-6 py-6 bg-[#18181b] shadow-[0_-10px_40px_rgba(18,18,18,0.2)] z-10 hidden">
+                    <div class="flex justify-between items-end mb-6">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total</span>
+                        <span class="text-3xl font-black text-white tracking-tighter" id="cart-total">$0</span>
+                    </div>
+                    <button onclick="openCheckout()" class="w-full bg-white text-[#1A1A1A] rounded-2xl py-5 font-black text-sm uppercase tracking-wider hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-xl shadow-[#121212]/20 hover:shadow-orange-600/30 active:scale-[0.98] flex items-center justify-center gap-2 group">
+                        Confirmar Pedido <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDERS DRAWER -->
+    <div id="orders-drawer" class="fixed inset-0 z-[100] overflow-hidden hidden">
+        <div class="absolute inset-0 bg-[#121212]/60 backdrop-blur-sm transition-opacity" onclick="toggleOrders(false)"></div>
+        <div class="absolute inset-y-0 left-0 max-w-full flex">
+            <div id="orders-drawer-panel" class="w-screen max-w-md bg-[#18181b] shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300">
+                <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                    <div class="flex items-start justify-between">
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2 font-heading">
+                            <i data-lucide="clipboard-list" class="w-6 h-6 text-orange-500"></i> Mis Pedidos
+                        </h2>
+                        <button onclick="toggleOrders(false)" class="p-2 text-slate-400 hover:text-white">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                    <div id="orders-list" class="mt-8 space-y-6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="fixed inset-0 z-[110] hidden items-center justify-center p-0 sm:p-4">
+        <div class="absolute inset-0 bg-[#121212]/70 backdrop-blur-md" onclick="closeCheckout()"></div>
+        <div class="relative bg-[#18181b] sm:rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden h-full sm:h-auto sm:max-h-[95vh] flex flex-col animate-fade-in border border-white/5">
+            <!-- Step 1: Formulario -->
+            <form id="checkout-form" class="flex flex-col h-full overflow-hidden" onsubmit="handleCheckoutSubmit(event)">
+                <div class="px-6 py-5 border-b border-white/5 bg-[#18181b] z-20 shadow-sm flex-shrink-0">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-extrabold text-white italic uppercase tracking-tighter flex items-center gap-2 font-heading">
+                            <i data-lucide="store" class="w-6 h-6 text-orange-500"></i> Datos de Retiro
+                        </h2>
+                        <button type="button" onclick="closeCheckout()" class="p-2 -mr-2 text-slate-400 hover:text-white">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Address Link -->
+                        <a id="checkout-address-link" href="#" target="_blank" class="flex items-center gap-2 bg-[#0f1113] p-2.5 rounded-xl border border-white/5 hover:border-orange-500/50 transition-all group">
+                            <div class="bg-[#18181b] p-1.5 rounded-lg shadow-sm text-slate-400 group-hover:text-orange-500 transition-colors"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
+                            <div class="flex flex-col overflow-hidden">
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1 group-hover:text-orange-500 transition-colors">Dirección</span>
+                                <span class="text-xs font-bold text-slate-300 truncate leading-none" id="checkout-address"></span>
+                            </div>
+                        </a>
+                        <!-- Phone Link -->
+                        <a id="checkout-phone-link" href="#" target="_blank" class="flex items-center gap-2 bg-[#0f1113] p-2.5 rounded-xl border border-white/5 hover:border-green-500/50 transition-all group">
+                            <div class="bg-[#18181b] p-1.5 rounded-lg shadow-sm text-slate-400 group-hover:text-green-500 transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i></div>
+                            <div class="flex flex-col overflow-hidden">
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1 group-hover:text-green-500 transition-colors">WhatsApp</span>
+                                <span class="text-xs font-bold text-slate-300 truncate leading-none" id="checkout-phone"></span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 bg-[#0f1113]/50 custom-scrollbar space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-1.5 ml-1">Nombre Completo</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                            <input required type="text" id="cust-name" class="w-full bg-[#0f1113] text-white border border-white/10 rounded-xl px-4 py-3.5 pl-10 focus:outline-none focus:ring-2 focus:ring-orange-500/30 font-medium placeholder-slate-600" placeholder="Ej: Juan Pérez">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-1.5 ml-1">Tu Teléfono</label>
+                        <div class="relative">
+                            <i data-lucide="phone" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                            <input required type="tel" id="cust-phone" class="w-full bg-[#0f1113] text-white border border-white/10 rounded-xl px-4 py-3.5 pl-10 focus:outline-none focus:ring-2 focus:ring-orange-500/30 font-medium placeholder-slate-600" placeholder="Ej: 387 123456">
+                        </div>
+                    </div>
+                    
+                    <!-- DÍA Y HORARIO DE RETIRO -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-300 mb-1.5 ml-1">Día</label>
+                            <div class="relative">
+                                <i data-lucide="calendar" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                                <input required type="date" id="cust-date" onchange="validateTime()" class="w-full bg-[#0f1113] text-white border border-white/10 rounded-xl px-4 py-3.5 pl-10 focus:outline-none focus:ring-2 focus:ring-orange-500/30 font-medium [color-scheme:dark]">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-300 mb-1.5 ml-1">Horario</label>
+                            <div class="relative">
+                                <i data-lucide="clock" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
+                                <input required type="time" id="cust-time" onchange="validateTime()" class="w-full bg-[#0f1113] text-white border border-white/10 rounded-xl px-4 py-3.5 pl-10 focus:outline-none focus:ring-2 focus:ring-orange-500/30 font-medium [color-scheme:dark]">
+                            </div>
+                        </div>
+                    </div>
+                    <p id="time-error" class="hidden text-xs font-bold text-red-400 mt-0 bg-red-900/20 p-2 rounded-lg border border-red-500/20"></p>
+                    
+                    <!-- Selector de Pago -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-2 ml-1">Método de Pago</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" onclick="selectPayment('Efectivo')" id="btn-pay-efectivo" class="p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-orange-500/10 border-orange-500 text-white">
+                                <i data-lucide="banknote" class="w-6 h-6 text-orange-500"></i>
+                                <span class="text-xs font-bold uppercase">Efectivo al Retirar</span>
+                            </button>
+                            <button type="button" onclick="selectPayment('Transferencia')" id="btn-pay-transfer" class="p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-[#0f1113] border-white/5 text-slate-400 hover:bg-[#1f2125]">
+                                <i data-lucide="qr-code" class="w-6 h-6 text-slate-500"></i>
+                                <span class="text-xs font-bold uppercase">Transferencia / MP</span>
+                            </button>
+                        </div>
+                        <div id="transfer-data" class="hidden mt-4 space-y-4 animate-fade-in">
+                            <!-- Aviso Importante -->
+                            <div class="p-4 bg-[#0f1113] rounded-xl border border-orange-500/30">
+                                <div class="flex items-center gap-2 mb-3 text-orange-400">
+                                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                    <p class="text-xs font-bold uppercase">Asegurá tu pedido pagando ahora</p>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="bg-[#18181b] p-3 rounded-lg border border-white/5">
+                                        <!-- Alias -->
+                                        <div class="mb-2 border-b border-white/5 pb-2 flex justify-between items-center">
+                                            <div class="overflow-hidden mr-2">
+                                                <p class="text-[10px] text-slate-500 font-bold uppercase">Alias</p>
+                                                <p class="text-sm font-mono text-white tracking-wide select-all truncate">deliciasurbanas13</p>
+                                            </div>
+                                            <button type="button" onclick="copyToClipboard('deliciasurbanas13', this)" class="shrink-0 p-2 text-slate-400 hover:text-white relative transition-colors group">
+                                                <i data-lucide="copy" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+                                            </button>
+                                        </div>
+                                        <!-- Titular -->
+                                        <div class="flex justify-between items-center">
+                                            <div class="overflow-hidden mr-2">
+                                                <p class="text-[10px] text-slate-500 font-bold uppercase">Titular</p>
+                                                <p class="text-xs font-medium text-white truncate">Nahida Esther Leonor Zamar</p>
+                                            </div>
+                                             <button type="button" onclick="copyToClipboard('Nahida Esther Leonor Zamar', this)" class="shrink-0 p-2 text-slate-400 hover:text-white relative transition-colors group">
+                                                <i data-lucide="copy" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="text-[10px] text-slate-400 text-center italic">
+                                Al finalizar, envia el comprobante por WhatsApp
+                            </p>
+                        </div>
+                        
+                        <!-- Limit Warning -->
+                        <div id="limit-warning" class="hidden mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-3">
+                            <i data-lucide="info" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
+                            <p class="text-xs text-amber-200 font-medium">Por seguridad, los pedidos superiores a <span class="font-bold text-white">$15.000</span> solo se aceptan con transferencia previa.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-1.5 ml-1">Notas (Opcional)</label>
+                        <textarea id="cust-notes" class="w-full bg-[#0f1113] text-white border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500/30 min-h-[80px] resize-none font-medium text-sm placeholder-slate-600" placeholder="¿Alguna aclaración?"></textarea>
+                    </div>
+                    
+                    <!-- Cancellation Warning -->
+                    <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                        <p class="text-[10px] text-red-200 font-medium leading-relaxed">
+                            <strong class="text-red-400 uppercase">⚠️ Importante:</strong> Una vez confirmado, el pedido se comienza a elaborar. Si necesitás cancelar, hacelo inmediatamente por WhatsApp para evitar desperdicio de comida.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-5 border-t border-white/5 bg-[#18181b] flex-shrink-0 z-20">
+                    <div id="checkout-totals-container" class="space-y-1 mb-4">
+                        <!-- Totales inyectados por JS -->
+                    </div>
+                    <button type="submit" id="btn-confirm-order" class="w-full bg-white text-[#1A1A1A] font-black py-4 rounded-xl shadow-xl hover:bg-orange-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
+                        CONFIRMAR PEDIDO <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Step 2: Éxito (Oculto por defecto) -->
+            <div id="checkout-success" class="hidden flex-col h-full bg-[#18181b]">
+                <div class="flex-1 overflow-y-auto p-8 text-center space-y-6 custom-scrollbar">
+                    <div class="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl flex items-center gap-4 text-left">
+                        <i data-lucide="alert-circle" class="w-10 h-10 text-amber-500 shrink-0"></i>
+                        <div>
+                            <p class="text-amber-500 font-black text-xs uppercase tracking-wider mb-1">¡Paso Obligatorio!</p>
+                            <p class="text-amber-200 text-sm font-medium">Enviá el pedido por WhatsApp para confirmar tu retiro.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-white mb-2 tracking-tighter italic uppercase font-heading">CASI LISTO...</h2>
+                        <p class="text-slate-400 font-medium">Hacé clic abajo para enviar el pedido por WhatsApp.</p>
+                        <p id="success-payment-msg" class="text-xs text-orange-400 font-bold mt-2 hidden">No olvides adjuntar el comprobante</p>
+                    </div>
+                    <button id="btn-send-whatsapp" class="w-full bg-green-600 text-white font-black py-5 rounded-2xl transition-all duration-300 hover:scale-105 shadow-xl shadow-green-600/30 flex items-center justify-center gap-3 animate-pulse">
+                        <i data-lucide="message-circle" class="w-7 h-7"></i> ENVIAR POR WHATSAPP
+                    </button>
+                    <div class="bg-[#0f1113] p-5 rounded-2xl text-left border border-white/5">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Resumen</p>
+                        <ul id="success-summary" class="text-xs space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar text-slate-300"></ul>
+                    </div>
+                </div>
+                <div class="p-5 border-t border-white/5 bg-[#18181b] z-20">
+                     <button onclick="window.location.reload()" class="w-full bg-white text-[#1A1A1A] font-black py-4 rounded-xl hover:bg-slate-200 transition-all duration-300">
+                        VOLVER AL INICIO
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÓN FLOTANTE CARRITO -->
+    <div id="float-cart-btn" class="hidden fixed bottom-6 left-6 z-[90] animate-slide-up">
+        <button onclick="toggleCart(true)" class="group flex items-center gap-3 bg-white text-[#1A1A1A] pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-[#121212]/50 border border-slate-700 hover:scale-105 active:scale-95 transition-all duration-300">
+            <div class="relative">
+                <div class="bg-orange-500 rounded-full p-2 text-white group-hover:bg-orange-400 transition-colors">
+                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                </div>
+                <span id="float-count" class="absolute -top-1 -right-1 bg-[#18181b] text-orange-500 text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">0</span>
+            </div>
+            <div class="flex flex-col items-start">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none mb-1">Tu Pedido</span>
+                <span id="float-total" class="text-sm font-black text-[#1A1A1A] leading-none">$0</span>
+            </div>
+        </button>
+    </div>
+
+    <!-- LÓGICA PRINCIPAL -->
+    <script>
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initUI();
+            
+            // 1. Render Categories immediately (skeleton or static is fine, static is better for UI structure)
+            renderCategories();
+            
+            // 2. Show Spinner in Product Grid
+            const productContainer = document.getElementById('product-container');
+            productContainer.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center py-40">
+                    <div class="relative">
+                        <div class="w-16 h-16 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="chef-hat" class="w-6 h-6 text-orange-500"></i>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-slate-500 font-bold text-xs uppercase tracking-[0.2em] animate-pulse">Preparando Menú...</p>
+                </div>
+            `;
+            lucide.createIcons();
+
+            // 3. Simulate Data Fetching
+            setTimeout(() => {
+                renderMenu();
+                renderCart();
+                renderOrders();
+                
+                // Handle Hero Image Fade-in
+                const heroImg = document.getElementById('hero-bg-image');
+                if(heroImg) {
+                    if(heroImg.complete) {
+                        heroImg.classList.remove('opacity-0');
+                    } else {
+                        heroImg.onload = () => heroImg.classList.remove('opacity-0');
+                    }
+                }
+            }, 1200); // 1.2 seconds delay
+        });
+        
+        // --- COPIAR AL PORTAPAPELES ---
+        function copyToClipboard(text, btn) {
+            // Manejo seguro del portapapeles
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => showCopyFeedback(btn))
+                .catch(err => {
+                    console.error('Async: Could not copy text: ', err);
+                    fallbackCopyTextToClipboard(text, btn);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text, btn);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text, btn) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  // Avoid scrolling to bottom
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if(successful) showCopyFeedback(btn);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showCopyFeedback(btn) {
+            const originalContent = btn.innerHTML;
+            // Cambio visual: Icono Check + Tooltip flotante
+            btn.innerHTML = `
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500 animate-in zoom-in duration-300"></i>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-in fade-in slide-in-from-bottom-2 whitespace-nowrap z-50 pointer-events-none">¡Copiado!</span>
+            `;
+            lucide.createIcons();
+
+            setTimeout(() => {
+                btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>`;
+                lucide.createIcons();
+            }, 2000);
+        }
+
+        function initUI() {
+            // Llenar información de la tienda
+            document.querySelectorAll('[id^="header-logo"], [id^="hero-logo"], [id^="footer-logo"]').forEach(img => {
+                img.src = SHOP_INFO.logoUrl;
+                img.onerror = () => { img.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=100'; };
+            });
+            document.getElementById('hero-address').innerText = SHOP_INFO.address;
+            document.getElementById('hero-instagram').href = SHOP_INFO.instagram;
+            document.getElementById('hero-instagram-user').innerText = SHOP_INFO.instagramUser;
+            
+            document.getElementById('footer-address').innerText = SHOP_INFO.address;
+            document.getElementById('footer-phone').innerText = SHOP_INFO.phoneDisplay;
+            document.getElementById('footer-instagram-link').href = SHOP_INFO.instagram;
+
+            document.getElementById('checkout-address').innerText = SHOP_INFO.address;
+            document.getElementById('checkout-address-link').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SHOP_INFO.addressFull)}`;
+            
+            document.getElementById('checkout-phone').innerText = SHOP_INFO.phoneDisplay;
+            document.getElementById('checkout-phone-link').href = `https://wa.me/${SHOP_INFO.phone}`;
+
+            // Listener de búsqueda
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderMenu();
+            });
+        }
+
+        // --- GESTIÓN DE FILTROS ---
+        function toggleFilters() {
+            filtersOpen = !filtersOpen;
+            const panel = document.getElementById('filter-panel');
+            const btn = document.getElementById('filter-btn');
+            
+            if (filtersOpen) {
+                panel.classList.remove('hidden');
+                btn.classList.add('bg-orange-500', 'text-white', 'border-orange-500');
+                btn.classList.remove('bg-[#0f1113]', 'text-slate-400');
+            } else {
+                panel.classList.add('hidden');
+                btn.classList.remove('bg-orange-500', 'text-white', 'border-orange-500');
+                btn.classList.add('bg-[#0f1113]', 'text-slate-400');
+            }
+        }
+
+        function toggleTag(tag) {
+            if (activeTags.includes(tag)) {
+                activeTags = activeTags.filter(t => t !== tag);
+            } else {
+                activeTags.push(tag);
+            }
+            updateTagUI();
+            renderMenu();
+        }
+
+        function updateTagUI() {
+            // Popular
+            const btnPopular = document.getElementById('tag-popular');
+            if (activeTags.includes('popular')) {
+                btnPopular.className = "px-4 py-2 rounded-xl border bg-orange-500 border-orange-500 text-white text-xs font-bold uppercase transition-all flex items-center gap-2 shadow-lg shadow-orange-500/30";
+            } else {
+                btnPopular.className = "px-4 py-2 rounded-xl border border-white/10 bg-[#0f1113] text-slate-400 text-xs font-bold uppercase hover:border-orange-500/50 hover:text-white transition-all flex items-center gap-2";
+            }
+
+            // Veggie
+            const btnVeggie = document.getElementById('tag-veggie');
+            if (activeTags.includes('veggie')) {
+                btnVeggie.className = "px-4 py-2 rounded-xl border bg-green-600 border-green-600 text-white text-xs font-bold uppercase transition-all flex items-center gap-2 shadow-lg shadow-green-600/30";
+            } else {
+                btnVeggie.className = "px-4 py-2 rounded-xl border border-white/10 bg-[#0f1113] text-slate-400 text-xs font-bold uppercase hover:border-green-500/50 hover:text-white transition-all flex items-center gap-2";
+            }
+        }
+
+        function updatePrice() {
+            const minInput = document.getElementById('price-min').value;
+            const maxInput = document.getElementById('price-max').value;
+            
+            priceRange.min = minInput ? parseFloat(minInput) : null;
+            priceRange.max = maxInput ? parseFloat(maxInput) : null;
+            
+            renderMenu();
+        }
+
+        function clearFilters() {
+            activeTags = [];
+            priceRange = { min: null, max: null };
+            document.getElementById('price-min').value = '';
+            document.getElementById('price-max').value = '';
+            updateTagUI();
+            renderMenu();
+        }
+
+        // --- RENDERIZADO DEL MENÚ ---
+        function renderCategories() {
+            const categories = [
+                { name: 'Todos', icon: 'pizza' },
+                { name: 'Pollo', icon: 'flame' },
+                { name: 'Sándwiches', icon: 'sandwich' },
+                { name: 'Guarniciones', icon: 'ice-cream' },
+                { name: 'Bebidas', icon: 'cup-soda' }
+            ];
+            
+            const container = document.getElementById('category-container');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat.name}')" 
+                    class="px-6 py-3 rounded-2xl font-black transition-all duration-300 whitespace-nowrap flex items-center gap-3 text-sm active:scale-95 hover:scale-105 
+                    ${selectedCategory === cat.name ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/40' : 'bg-[#18181b] text-slate-400 hover:bg-[#27272a]'}">
+                    <i data-lucide="${cat.icon}" class="w-4 h-4"></i> ${cat.name.toUpperCase()}
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function setCategory(cat) {
+            selectedCategory = cat;
+            renderCategories(); // Actualizar estado visual
+            renderMenu();
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('product-container');
+            const title = document.getElementById('menu-title');
+            const clearBtn = document.getElementById('clear-filters-btn');
+            
+            title.innerText = selectedCategory === 'Todos' ? 'NUESTRO MENÚ' : selectedCategory.toUpperCase();
+
+            const hasActiveFilters = activeTags.length > 0 || priceRange.min !== null || priceRange.max !== null;
+            if(clearBtn) {
+                if(hasActiveFilters) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
+            }
+
+            // Filtrar items
+            const filtered = MENU_ITEMS.filter(item => {
+                const matchCat = selectedCategory === 'Todos' || item.category === selectedCategory;
+                const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                    item.description.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                // Filtro Tags
+                const matchTags = activeTags.length === 0 || activeTags.every(tag => item.tags && item.tags.includes(tag));
+                
+                // Filtro Precio
+                const matchMinPrice = priceRange.min === null || item.price >= priceRange.min;
+                const matchMaxPrice = priceRange.max === null || item.price <= priceRange.max;
+
+                return matchCat && matchSearch && matchTags && matchMinPrice && matchMaxPrice;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-20 bg-[#18181b] rounded-3xl border-2 border-dashed border-white/5">
+                        <p class="text-slate-500 text-lg font-bold">No encontramos esa delicia...</p>
+                        ${hasActiveFilters 
+                            ? `<button onclick="clearFilters()" class="mt-4 text-orange-600 font-extrabold hover:underline">Limpiar filtros</button>` 
+                            : `<button onclick="setCategory('Todos'); document.getElementById('search-input').value='';" class="mt-4 text-orange-600 font-extrabold hover:underline">Ver todo el menú</button>`
+                        }
+                    </div>`;
+                return;
+            }
+
+            // Agrupar items por categoría
+            const grouped = {};
+            filtered.forEach(item => {
+                if (!grouped[item.category]) grouped[item.category] = [];
+                grouped[item.category].push(item);
+            });
+
+            // Orden de categorías a mostrar
+            const displayOrder = ['Pollo', 'Sándwiches', 'Guarniciones', 'Bebidas'];
+            let htmlContent = '';
+
+            displayOrder.forEach(cat => {
+                // Si la categoría seleccionada no es Todos y no coincide, saltar
+                if (selectedCategory !== 'Todos' && selectedCategory !== cat) return;
+                
+                const items = grouped[cat];
+                if (!items || items.length === 0) return;
+
+                // Generar HTML de la sección
+                let itemsHtml = items.map(item => {
+                    const isPromo = item.id.startsWith('p'); 
+                    const hasCustomization = !!item.customization;
+                    const buttonAction = hasCustomization ? `openFlavorModal('${item.id}')` : `addToCart('${item.id}', this)`;
+                    const buttonIcon = hasCustomization ? `<i data-lucide="list-plus" class="w-5 h-5 absolute transition-all duration-300 group-hover/btn:scale-110"></i>` : `
+                        <i data-lucide="plus" class="w-5 h-5 transition-all duration-300 group-hover/btn:rotate-90 group-hover/btn:scale-0 opacity-100 group-hover/btn:opacity-0 absolute"></i>
+                        <i data-lucide="arrow-right" class="w-5 h-5 transition-all duration-300 -rotate-90 scale-0 opacity-0 group-hover/btn:rotate-0 group-hover/btn:scale-100 group-hover/btn:opacity-100 absolute"></i>
+                    `;
+
+                    // Tags visuales
+                    let tagsHtml = '';
+                    if(item.tags && item.tags.includes('popular')) {
+                        tagsHtml += `<span class="bg-orange-500/20 text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded ml-2 border border-orange-500/20 flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3"></i> Top</span>`;
+                    }
+                    if(item.tags && item.tags.includes('veggie')) {
+                        tagsHtml += `<span class="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded ml-2 border border-green-500/20 flex items-center gap-1"><i data-lucide="leaf" class="w-3 h-3"></i> Veg</span>`;
+                    }
+
+                    return `
+                    <div class="group relative rounded-[2rem] p-6 transition-all duration-500 flex flex-col justify-between h-full min-h-[240px]
+                        ${isPromo 
+                            ? 'bg-gradient-to-br from-[#1c1c20] via-[#2a1b12] to-[#1c1c20] border border-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.1)] hover:shadow-[0_0_40px_rgba(249,115,22,0.25)] hover:border-orange-500/80 scale-[1.02]' 
+                            : 'bg-[#18181b] border border-white/5 shadow-sm hover:shadow-2xl hover:shadow-orange-500/10 hover:border-orange-500/30'
+                        }">
+                        
+                        ${isPromo ? `
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
+                          <div class="bg-orange-500 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg shadow-orange-500/40 tracking-[0.2em] uppercase flex items-center gap-1.5 border border-white/10 whitespace-nowrap">
+                            <i data-lucide="flame" class="w-3 h-3 fill-white animate-pulse"></i>
+                            Oferta Especial
+                          </div>
+                        </div>` : ''}
+
+                        <div class="absolute top-0 right-0 w-32 h-32 rounded-bl-[100%] rounded-tr-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none ${isPromo ? 'bg-orange-500/10' : 'bg-orange-500/5'}"></div>
+                        
+                        <div class="relative z-10 pt-2">
+                            <div class="mb-4 flex flex-wrap gap-y-2 justify-between items-start">
+                                <div class="flex flex-wrap items-center">
+                                    <span class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors duration-300
+                                        ${isPromo 
+                                            ? 'bg-orange-500/20 text-orange-400 border border-orange-500/20' 
+                                            : 'bg-[#0f1113] text-slate-400 group-hover:bg-orange-900/20 group-hover:text-orange-500'
+                                        }">
+                                        ${item.category}
+                                    </span>
+                                    ${tagsHtml}
+                                </div>
+                                 ${isPromo ? '<i data-lucide="sparkles" class="w-4 h-4 text-orange-400/50"></i>' : ''}
+                            </div>
+                            <h3 class="text-2xl font-extrabold leading-tight tracking-tight mb-3 transition-colors duration-300 ${isPromo ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-orange-200' : 'text-white group-hover:text-orange-500'}">
+                                ${item.name.replace('PROMO:', '').trim()}
+                            </h3>
+                            <p class="text-sm font-medium leading-relaxed line-clamp-3 ${isPromo ? 'text-orange-100/70' : 'text-slate-400'}">${item.description}</p>
+                        </div>
+                        <div class="relative z-10 mt-8 pt-6 border-t flex items-center justify-between ${isPromo ? 'border-orange-500/20' : 'border-white/5'}">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5 font-bold">Precio</span>
+                                <span class="text-2xl font-black tracking-tighter ${isPromo ? 'text-white drop-shadow-sm' : 'text-white'}">$${item.price.toLocaleString('es-AR')}</span>
+                            </div>
+                            <button onclick="${buttonAction}" class="group/btn relative overflow-hidden w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-lg active:scale-95
+                                ${isPromo 
+                                    ? 'bg-orange-500 text-white hover:bg-white hover:text-orange-600 shadow-orange-500/20' 
+                                    : 'bg-white hover:bg-orange-500 text-[#1A1A1A] hover:text-white shadow-[#121212]/20 hover:shadow-orange-500/30'
+                                }">
+                                ${buttonIcon}
+                            </button>
+                        </div>
+                    </div>
+                `;}).join('');
+
+                htmlContent += `
+                    <div class="animate-fade-in">
+                        <div class="flex items-center gap-4 mb-8">
+                           <h3 class="text-2xl font-black text-white uppercase italic tracking-tighter shrink-0">
+                             ${cat}
+                           </h3>
+                           <div class="h-px bg-gradient-to-r from-orange-500/50 to-transparent w-full"></div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+            lucide.createIcons();
+        }
+
+        // --- LÓGICA DEL MODAL DE SABORES (VANILLA) ---
+        function openFlavorModal(productId) {
+            const product = MENU_ITEMS.find(p => p.id === productId);
+            if (!product || !product.customization) return;
+
+            currentCustomProduct = product;
+            // Inicializar selecciones
+            flavorSelections = {};
+            product.customization.groups.forEach(group => {
+                flavorSelections[group.title] = {};
+                group.options.forEach(opt => flavorSelections[group.title][opt] = 0);
+            });
+
+            renderFlavorModal();
+            const modal = document.getElementById('flavor-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeFlavorModal() {
+            const modal = document.getElementById('flavor-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentCustomProduct = null;
+        }
+
+        function updateFlavor(groupTitle, option, delta, limit, minStep = 1) {
+            const currentCount = flavorSelections[groupTitle][option] || 0;
+            const totalInGroup = Object.values(flavorSelections[groupTitle]).reduce((a, b) => a + b, 0);
+
+            // Logic to handle minStep jumps
+            if (delta > 0) {
+                if (totalInGroup >= limit) return;
+                
+                if (currentCount === 0) {
+                    if (totalInGroup + minStep <= limit) {
+                        flavorSelections[groupTitle][option] = minStep;
+                    }
+                } else {
+                    if (totalInGroup + 1 <= limit) {
+                        flavorSelections[groupTitle][option] = currentCount + 1;
+                    }
+                }
+            } else {
+                if (currentCount <= 0) return;
+                
+                if (currentCount === minStep) {
+                    flavorSelections[groupTitle][option] = 0;
+                } else if (currentCount > minStep) {
+                    flavorSelections[groupTitle][option] = currentCount - 1;
+                } else {
+                    flavorSelections[groupTitle][option] = 0;
+                }
+            }
+            renderFlavorModal();
+        }
+
+        function renderFlavorModal() {
+            if (!currentCustomProduct) return;
+            const product = currentCustomProduct;
+            
+            document.getElementById('flavor-modal-title').innerText = product.name;
+            
+            let html = '';
+            let isAllComplete = true;
+
+            product.customization.groups.forEach(group => {
+                const currentTotal = Object.values(flavorSelections[group.title] || {}).reduce((a, b) => a + b, 0);
+                const remaining = group.limit - currentTotal;
+                const isGroupComplete = currentTotal === group.limit;
+                const minStep = group.minSelection || 1;
+                
+                if (!isGroupComplete) isAllComplete = false;
+
+                html += `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-end">
+                       <h4 class="text-sm font-bold text-orange-500 uppercase tracking-widest">${group.title}</h4>
+                       <span class="text-xs font-black px-2 py-1 rounded-md border ${isGroupComplete ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-slate-800 text-slate-300 border-white/10'}">
+                          ${isGroupComplete ? 'Listo' : `Faltan ${remaining}`}
+                       </span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">`;
+                
+                group.options.forEach(opt => {
+                    const qty = flavorSelections[group.title][opt] || 0;
+                    const canAdd = qty === 0 ? (currentTotal + minStep <= group.limit) : (currentTotal + 1 <= group.limit);
+
+                    html += `
+                      <div class="flex items-center justify-between p-3 rounded-xl border transition-all ${qty > 0 ? 'bg-orange-500/10 border-orange-500/30' : 'bg-[#0f1113] border-white/5'}">
+                        <span class="text-sm font-medium ${qty > 0 ? 'text-white' : 'text-slate-400'}">${opt}</span>
+                        <div class="flex items-center gap-3">
+                          <button onclick="updateFlavor('${group.title}', '${opt}', -1, ${group.limit}, ${minStep})" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#18181b] border border-white/10 text-slate-400 hover:text-white ${qty === 0 ? 'opacity-30 cursor-not-allowed' : ''}">
+                             <i data-lucide="minus" class="w-3 h-3"></i>
+                          </button>
+                          <span class="w-4 text-center text-sm font-black text-white">${qty}</span>
+                          <button onclick="updateFlavor('${group.title}', '${opt}', 1, ${group.limit}, ${minStep})" class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#18181b] border border-white/10 text-slate-400 hover:text-white ${!canAdd ? 'opacity-30 cursor-not-allowed' : 'hover:border-orange-500/50'}">
+                             <i data-lucide="plus" class="w-3 h-3"></i>
+                          </button>
+                        </div>
+                      </div>
+                    `;
+                });
+                html += `</div></div>`;
+            });
+
+            document.getElementById('flavor-modal-body').innerHTML = html;
+            
+            const btn = document.getElementById('flavor-confirm-btn');
+            btn.disabled = !isAllComplete;
+            if (isAllComplete) {
+                btn.classList.remove('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
+                btn.classList.add('bg-orange-500', 'text-white', 'hover:bg-orange-600', 'shadow-lg');
+                btn.innerHTML = `Agregar al Pedido <i data-lucide="sandwich" class="w-4 h-4"></i>`;
+            } else {
+                btn.classList.add('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
+                btn.classList.remove('bg-orange-500', 'text-white', 'hover:bg-orange-600', 'shadow-lg');
+                btn.innerText = 'Completá las selecciones';
+            }
+            lucide.createIcons();
+        }
+
+        function confirmFlavors() {
+            if (!currentCustomProduct) return;
+            
+            // Visual feedback
+            const btn = document.getElementById('flavor-confirm-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check" class="w-5 h-5"></i> ¡Agregado!`;
+            btn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+            btn.classList.add('bg-green-500', 'hover:bg-green-600');
+            lucide.createIcons();
+
+            setTimeout(() => {
+                const flavorTextParts = [];
+                Object.entries(flavorSelections).forEach(([groupTitle, opts]) => {
+                    const activeOpts = Object.entries(opts).filter(([_, qty]) => qty > 0);
+                    if (activeOpts.length > 0) {
+                        const groupDesc = activeOpts.map(([name, qty]) => `${qty}x ${name}`).join(', ');
+                        flavorTextParts.push(groupDesc);
+                    }
+                });
+
+                addToCartWithCustomization(currentCustomProduct.id, flavorTextParts.join(' + '));
+                closeFlavorModal();
+            }, 500);
+        }
+
+        // --- LÓGICA DEL CARRITO ---
+        function addToCart(id, btn) {
+            const product = MENU_ITEMS.find(p => p.id === id);
+            const existing = cart.find(i => i.id === id && !i.selectedFlavors); // Solo si no es custom
+            
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            renderCart();
+
+            // Visual feedback
+            if(btn) {
+                const originalHTML = btn.innerHTML;
+                const originalClass = btn.className;
+                
+                // Remove existing content temporarily
+                btn.innerHTML = `<i data-lucide="check" class="w-6 h-6 text-white animate-in zoom-in duration-300"></i>`;
+                
+                // Change style to green circle
+                btn.className = "group/btn relative overflow-hidden w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-green-500 scale-110 shadow-green-500/30";
+                
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.className = originalClass;
+                    lucide.createIcons();
+                }, 1500);
+            }
+        }
+
+        function addToCartWithCustomization(id, flavorText) {
+            const product = MENU_ITEMS.find(p => p.id === id);
+            // Generar ID único para el carrito para evitar agrupamiento incorrecto
+            const uniqueId = `${id}-${Date.now()}`;
+            cart.push({ ...product, id: uniqueId, originalId: id, quantity: 1, selectedFlavors: flavorText });
+            renderCart();
+        }
+
+        function updateQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+                renderCart();
+            }
+        }
+
+        function removeCartItem(id) {
+            cart = cart.filter(i => i.id !== id);
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const recommendationsContainer = document.getElementById('cart-recommendations');
+            const totalDisplay = document.getElementById('cart-total');
+            const cartFooter = document.getElementById('cart-footer');
+            const badge = document.getElementById('cart-badge');
+            const floatBtn = document.getElementById('float-cart-btn');
+            
+            const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
+            
+            // Usamos precio base solamente
+            const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+
+            // Badge
+            badge.innerText = totalItems;
+            badge.classList.toggle('hidden', totalItems === 0);
+
+            // Botón flotante
+            floatBtn.classList.toggle('hidden', totalItems === 0);
+            document.getElementById('float-count').innerText = totalItems;
+            document.getElementById('float-total').innerText = '$' + totalPrice.toLocaleString('es-AR');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-20 bg-[#18181b] rounded-3xl border-2 border-dashed border-white/5">
+                        <i data-lucide="shopping-bag" class="w-12 h-12 text-slate-600 mx-auto mb-4"></i>
+                        <p class="text-slate-400 font-medium">Tu carrito está vacío.</p>
+                        <button onclick="toggleCart(false)" class="mt-4 text-orange-600 font-black text-sm uppercase tracking-wide hover:underline">Ir al menú</button>
+                    </div>`;
+                cartFooter.classList.add('hidden');
+                recommendationsContainer.classList.add('hidden');
+            } else {
+                // Lista de Productos
+                container.innerHTML = `<ul class="space-y-4">` + cart.map((item) => {
+                    const itemTotal = item.price * item.quantity;
+                    return `
+                    <li class="p-4 bg-[#0f1113] rounded-2xl border border-white/5 flex gap-4">
+                         <div class="h-12 w-12 flex-shrink-0 rounded-xl bg-[#18181b] border border-white/5 flex items-center justify-center text-orange-500">
+                            <i data-lucide="utensils" class="w-5 h-5"></i>
+                         </div>
+                         <div class="flex flex-1 flex-col justify-between">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-sm font-bold text-white leading-tight">${item.name}</h3>
+                                <p class="ml-4 font-bold text-white text-sm">$${itemTotal.toLocaleString('es-AR')}</p>
+                            </div>
+                            ${item.selectedFlavors ? `<p class="text-[10px] text-slate-300 mt-1 mb-2 italic border-l-2 border-orange-500 pl-2">${item.selectedFlavors}</p>` : ''}
+                            <div class="flex items-end justify-between mt-3">
+                                <div class="flex items-center bg-[#18181b] border border-white/5 rounded-lg h-8">
+                                    <button onclick="updateQty('${item.id}', -1)" class="w-8 h-full flex items-center justify-center text-slate-500 hover:text-white"><i data-lucide="minus" class="w-3 h-3"></i></button>
+                                    <span class="w-8 text-center text-sm font-black text-white">${item.quantity}</span>
+                                    <button onclick="updateQty('${item.id}', 1)" class="w-8 h-full flex items-center justify-center text-slate-500 hover:text-white"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                                </div>
+                                <button onclick="removeCartItem('${item.id}')" class="p-2 text-slate-500 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                         </div>
+                    </li>
+                `}).join('') + `</ul>`;
+                
+                // Recomendaciones en CARRUSEL (SIN IMÁGENES)
+                const recommendations = MENU_ITEMS
+                    .filter(item => !cart.find(c => (c.originalId || c.id) === item.id))
+                    .filter(item => ['Bebidas', 'Guarniciones', 'Sándwiches'].includes(item.category))
+                    .filter(item => !item.id.startsWith('d') && !item.id.startsWith('c') && !item.id.startsWith('p')) // Solo items pequeños
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 5); // 5 items para el carrusel
+
+                if (recommendations.length > 0) {
+                    recommendationsContainer.innerHTML = `
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                               <i data-lucide="sparkles" class="w-3 h-3 text-orange-500"></i> Agregá a tu pedido
+                            </h3>
+                            <div class="flex gap-1">
+                                <div class="w-1 h-1 rounded-full bg-orange-500"></div>
+                                <div class="w-1 h-1 rounded-full bg-slate-700"></div>
+                                <div class="w-1 h-1 rounded-full bg-slate-700"></div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 overflow-x-auto pb-4 -mx-6 px-6 snap-x snap-mandatory no-scrollbar">
+                            ${recommendations.map(rec => {
+                                return `
+                                <div class="snap-center shrink-0 w-32 bg-[#0f1113] rounded-2xl border border-white/5 p-4 flex flex-col justify-between gap-3 group hover:border-orange-500/30 transition-all h-full min-h-[120px]">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-xs font-bold text-white line-clamp-2 leading-tight">${rec.name}</span>
+                                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">$${rec.price.toLocaleString('es-AR')}</span>
+                                    </div>
+                                    <button onclick="addToCart('${rec.id}', this)" class="w-full py-2 bg-[#18181b] border border-white/10 text-orange-500 rounded-xl hover:bg-orange-500 hover:text-white transition-all active:scale-95 flex items-center justify-center shadow-sm">
+                                        <span class="text-[10px] font-bold uppercase mr-1">AGREGAR</span> <i data-lucide="plus" class="w-3 h-3"></i>
+                                    </button>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                    recommendationsContainer.classList.remove('hidden');
+                } else {
+                    recommendationsContainer.classList.add('hidden');
+                }
+
+                totalDisplay.innerText = '$' + totalPrice.toLocaleString('es-AR');
+                cartFooter.classList.remove('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        // --- DRAWERS & MODALS ---
+        function toggleCart(show) {
+            const drawer = document.getElementById('cart-drawer');
+            const panel = document.getElementById('cart-drawer-panel');
+            if (show) {
+                drawer.classList.remove('hidden');
+                setTimeout(() => panel.classList.add('drawer-open'), 10);
+                
+                // Trigger animation replay for cart items
+                const itemsContainer = document.getElementById('cart-items-container');
+                if(itemsContainer) {
+                    itemsContainer.classList.remove('animate-fade-in');
+                    void itemsContainer.offsetWidth; // trigger reflow
+                    itemsContainer.classList.add('animate-fade-in');
+                }
+            } else {
+                panel.classList.remove('drawer-open');
+                setTimeout(() => drawer.classList.add('hidden'), 300);
+            }
+        }
+
+        function toggleOrders(show) {
+            const drawer = document.getElementById('orders-drawer');
+            const panel = document.getElementById('orders-drawer-panel');
+            if (show) {
+                drawer.classList.remove('hidden');
+                setTimeout(() => panel.classList.add('drawer-open'), 10);
+            } else {
+                panel.classList.remove('drawer-open');
+                setTimeout(() => drawer.classList.add('hidden'), 300);
+            }
+        }
+
+        // --- CHECKOUT ---
+        let tempOrderDetails = {};
+
+        function formatDate(dateStr) {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const date = new Date(y, m - 1, d);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            // Check if today
+            if (date.getTime() === today.getTime()) return "Hoy";
+            
+            // Check if tomorrow
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            if (date.getTime() === tomorrow.getTime()) return "Mañana";
+            
+            // Else DD/MM
+            return `${d.toString().padStart(2, '0')}/${m.toString().padStart(2, '0')}`;
+        }
+
+        function openCheckout() {
+            toggleCart(false);
+            const modal = document.getElementById('checkout-modal');
+            const totalCash = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            
+            // Set Default Date to Today
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+            
+            const dateInput = document.getElementById('cust-date');
+            dateInput.value = dateStr;
+            dateInput.min = dateStr; // Disable past dates
+
+            document.getElementById('cust-time').value = "";
+            document.getElementById('time-error').classList.add('hidden');
+            
+            // Lógica de Límite de Pago
+            const isHighValue = totalCash > TRANSFER_LIMIT;
+            const limitWarning = document.getElementById('limit-warning');
+            
+            if (isHighValue) {
+                // Forzar transferencia si supera límite
+                selectedPaymentMethod = 'Transferencia';
+                limitWarning.classList.remove('hidden');
+            } else {
+                // Default: Efectivo
+                selectedPaymentMethod = 'Efectivo';
+                limitWarning.classList.add('hidden');
+            }
+            
+            updatePaymentUI();
+            
+            document.getElementById('checkout-form').classList.remove('hidden');
+            document.getElementById('checkout-success').classList.remove('flex');
+            document.getElementById('checkout-success').classList.add('hidden');
+            
+            // LOCK SCROLL
+            document.body.style.overflow = 'hidden';
+            
+            modal.classList.add('modal-open');
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').classList.remove('modal-open');
+            // UNLOCK SCROLL
+            document.body.style.overflow = '';
+        }
+
+        function validateTime() {
+            const dateInput = document.getElementById('cust-date');
+            const timeInput = document.getElementById('cust-time');
+            const errorMsg = document.getElementById('time-error');
+            const btn = document.getElementById('btn-confirm-order');
+
+            if (!dateInput.value || !timeInput.value) return false;
+
+            // Parse Date correctly in Local Time
+            const [y, m, d] = dateInput.value.split('-').map(Number);
+            const selectedDate = new Date(y, m - 1, d);
+            const dayOfWeek = selectedDate.getDay(); // 0 = Domingo
+
+            // 1. Check Domingo
+            if (dayOfWeek === 0) {
+                errorMsg.innerText = "Los domingos estamos cerrados.";
+                errorMsg.classList.remove('hidden');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                return false;
+            }
+
+            // 2. Check Past Time (Solo si es hoy)
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            if (selectedDate.getTime() === today.getTime()) {
+                const [h, min] = timeInput.value.split(':').map(Number);
+                const selectedMinutes = h * 60 + min;
+                const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                
+                if (selectedMinutes < currentMinutes) {
+                    errorMsg.innerText = "El horario seleccionado ya pasó.";
+                    errorMsg.classList.remove('hidden');
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    return false;
+                }
+            }
+
+            // 3. Check Opening Hours
+            const [h, min] = timeInput.value.split(':').map(Number);
+            const totalMins = h * 60 + min;
+            // 08:00 (480) - 15:00 (900) y 17:30 (1050) - 21:00 (1260)
+            const isMorning = totalMins >= 480 && totalMins <= 900;
+            const isAfternoon = totalMins >= 1050 && totalMins <= 1260;
+
+            if (!isMorning && !isAfternoon) {
+                errorMsg.innerText = "Cerrado a esta hora (08-15hs / 17:30-21hs)";
+                errorMsg.classList.remove('hidden');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                return false;
+            }
+
+            errorMsg.classList.add('hidden');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            return true;
+        }
+
+        // Payment Selection Logic (Vanilla)
+        function selectPayment(method) {
+            const totalMoney = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            // Evitar seleccionar efectivo si supera el límite
+            if (method === 'Efectivo' && totalMoney > TRANSFER_LIMIT) return;
+            
+            selectedPaymentMethod = method;
+            updatePaymentUI();
+        }
+
+        function updatePaymentUI() {
+            const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            
+            const isHighValue = totalPrice > TRANSFER_LIMIT;
+
+            const btnCash = document.getElementById('btn-pay-efectivo');
+            const btnTransfer = document.getElementById('btn-pay-transfer');
+            const transferData = document.getElementById('transfer-data');
+            const totalsContainer = document.getElementById('checkout-totals-container');
+            
+            // Configurar botón Efectivo (Deshabilitado si supera limite)
+            if (isHighValue) {
+                btnCash.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-[#0f1113] border-white/5 text-slate-600 opacity-50 cursor-not-allowed";
+                btnCash.innerHTML = `<i data-lucide="banknote" class="w-6 h-6 text-slate-600"></i><span class="text-xs font-bold uppercase">Efectivo al Retirar</span>`;
+                // Forzar transferencia si estaba en efectivo
+                if(selectedPaymentMethod === 'Efectivo') selectedPaymentMethod = 'Transferencia';
+            } else if (selectedPaymentMethod === 'Efectivo') {
+                btnCash.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-orange-500/10 border-orange-500 text-white";
+                btnCash.innerHTML = `<i data-lucide="banknote" class="w-6 h-6 text-orange-500"></i><span class="text-xs font-bold uppercase">Efectivo al Retirar</span>`;
+            } else {
+                btnCash.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-[#0f1113] border-white/5 text-slate-400 hover:bg-[#1f2125]";
+                btnCash.innerHTML = `<i data-lucide="banknote" class="w-6 h-6 text-slate-500"></i><span class="text-xs font-bold uppercase">Efectivo al Retirar</span>`;
+            }
+
+            // Configurar botón Transferencia
+            if (selectedPaymentMethod === 'Transferencia') {
+                btnTransfer.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-orange-500/10 border-orange-500 text-white";
+                btnTransfer.innerHTML = `<i data-lucide="qr-code" class="w-6 h-6 text-orange-500"></i><span class="text-xs font-bold uppercase">Transferencia / MP</span>`;
+                transferData.classList.remove('hidden');
+            } else {
+                btnTransfer.className = "p-3 rounded-xl border flex flex-col items-center gap-2 transition-all duration-300 bg-[#0f1113] border-white/5 text-slate-400 hover:bg-[#1f2125]";
+                btnTransfer.innerHTML = `<i data-lucide="qr-code" class="w-6 h-6 text-slate-500"></i><span class="text-xs font-bold uppercase">Transferencia / MP</span>`;
+                transferData.classList.add('hidden');
+            }
+            
+            // Mostrar TOTAL ÚNICO
+            totalsContainer.innerHTML = `
+                <div class="flex justify-between items-center border-t border-white/10 pt-2">
+                    <span class="text-sm font-bold text-white uppercase">Total a Pagar</span>
+                    <span class="text-2xl font-black text-orange-500 tracking-tighter">$${totalPrice.toLocaleString('es-AR')}</span>
+                </div>
+            `;
+            
+            lucide.createIcons();
+        }
+
+        function handleCheckoutSubmit(e) {
+            e.preventDefault();
+            if (!validateTime()) return;
+
+            // Loading state
+            const btn = document.getElementById('btn-confirm-order');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Procesando...`;
+            lucide.createIcons();
+
+            setTimeout(() => {
+                const dateInput = document.getElementById('cust-date');
+                const timeInput = document.getElementById('cust-time');
+                
+                tempOrderDetails = {
+                    name: document.getElementById('cust-name').value,
+                    phone: document.getElementById('cust-phone').value,
+                    date: dateInput.value,
+                    displayDate: formatDate(dateInput.value),
+                    time: timeInput.value,
+                    notes: document.getElementById('cust-notes').value,
+                    paymentMethod: selectedPaymentMethod
+                };
+
+                const totalFinal = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+                
+                const newOrder = {
+                    id: Math.random().toString(36).substr(2, 9).toUpperCase(),
+                    details: tempOrderDetails,
+                    items: [...cart],
+                    total: totalFinal, 
+                    timestamp: Date.now(),
+                    status: 'Pendiente'
+                };
+                orders.unshift(newOrder);
+                localStorage.setItem('delicias_urbanas_orders', JSON.stringify(orders));
+                renderOrders();
+
+                // Preparar WhatsApp
+                const itemsText = cart.map(i => {
+                    let text = `• ${i.quantity}x ${i.name}`;
+                    if(i.selectedFlavors) text += `%0A  _(${i.selectedFlavors})_`;
+                    return text;
+                }).join('%0A');
+                
+                let paymentText = "";
+                if (tempOrderDetails.paymentMethod === 'Transferencia') {
+                    paymentText = `💳 *Pago:* Transferencia/MP (Adjunto comprobante)`;
+                } else {
+                    paymentText = `💵 *Pago:* Efectivo en el local`;
+                }
+
+                const msg = `¡Hola Delicias Urbanas! 👋%0A%0A*NUEVO PEDIDO*%0A------------------%0A👤 ${tempOrderDetails.name}%0A📞 ${tempOrderDetails.phone}%0A📅 Retiro: *${tempOrderDetails.displayDate} a las ${tempOrderDetails.time} hs*%0A------------------%0A${itemsText}%0A------------------%0A💰 TOTAL: $${totalFinal.toLocaleString('es-AR')}%0A${paymentText}` + (tempOrderDetails.notes ? `%0A📝 ${tempOrderDetails.notes}` : '');
+                
+                const waBtn = document.getElementById('btn-send-whatsapp');
+                waBtn.onclick = () => {
+                    window.open(`https://wa.me/${SHOP_INFO.phone}?text=${msg}`, '_blank');
+                    cart = []; // Limpiar carrito al enviar
+                    renderCart();
+                };
+
+                // Mostrar recordatorio de comprobante
+                const successMsg = document.getElementById('success-payment-msg');
+                if (tempOrderDetails.paymentMethod === 'Transferencia') {
+                    successMsg.classList.remove('hidden');
+                } else {
+                    successMsg.classList.add('hidden');
+                }
+
+                // Resumen de éxito
+                const summaryList = document.getElementById('success-summary');
+                summaryList.innerHTML = cart.map(i => {
+                    return `
+                    <li class="flex flex-col border-b border-white/5 pb-1">
+                        <div class="flex justify-between">
+                            <span>${i.quantity}x ${i.name}</span>
+                        </div>
+                        ${i.selectedFlavors ? `<span class="text-[10px] text-slate-400 italic">${i.selectedFlavors}</span>` : ''}
+                    </li>`;
+                }).join('') + 
+                    `<li class="flex justify-between mt-2 pt-2 border-t border-white/20">
+                        <span class="font-bold text-white uppercase">TOTAL FINAL</span>
+                        <span class="font-black text-orange-500">$${totalFinal.toLocaleString('es-AR')}</span>
+                    </li>`;
+                
+                // Restore button
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+
+                document.getElementById('checkout-form').classList.add('hidden');
+                document.getElementById('checkout-success').classList.remove('hidden');
+                document.getElementById('checkout-success').classList.add('flex');
+            }, 1500);
+        }
+
+        // --- PEDIDOS ---
+        function renderOrders() {
+            // Actualizar Badge
+            const activeCount = orders.filter(o => o.status === 'Pendiente').length;
+            const badge = document.getElementById('orders-badge');
+            if (badge) {
+                badge.childNodes[0].nodeValue = activeCount; // Text node
+                if(activeCount > 0) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            }
+
+            const container = document.getElementById('orders-list');
+            if (orders.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-500">No hay pedidos recientes.</p>`;
+                return;
+            }
+            container.innerHTML = orders.map(o => {
+                const dateDisplay = o.details.displayDate ? `${o.details.displayDate} ` : '';
+                
+                // Generar botones de acción según estado
+                let actionButtons = '';
+                if (o.status === 'Pendiente') {
+                    if (confirmingOrderId === o.id) {
+                         // Mostrar opciones de confirmación
+                         actionButtons = `
+                            <div class="flex items-center gap-2">
+                                <button id="confirm-btn-${o.id}" onclick="processCancel('${o.id}')" class="text-[10px] font-black bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 flex items-center gap-1">
+                                    <i data-lucide="check" class="w-3 h-3"></i> CONFIRMAR
+                                </button>
+                                <button onclick="confirmingOrderId = null; renderOrders()" class="text-[10px] font-black bg-white/10 text-slate-300 px-3 py-2 rounded-lg hover:bg-white/20 flex items-center gap-1">
+                                    <i data-lucide="rotate-ccw" class="w-3 h-3"></i> NO
+                                </button>
+                            </div>
+                         `;
+                    } else {
+                         // Mostrar botón cancelar inicial
+                         actionButtons = `
+                            <button onclick="confirmingOrderId = '${o.id}'; renderOrders()" class="text-xs bg-red-900/20 text-red-400 px-3 py-2 rounded-lg font-bold hover:bg-red-900/40 flex items-center gap-1 border border-red-500/20">
+                                <i data-lucide="alert-triangle" class="w-3 h-3"></i> CANCELAR
+                            </button>
+                         `;
+                    }
+                }
+
+                // Mostrar botón de WhatsApp si ya está cancelado
+                if (o.status === 'Cancelado') {
+                    actionButtons = `
+                        <div class="mt-3 w-full space-y-2">
+                            <div class="flex items-center gap-2 p-2 bg-red-900/20 rounded-lg border border-red-500/20">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i>
+                                <p class="text-[10px] text-red-400 font-bold uppercase tracking-tight">Este pedido ha sido cancelado</p>
+                            </div>
+                            <button onclick="notifyCancelWhatsApp('${o.id}')" class="w-full bg-white text-black text-[10px] font-black py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-200 transition-all duration-300">
+                                <i data-lucide="message-circle" class="w-3 h-3 text-green-600"></i> AVISAR CANCELACIÓN
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return `
+                <div class="bg-[#0f1113] rounded-2xl p-5 border border-white/5 relative overflow-hidden mb-4">
+                    <div class="absolute top-0 right-0 px-3 py-1 text-[10px] font-black uppercase text-white ${o.status === 'Pendiente' ? 'bg-orange-500' : 'bg-red-500'}">${o.status}</div>
+                    <div class="mb-3">
+                         <p class="text-xs font-bold text-slate-500">#${o.id.slice(-6)}</p>
+                         <p class="text-sm font-black text-white"><i data-lucide="calendar-clock" class="inline w-3 h-3 text-orange-500"></i> ${dateDisplay}${o.details.time || o.details.pickupTime} hs</p>
+                    </div>
+                    <ul class="space-y-1 mb-4 text-xs text-slate-300">
+                        ${o.items.map(i => `
+                            <li class="flex flex-col mb-1">
+                                <div class="flex justify-between">
+                                    <span>${i.quantity}x ${i.name}</span>
+                                </div>
+                                ${i.selectedFlavors ? `<span class="text-[10px] italic text-slate-500">${i.selectedFlavors}</span>` : ''}
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <div class="flex flex-col pt-3 border-t border-white/10">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-lg font-black text-white">$${o.total.toLocaleString('es-AR')}</span>
+                            ${o.status === 'Pendiente' ? actionButtons : ''}
+                        </div>
+                        ${o.status === 'Cancelado' ? actionButtons : ''}
+                    </div>
+                </div>
+            `}).join('');
+            lucide.createIcons();
+        }
+
+        function processCancel(id) {
+            // Mostrar spinner en el botón de confirmar
+            const btn = document.getElementById(`confirm-btn-${id}`);
+            if(btn) {
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i>`;
+                btn.disabled = true;
+                lucide.createIcons();
+            }
+            
+            setTimeout(() => {
+                orders = orders.map(o => o.id === id ? {...o, status: 'Cancelado'} : o);
+                localStorage.setItem('delicias_urbanas_orders', JSON.stringify(orders));
+                confirmingOrderId = null;
+                renderOrders();
+                notifyCancelWhatsApp(id);
+            }, 1500);
+        }
+
+        function notifyCancelWhatsApp(id) {
+            const order = orders.find(o => o.id === id);
+            if(order) {
+                const itemsText = order.items.map(i => {
+                    let text = `• ${i.quantity}x ${i.name}`;
+                    if(i.selectedFlavors) text += ` (${i.selectedFlavors})`;
+                    return text;
+                }).join('\n'); // Usar \n
+
+                const msg = `⚠️ *CANCELACIÓN DE PEDIDO*\n` +
+                            `----------------------------------\n` +
+                            `🆔 Orden: #${id.slice(-6)}\n` +
+                            `👤 Cliente: ${order.details.name}\n` +
+                            `----------------------------------\n` +
+                            `*ÍTEMS A CANCELAR:*\n${itemsText}\n` +
+                            `----------------------------------\n` +
+                            `Disculpen las molestias.`;
+                window.open(`https://wa.me/${SHOP_INFO.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+        
+        function openWhatsApp() {
+            window.open(`https://wa.me/${SHOP_INFO.phone}`, "_blank");
+        }
+
+    </script>
 </body>
 </html>

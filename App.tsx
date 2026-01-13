@@ -5,7 +5,6 @@ import { CartDrawer } from './components/CartDrawer';
 import { OrdersDrawer } from './components/OrdersDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { FlavorModal } from './components/FlavorModal';
-import { LetsWorkTogether } from './components/ui/lets-work-section';
 import { MENU_ITEMS } from './constants';
 import { Product, CartItem, Category, Order, OrderDetails } from './types';
 import { Search, Flame, Sandwich, IceCream, Pizza, Instagram, MapPin, Phone, Clock, ShoppingCart } from 'lucide-react';
@@ -197,7 +196,9 @@ const App: React.FC = () => {
                   DELICIAS URBANAS
                 </h2>
               </div>
-              
+              <p className="text-slate-300 text-lg sm:text-xl font-medium mb-6 max-w-xl leading-relaxed drop-shadow-lg">
+                Somos Delicias Urbanas, un lugar en donde vas a encontrar una variedad de comidas y bebidas riquísimas. 🍗🥪🥗🥤
+              </p>
               <div className="flex flex-wrap justify-center md:justify-start gap-4">
                  <div className="flex items-center gap-2 text-slate-200 bg-white/5 px-4 py-2 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 cursor-default hover:scale-105 backdrop-blur-sm">
                     <MapPin className="w-4 h-4 text-orange-500" />
@@ -294,8 +295,6 @@ const App: React.FC = () => {
           )}
         </div>
       </main>
-
-      <LetsWorkTogether />
 
       <CartDrawer
         isOpen={isCartOpen}
