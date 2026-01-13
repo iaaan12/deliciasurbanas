@@ -1,4 +1,3 @@
-
 import { Product } from './types';
 
 const SABORES_COMUNES = ['Jamón y Queso', 'Salame y Queso'];
@@ -46,7 +45,7 @@ export const MENU_ITEMS: Product[] = [
     image: 'https://images.unsplash.com/photo-1553909489-cd47e0907d3f?auto=format&fit=crop&q=80&w=600',
     customization: {
       groups: [
-        { title: 'Elegí 12 sabores (Min 4)', limit: 12, minSelection: 4, options: SABORES_COMUNES }
+        { title: 'Elegí 12 sabores (Min 2)', limit: 12, minSelection: 2, options: SABORES_COMUNES }
       ]
     }
   },
@@ -60,7 +59,7 @@ export const MENU_ITEMS: Product[] = [
     customization: {
       groups: [
         { title: 'Elegí 4 sabores especiales (Min 2)', limit: 4, minSelection: 2, options: SABORES_ESPECIALES },
-        { title: 'Elegí 8 sabores comunes (Min 4)', limit: 8, minSelection: 4, options: SABORES_COMUNES }
+        { title: 'Elegí 8 sabores comunes (Min 2)', limit: 8, minSelection: 2, options: SABORES_COMUNES }
       ]
     }
   },
@@ -73,7 +72,7 @@ export const MENU_ITEMS: Product[] = [
     image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=600',
     customization: {
       groups: [
-        { title: 'Elegí 12 sabores especiales (Min 4)', limit: 12, minSelection: 4, options: SABORES_ESPECIALES }
+        { title: 'Elegí 12 sabores especiales (Min 2)', limit: 12, minSelection: 2, options: SABORES_ESPECIALES }
       ]
     }
   },
@@ -188,7 +187,7 @@ export const MENU_ITEMS: Product[] = [
     }
   },
 
-  // --- SECCIÓN GUARNICIONES ---
+  // --- GUARNICIONES ---
   {
     id: 'g1',
     name: 'Guarnición de Arroz',
@@ -206,7 +205,7 @@ export const MENU_ITEMS: Product[] = [
     image: 'https://images.unsplash.com/photo-1619684784943-415eb634e062?auto=format&fit=crop&q=80&w=600'
   },
 
-  // --- SECCIÓN BEBIDAS ---
+  // --- BEBIDAS ---
   {
     id: 'b1',
     name: 'Coca Cola 250ml',
