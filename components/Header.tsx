@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ShoppingCart, ClipboardList } from 'lucide-react';
 
@@ -16,11 +15,11 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, ordersCount, onCartCl
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-20">
           <div className="flex items-center space-x-3 group cursor-pointer transition-transform duration-300 hover:scale-105">
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-500 shadow-lg shadow-orange-500/20 bg-white">
+            <div className="w-14 h-14 flex items-center justify-center">
               <img 
                 src={logoUrl}
                 alt="Logo Delicias Urbanas" 
-                className="w-full h-full object-contain p-0.5"
+                className="w-full h-full object-contain drop-shadow-lg"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=100';
@@ -28,8 +27,8 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, ordersCount, onCartCl
               />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tighter leading-none italic uppercase">
-                DELICIAS <span className="text-orange-500">URBANAS</span>
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight uppercase font-heading">
+                DELICIAS URBANAS
               </h1>
               <p className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">
                 Comidas al Paso

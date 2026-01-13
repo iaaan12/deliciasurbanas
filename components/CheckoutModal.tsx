@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { X, CheckCircle2, Clock, Phone, User, MessageCircle, AlertCircle, MapPin, ExternalLink, Store, Loader2, Banknote, QrCode, Copy } from 'lucide-react';
 import { CartItem, OrderDetails, PaymentMethod } from '../types';
@@ -27,7 +26,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [whatsappSent, setWhatsappSent] = useState(false);
   const [timeError, setTimeError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   
   const shopAddress = "Av. San Martín 532, Salta";
   const shopPhoneDisplay = "+54 9 387 502-0884";
@@ -44,10 +43,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     cartItems.reduce((s, i) => s + (i.price * i.quantity), 0)
   , [cartItems]);
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
   // Validar horario al abrir el modal o cambiar la hora
@@ -162,7 +161,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-0 sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={whatsappSent ? handleClose : undefined} />
+      <div className="absolute inset-0 bg-[#121212]/70 backdrop-blur-md" onClick={whatsappSent ? handleClose : undefined} />
       
       <div className="relative bg-[#18181b] sm:rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden h-full sm:h-auto sm:max-h-[95vh] flex flex-col animate-in zoom-in-95 duration-200 border border-white/5">
         
@@ -321,20 +320,60 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         </div>
                         <div className="space-y-3">
                            <div className="bg-[#18181b] p-3 rounded-lg border border-white/5">
+                              {/* Alias Row */}
                               <div className="mb-2 border-b border-white/5 pb-2 flex justify-between items-center">
                                  <div>
                                     <p className="text-[10px] text-slate-500 font-bold uppercase">Alias</p>
                                     <p className="text-sm font-mono text-white tracking-wide select-all">{MP_ALIAS}</p>
                                  </div>
-                                 <button type="button" onClick={() => copyToClipboard(MP_ALIAS)} className="p-2 text-slate-400 hover:text-white transition-colors">
-                                    {copied ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                 <button 
+                                    type="button" 
+                                    onClick={() => copyToClipboard(MP_ALIAS, 'alias')} 
+                                    className="p-2 text-slate-400 hover:text-white transition-colors relative"
+                                    title="Copiar Alias"
+                                 >
+                                    {copiedField === 'alias' ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                    {copiedField === 'alias' && (
+                                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-in fade-in zoom-in whitespace-nowrap">
+                                            ¡Copiado!
+                                        </span>
+                                    )}
                                  </button>
                               </div>
-                              <div>
-                                 <p className="text-[10px] text-slate-500 font-bold uppercase">Titular</p>
-                                 <p className="text-xs font-medium text-white">{MP_HOLDER}</p>
+                              {/* Holder Row */}
+                              <div className="flex justify-between items-center">
+                                 <div>
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase">Titular</p>
+                                    <p className="text-xs font-medium text-white">{MP_HOLDER}</p>
+                                 </div>
+                                 <button 
+                                    type="button" 
+                                    onClick={() => copyToClipboard(MP_HOLDER, 'holder')} 
+                                    className="p-2 text-slate-400 hover:text-white transition-colors relative"
+                                    title="Copiar Titular"
+                                 >
+                                    {copiedField === 'holder' ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                    {copiedField === 'holder' && (
+                                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-in fade-in zoom-in whitespace-nowrap">
+                                            ¡Copiado!
+                                        </span>
+                                    )}
+                                 </button>
                               </div>
                            </div>
+
+                           {/* Botón Mercado Pago Link Directo */}
+                           <a 
+                             href={`https://link.mercadopago.com.ar/${MP_ALIAS}`} 
+                             target="_blank" 
+                             rel="noopener noreferrer"
+                             className="block w-full bg-[#009EE3] hover:bg-[#008ED6] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#009EE3]/20 transition-all active:scale-[0.98] mt-4"
+                           >
+                              <img src="https://logotipoz.com/wp-content/uploads/2021/10/version-horizontal-large-logo-mercado-pago.webp" alt="Mercado Pago" className="h-6 object-contain brightness-0 invert" />
+                              <span className="text-sm">IR A PAGAR CON MERCADO PAGO</span>
+                              <ExternalLink className="w-4 h-4" />
+                           </a>
+
                            <p className="text-[10px] text-slate-400 text-center italic">
                              Envia el comprobante junto al pedido por WhatsApp
                            </p>
@@ -369,10 +408,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <button
                 type="submit"
                 disabled={!!timeError || isSubmitting}
-                className={`w-full text-black font-black py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 ${
+                className={`w-full text-[#1A1A1A] font-black py-4 rounded-xl shadow-xl transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 ${
                   timeError || isSubmitting
                     ? 'bg-slate-700 cursor-not-allowed text-slate-400' 
-                    : 'bg-white shadow-black/20 hover:bg-orange-600 hover:text-white hover:shadow-orange-600/30'
+                    : 'bg-white shadow-[#121212]/20 hover:bg-orange-600 hover:text-white hover:shadow-orange-600/30'
                 }`}
               >
                 {isSubmitting ? (
@@ -474,7 +513,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               {whatsappSent ? (
                 <button
                   onClick={handleClose}
-                  className="w-full bg-white text-black font-black py-4 rounded-xl hover:bg-slate-200 transition-all duration-300 hover:scale-105 shadow-lg animate-in slide-in-from-bottom-4"
+                  className="w-full bg-white text-[#1A1A1A] font-black py-4 rounded-xl hover:bg-slate-200 transition-all duration-300 hover:scale-105 shadow-lg animate-in slide-in-from-bottom-4"
                 >
                   VOLVER AL INICIO
                 </button>

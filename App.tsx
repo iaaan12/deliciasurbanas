@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
 import { ProductCard } from './components/ProductCard';
@@ -6,6 +5,8 @@ import { CartDrawer } from './components/CartDrawer';
 import { OrdersDrawer } from './components/OrdersDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { FlavorModal } from './components/FlavorModal';
+import { GeminiAssistant } from './components/GeminiAssistant';
+import { LetsWorkTogether } from './components/ui/lets-work-section';
 import { MENU_ITEMS } from './constants';
 import { Product, CartItem, Category, Order, OrderDetails } from './types';
 import { Search, Flame, Sandwich, IceCream, Pizza, Instagram, MapPin, Phone, Clock, ShoppingCart } from 'lucide-react';
@@ -163,38 +164,47 @@ const App: React.FC = () => {
         logoUrl={logoUrl}
       />
 
-      <section className="bg-[#0f1113] text-white py-16 sm:py-24 overflow-hidden relative border-b border-white/5">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-orange-600/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      {/* HERO SECTION */}
+      <section className="relative bg-[#0f1113] text-white py-20 sm:py-32 overflow-hidden border-b border-white/5">
+        
+        {/* BACKGROUND IMAGE START */}
+        <div className="absolute inset-0 z-0">
+            <img 
+                 src="https://i.imgur.com/ibEvRnc.jpeg" 
+                 alt="Fondo Delicias Urbanas" 
+                 className="w-full h-full object-cover opacity-60" 
+                 style={{ objectPosition: 'center 60%' }}
+            />
+            {/* Gradient Overlay para legibilidad */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0f1113]/95 via-[#0f1113]/80 to-[#0f1113]/40"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f1113] via-transparent to-transparent"></div>
+        </div>
+        {/* BACKGROUND IMAGE END */}
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row items-center gap-10">
-            <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-orange-500 p-1 flex-shrink-0 bg-white overflow-hidden shadow-[0_0_50px_rgba(249,115,22,0.4)] transition-transform duration-700 hover:rotate-3 hover:scale-105">
+            <div className="w-48 h-48 sm:w-64 sm:h-64 flex-shrink-0 flex items-center justify-center relative z-20">
               <img 
                 src={logoUrl} 
                 alt="Logo Delicias Urbanas" 
-                className="w-full h-full object-contain p-2"
+                className="w-full h-full object-contain drop-shadow-2xl"
                 referrerPolicy="no-referrer"
                 onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400'; }}
               />
             </div>
             <div className="text-center md:text-left">
               <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-                <h2 className="text-4xl sm:text-5xl font-black tracking-tighter italic uppercase animate-in slide-in-from-left-4 duration-500 text-white">
-                  DELICIAS <span className="text-orange-500">URBANAS</span>
+                <h2 className="text-4xl sm:text-5xl font-bold tracking-tight uppercase animate-in slide-in-from-left-4 duration-500 text-white drop-shadow-2xl font-heading">
+                  DELICIAS URBANAS
                 </h2>
-                <div className="flex gap-2">
-                  <span className="bg-[#18181b] border border-white/10 text-xs font-bold px-3 py-1 rounded-full text-slate-300">Restaurante</span>
-                  <span className="bg-orange-500 text-xs font-bold px-3 py-1 rounded-full text-white">Salta</span>
-                </div>
               </div>
-              <p className="text-slate-400 text-lg sm:text-xl font-medium mb-6 max-w-xl leading-relaxed">
-                Somos Delicias Urbanas, un lugar en donde vas a encontrar una variedad de comidas y bebidas riquísimas. 🍗🥪🥗🥤
-              </p>
+              
               <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                 <div className="flex items-center gap-2 text-slate-300 bg-white/5 px-4 py-2 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 cursor-default hover:scale-105">
+                 <div className="flex items-center gap-2 text-slate-200 bg-white/5 px-4 py-2 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 cursor-default hover:scale-105 backdrop-blur-sm">
                     <MapPin className="w-4 h-4 text-orange-500" />
                     <span className="text-sm font-bold">Av. San Martín 532, Salta</span>
                  </div>
-                 <a href="https://instagram.com/delicias.urbanas" target="_blank" className="flex items-center gap-2 text-slate-300 hover:text-white transition-all duration-300 bg-white/5 hover:bg-white/10 hover:scale-105 active:scale-95 px-4 py-2 rounded-xl border border-white/10">
+                 <a href="https://instagram.com/delicias.urbanas" target="_blank" className="flex items-center gap-2 text-slate-200 hover:text-white transition-all duration-300 bg-white/5 hover:bg-white/10 hover:scale-105 active:scale-95 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-sm">
                     <Instagram className="w-4 h-4 text-pink-500" />
                     <span className="text-sm font-bold">@delicias.urbanas</span>
                  </a>
@@ -286,6 +296,8 @@ const App: React.FC = () => {
         </div>
       </main>
 
+      <LetsWorkTogether />
+
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -317,11 +329,13 @@ const App: React.FC = () => {
         onConfirm={addToCartWithCustomization}
       />
 
+      <GeminiAssistant />
+
       {totalItems > 0 && (
         <div className="fixed bottom-6 left-6 z-[90] animate-in slide-in-from-bottom-4 fade-in duration-500">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="group flex items-center gap-3 bg-white text-black pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-black/50 border border-slate-700 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-orange-500/20"
+            className="group flex items-center gap-3 bg-white text-[#1A1A1A] pl-4 pr-6 py-4 rounded-full shadow-2xl shadow-[#121212]/50 border border-slate-700 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-orange-500/20"
           >
             <div className="relative">
               <div className="bg-orange-500 rounded-full p-2 text-white group-hover:bg-orange-400 transition-colors">
@@ -333,7 +347,7 @@ const App: React.FC = () => {
             </div>
             <div className="flex flex-col items-start">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none mb-1">Tu Pedido</span>
-              <span className="text-sm font-black text-black leading-none">${currentTotal.toLocaleString('es-AR')}</span>
+              <span className="text-sm font-black text-[#1A1A1A] leading-none">${currentTotal.toLocaleString('es-AR')}</span>
             </div>
           </button>
         </div>

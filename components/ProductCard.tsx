@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, ArrowRight, Sparkles, Flame, ListPlus, Check } from 'lucide-react';
 import { Product } from '../types';
@@ -59,7 +58,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
           {isPromo && <Sparkles className="w-4 h-4 text-orange-400/50" />}
         </div>
 
-        <h3 className={`text-2xl font-black italic uppercase leading-none tracking-tight mb-3 transition-colors duration-300
+        <h3 className={`text-2xl font-extrabold leading-tight tracking-tight mb-3 transition-colors duration-300
           ${isPromo ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-orange-200' : 'text-white group-hover:text-orange-500'}`}>
           {product.name.replace('PROMO:', '').trim()}
         </h3>
@@ -87,7 +86,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, 
                 ? 'bg-green-500 text-white scale-110 shadow-green-500/30'
                 : isPromo 
                     ? 'bg-orange-500 text-white hover:bg-white hover:text-orange-600 shadow-orange-500/20' 
-                    : 'bg-white hover:bg-orange-500 text-black hover:text-white shadow-black/20 hover:shadow-orange-500/30'
+                    : 'bg-white hover:bg-orange-500 text-[#1A1A1A] hover:text-white shadow-[#121212]/20 hover:shadow-orange-500/30'
             }`}
         >
           {isAdded ? (

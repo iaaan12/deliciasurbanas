@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, ClipboardList, Clock, AlertTriangle, PhoneCall, Check, RotateCcw, MessageCircle, Loader2 } from 'lucide-react';
 import { Order } from '../types';
@@ -66,7 +65,7 @@ export const OrdersDrawer: React.FC<OrdersDrawerProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] overflow-hidden">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#121212]/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
       
       <div className="absolute inset-y-0 left-0 max-w-full flex">
         <div className="w-screen max-w-md bg-[#18181b] shadow-2xl flex flex-col">
@@ -161,7 +160,7 @@ export const OrdersDrawer: React.FC<OrdersDrawerProps> = ({
                         </div>
                         <button
                           onClick={() => handleWhatsAppCancel(order)}
-                          className="w-full bg-white text-black text-[10px] font-black py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-200 transition-all duration-300 hover:scale-105"
+                          className="w-full bg-white text-[#1A1A1A] text-[10px] font-black py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-200 transition-all duration-300 hover:scale-105"
                         >
                           <MessageCircle className="w-3 h-3 text-green-600" />
                           AVISAR CANCELACIÓN POR WHATSAPP
@@ -178,7 +177,7 @@ export const OrdersDrawer: React.FC<OrdersDrawerProps> = ({
             href="https://wa.me/5493875020884"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-6 bg-[#0f1113] text-white block hover:bg-black transition-colors cursor-pointer border-t border-white/5"
+            className="p-6 bg-[#0f1113] text-white block hover:bg-[#121212] transition-colors cursor-pointer border-t border-white/5"
           >
             <div className="flex items-center gap-4">
               <div className="bg-orange-500 p-3 rounded-xl shadow-lg shadow-orange-500/20">
