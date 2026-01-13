@@ -5,7 +5,6 @@ import { CartDrawer } from './components/CartDrawer';
 import { OrdersDrawer } from './components/OrdersDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { FlavorModal } from './components/FlavorModal';
-import { GeminiAssistant } from './components/GeminiAssistant';
 import { LetsWorkTogether } from './components/ui/lets-work-section';
 import { MENU_ITEMS } from './constants';
 import { Product, CartItem, Category, Order, OrderDetails } from './types';
@@ -328,8 +327,6 @@ const App: React.FC = () => {
         product={customizingProduct}
         onConfirm={addToCartWithCustomization}
       />
-
-      <GeminiAssistant />
 
       {totalItems > 0 && (
         <div className="fixed bottom-6 left-6 z-[90] animate-in slide-in-from-bottom-4 fade-in duration-500">
