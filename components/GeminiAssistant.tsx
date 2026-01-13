@@ -3,8 +3,6 @@ import { GoogleGenAI } from "@google/genai";
 import { MessageSquare, Send, X, Bot, Loader2 } from 'lucide-react';
 import { MENU_ITEMS } from '../constants';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -36,6 +34,9 @@ export const GeminiAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
+      // Initialize AI client lazily to prevent crashes on initial load if env vars are missing
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
       const menuContext = MENU_ITEMS.map(i => `${i.name}: $${i.price} - ${i.description}`).join('\n');
       
       const response = await ai.models.generateContent({
