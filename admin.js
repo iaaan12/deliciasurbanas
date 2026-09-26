@@ -305,7 +305,13 @@ async function saveCatalog() {
     normalizeCatalog();
     state.savedSnapshot = snapshot();
     renderAll();
-    showToast("Cambios guardados. La web ya usa este catálogo.");
+    if (payload.productionSync?.enabled && payload.productionSync.ok && payload.productionSync.commit) {
+      showToast(`Guardado y enviado a producción · ${payload.productionSync.commit}`);
+    } else if (payload.productionSync?.enabled && !payload.productionSync.ok) {
+      showToast("Guardado localmente, pero no se pudo publicar en GitHub.");
+    } else {
+      showToast("Cambios guardados. La web ya usa este catálogo.");
+    }
   } catch (error) {
     setSaveState("Error al guardar");
     showToast(error.message);

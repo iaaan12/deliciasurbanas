@@ -26,7 +26,7 @@ node server.cjs
 - Web: `http://127.0.0.1:4173/`
 - Admin: `http://127.0.0.1:4173/admin`
 
-El servidor local escucha únicamente en `127.0.0.1`.
+Por defecto escucha en `0.0.0.0`; podés limitarlo con `HOST=127.0.0.1` si querés usarlo solo en la PC.
 
 ## Panel de administración
 
@@ -46,9 +46,35 @@ El catálogo público vive en `catalog.json`. El panel permite modificarlo sin e
 
 Los IDs internos existentes permanecen bloqueados para no romper carritos o personalizaciones guardadas. Las personalizaciones de docenas, baguette y pebete se preservan aunque cambien nombre, precio o descripción.
 
-El guardado usa `PUT /api/catalog`, valida los datos y reemplaza `catalog.json` de forma atómica. La web pública carga el catálogo al iniciar y solo muestra productos con `active !== false`.
+El guardado usa `PUT /api/catalog`, valida los datos y reemplaza el catálogo de forma atómica. La web pública carga el catálogo al iniciar y solo muestra productos con `active !== false`.
 
-**Importante para producción:** el panel está pensado actualmente para administración local. Antes de exponer `/admin` y `PUT /api/catalog` en Internet hay que agregar autenticación y autorización en el hosting definitivo.
+En producción, `/admin`, sus assets y las escrituras del catálogo están protegidos con HTTP Basic Auth mediante `ADMIN_USER` y `ADMIN_PASSWORD`. Si `NODE_ENV=production` y esas variables no están configuradas, el panel responde `503` en lugar de quedar expuesto.
+
+Para persistencia entre deploys se puede definir `DATA_DIR=/data` y montar un volumen persistente en esa ruta. En el primer arranque, el servidor copia automáticamente el `catalog.json` incluido en el repositorio al volumen si todavía no existe.
+
+Variables recomendadas:
+
+```env
+NODE_ENV=production
+HOST=0.0.0.0
+DATA_DIR=/data
+ADMIN_USER=admin
+ADMIN_PASSWORD=<contraseña-segura>
+```
+
+El endpoint `GET /healthz` devuelve `200` y se usa como healthcheck del hosting.
+
+### Administración privada + publicación automática
+
+La producción pública se puede servir de forma estática con GitHub Pages y mantener el panel fuera de Internet. Para administrar desde esta PC y publicar cada cambio automáticamente:
+
+```powershell
+$env:HOST="127.0.0.1"
+$env:AUTO_PUSH_CATALOG="1"
+node server.cjs
+```
+
+Después abrí `http://127.0.0.1:4173/admin`. Cada guardado modifica `catalog.json`, crea un commit solo para ese archivo y hace `git push origin main`. El workflow de GitHub Pages publica el catálogo actualizado.
 
 ## Funcionalidades públicas
 
@@ -91,10 +117,12 @@ También se validó:
 - lectura y guardado real del admin sobre `catalog.json` con restauración posterior del valor probado;
 - sintaxis de `app.js`, `admin.js` y `server.cjs`.
 
-## Antes de publicar
+## Checklist de producción
 
-1. Integrar esta versión en el hosting/repositorio que sirve `deliciasurbanas.com.ar`.
-2. Proteger el panel admin con autenticación antes de exponerlo públicamente.
-3. Cargar fotografías reales de producto desde el panel cuando estén disponibles y activar “Usar foto” solo después de verificarlas.
-4. Confirmar Analytics/Meta Pixel existentes antes de agregar scripts nuevos.
-5. Hacer una última prueba en staging/producción de enlaces, WhatsApp y caché sin enviar pedidos falsos al negocio.
+1. Desplegar el servicio Node y configurar `NODE_ENV`, `ADMIN_USER`, `ADMIN_PASSWORD` y `DATA_DIR`.
+2. Montar almacenamiento persistente en `DATA_DIR` si el hosting usa filesystem efímero.
+3. Configurar `GET /healthz` como healthcheck.
+4. Apuntar `deliciasurbanas.com.ar` y `www.deliciasurbanas.com.ar` al servicio y verificar HTTPS.
+5. Cargar fotografías reales de producto desde el panel cuando estén disponibles y activar “Usar foto” solo después de verificarlas.
+6. Confirmar Analytics/Meta Pixel existentes antes de agregar scripts nuevos.
+7. Hacer una última prueba en producción de enlaces, WhatsApp y caché sin enviar pedidos falsos al negocio.
