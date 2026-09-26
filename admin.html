@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#ff6a00" />
+  <title>Admin · Delicias Urbanas</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="./assets/favicon-48.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./admin.css" />
+  <script src="./admin.js" defer></script>
+</head>
+<body>
+  <header class="admin-header">
+    <div class="admin-shell admin-header-inner">
+      <a class="admin-brand" href="/" target="_blank" rel="noopener">
+        <img src="./assets/delicias-logo-clean.png" alt="" width="512" height="512" />
+        <span><strong>Delicias Urbanas</strong><small>Panel de administración</small></span>
+      </a>
+      <div class="admin-header-actions">
+        <span class="save-state" data-save-state>Sin cambios</span>
+        <button class="button button-primary" type="button" data-save>Guardar cambios</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-shell admin-main">
+    <section class="admin-hero">
+      <div>
+        <p class="eyebrow">Catálogo</p>
+        <h1>Administrá el menú sin tocar código.</h1>
+        <p>Editá nombres, precios, descripciones, categorías, visibilidad, promos, destacados e imágenes. Los cambios se guardan en <code>catalog.json</code> y la web pública los lee automáticamente.</p>
+      </div>
+      <div class="summary-grid" aria-label="Resumen del catálogo">
+        <div><strong data-stat-total>0</strong><span>productos</span></div>
+        <div><strong data-stat-active>0</strong><span>activos</span></div>
+        <div><strong data-stat-featured>0</strong><span>destacados</span></div>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="Herramientas del catálogo">
+      <label class="search-box">
+        <span class="sr-only">Buscar productos</span>
+        <input type="search" data-search placeholder="Buscar producto, categoría o ID…" autocomplete="off" />
+      </label>
+      <select data-category-filter aria-label="Filtrar por categoría">
+        <option value="">Todas las categorías</option>
+      </select>
+      <select data-status-filter aria-label="Filtrar por estado">
+        <option value="">Todos</option>
+        <option value="active">Activos</option>
+        <option value="inactive">Ocultos</option>
+        <option value="featured">Destacados</option>
+        <option value="promo">Promos</option>
+      </select>
+      <button class="button button-secondary" type="button" data-add-product>+ Nuevo producto</button>
+    </section>
+
+    <section>
+      <div class="catalog-head">
+        <div>
+          <p class="eyebrow">Productos</p>
+          <h2>Catálogo</h2>
+        </div>
+        <span data-result-count></span>
+      </div>
+      <div class="product-editor-list" data-products></div>
+      <div class="empty-state" data-empty hidden>No hay productos para este filtro.</div>
+    </section>
+  </main>
+
+  <div class="sticky-save" data-sticky-save hidden>
+    <span>Tenés cambios sin guardar</span>
+    <button class="button button-primary" type="button" data-save>Guardar</button>
+  </div>
+
+  <dialog class="confirm-dialog" data-confirm-dialog>
+    <form method="dialog" class="confirm-card">
+      <h2>¿Descartar cambios?</h2>
+      <p>Hay modificaciones sin guardar. Si recargás o salís del panel, se van a perder.</p>
+      <div>
+        <button class="button button-secondary" value="cancel">Cancelar</button>
+        <button class="button button-danger" value="discard">Descartar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" role="status" aria-live="polite" data-toast></div>
+</body>
+</html>

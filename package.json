@@ -1,22 +1,14 @@
 {
-  "name": "delicias-urbanas---pedidos-online",
+  "name": "delicias-urbanas",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "2.0.0",
+  "description": "Sitio web y panel de administración de Delicias Urbanas",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "node server.cjs",
+    "start": "node server.cjs",
+    "check": "node --check app.js && node --check admin.js && node --check server.cjs"
   },
-  "dependencies": {
-    "react": "^19.2.3",
-    "lucide-react": "^0.562.0",
-    "@google/genai": "^1.35.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+  "engines": {
+    "node": ">=18"
   }
 }

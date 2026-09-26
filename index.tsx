@@ -1,1 +1,0 @@
-// El contenido ha sido movido a index.html para despliegue estático sin compilación.

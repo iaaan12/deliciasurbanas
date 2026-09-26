@@ -1,0 +1,459 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-26T03:18:52.308Z",
+  "featuredIds": [
+    "p3",
+    "d2",
+    "nuevo-1"
+  ],
+  "products": [
+    {
+      "id": "c1",
+      "name": "Pollo al Spiedo Entero",
+      "description": "Nuestro clásico pollo asado lentamente al spiedo, tierno y sabroso.",
+      "price": 18000,
+      "category": "Pollo",
+      "image": "",
+      "tags": [
+        "popular"
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "p3",
+      "name": "Pollo Entero + Arroz",
+      "sourceName": "PROMO: Pollo Entero + Arroz",
+      "description": "¡Ideal familia! Pollo entero al spiedo con una guarnición de arroz incluida.",
+      "price": 20000,
+      "category": "Pollo",
+      "image": "",
+      "tags": [
+        "popular"
+      ],
+      "promo": true,
+      "active": true,
+      "usePhoto": false
+    },
+    {
+      "id": "p2",
+      "name": "Medio Pollo + Arroz",
+      "sourceName": "PROMO: Medio Pollo + Arroz",
+      "description": "¡Oportunidad! Medio pollo al spiedo con una guarnición de arroz incluida.",
+      "price": 11000,
+      "category": "Pollo",
+      "image": "",
+      "tags": [],
+      "promo": true,
+      "active": false,
+      "usePhoto": false
+    },
+    {
+      "id": "d1",
+      "name": "Docena Sándwiches Comunes",
+      "description": "12 sándwiches de miga clásicos.",
+      "price": 22000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [
+        "popular"
+      ],
+      "customization": [
+        {
+          "title": "Elegí los 12 sándwiches",
+          "type": "quantity",
+          "total": 12,
+          "options": [
+            "Jamón y Queso",
+            "Salame y Queso"
+          ]
+        }
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "d2",
+      "name": "Docena Sándwiches Surtidos",
+      "description": "4 Especiales y 8 Comunes a elección.",
+      "price": 26000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [
+        "popular"
+      ],
+      "customization": [
+        {
+          "title": "Elegí 4 especiales",
+          "type": "quantity",
+          "total": 4,
+          "options": [
+            "Ternera, Tomate y Huevo",
+            "Aceituna, Huevo y Queso",
+            "Roquefort y Jamón",
+            "Jamón Crudo y Queso"
+          ]
+        },
+        {
+          "title": "Elegí 8 comunes",
+          "type": "quantity",
+          "total": 8,
+          "options": [
+            "Jamón y Queso",
+            "Salame y Queso"
+          ]
+        }
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "d3",
+      "name": "Docena Sándwiches Especiales",
+      "description": "12 sándwiches premium surtidos.",
+      "price": 33000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "customization": [
+        {
+          "title": "Elegí los 12 especiales",
+          "type": "quantity",
+          "total": 12,
+          "options": [
+            "Ternera, Tomate y Huevo",
+            "Aceituna, Huevo y Queso",
+            "Roquefort y Jamón",
+            "Jamón Crudo y Queso"
+          ]
+        }
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s1",
+      "name": "Sándwich Jamón y Queso",
+      "description": "Clásico sándwich con abundante jamón cocido y queso tybo.",
+      "price": 2000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s2",
+      "name": "Sándwich Salame y Queso",
+      "description": "Sabroso salame milán y queso en fetas en pan fresco.",
+      "price": 2000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s3",
+      "name": "Sándwich Ternera y Queso",
+      "description": "Finas fetas de ternera con queso derretido o natural.",
+      "price": 2500,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s4",
+      "name": "Sándwich Ternera y Lechuga",
+      "description": "Ternera seleccionada con lechuga fresca y crocante.",
+      "price": 2500,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s5",
+      "name": "Ternera, Tomate y Huevo",
+      "description": "Completo: ternera, tomate fresco y huevo duro picado.",
+      "price": 3000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s6",
+      "name": "Aceituna, Huevo y Queso",
+      "description": "Opción vegetariana con aceitunas verdes, huevo y mucho queso.",
+      "price": 3000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [
+        "veggie"
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s7",
+      "name": "Roquefort y Jamón",
+      "description": "Para los amantes del sabor fuerte: roquefort premium y jamón.",
+      "price": 3000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s8",
+      "name": "Jamón Crudo y Queso",
+      "description": "Jamón crudo estacionado y queso de campo.",
+      "price": 3000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s9",
+      "name": "Sándwich de Milanesa",
+      "description": "Clásico argentino: milanesa de carne en pan francés con lechuga y tomate.",
+      "price": 6000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [
+        "popular"
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s10",
+      "name": "Baguette Especial",
+      "description": "Sándwich en pan baguette con ingredientes a elección.",
+      "price": 4500,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "customization": [
+        {
+          "title": "Elegí el relleno",
+          "type": "choice",
+          "options": [
+            "Ternera, Tomate y Huevo",
+            "Ternera y Queso",
+            "Salame y Queso"
+          ]
+        }
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "s11",
+      "name": "Pebete",
+      "description": "Clásico pan pebete suave con relleno a elección.",
+      "price": 2000,
+      "category": "Sándwiches",
+      "image": "",
+      "tags": [],
+      "customization": [
+        {
+          "title": "Elegí el relleno",
+          "type": "choice",
+          "options": [
+            "Jamón y Queso",
+            "Salame y Queso"
+          ]
+        }
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "g1",
+      "name": "Guarnición de Arroz",
+      "description": "Arroz blanco al dente, el acompañamiento ideal.",
+      "price": 3000,
+      "category": "Guarniciones",
+      "image": "",
+      "tags": [
+        "veggie"
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "g2",
+      "name": "Papas Doradas al Horno",
+      "description": "Papas cortadas en cubos, doradas al horno con un toque de romero.",
+      "price": 3000,
+      "category": "Guarniciones",
+      "image": "",
+      "tags": [
+        "veggie",
+        "popular"
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b1",
+      "name": "Coca Cola 250ml",
+      "description": "Botella de vidrio o lata pequeña bien helada.",
+      "price": 2000,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b2",
+      "name": "Fanta 250ml",
+      "description": "Sabor naranja refrescante.",
+      "price": 2000,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b3",
+      "name": "Sprite 250ml",
+      "description": "Sabor lima-limón.",
+      "price": 2000,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b4",
+      "name": "Coca Cola 350ml",
+      "description": "Lata clásica.",
+      "price": 2500,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b5",
+      "name": "Fanta 350ml",
+      "description": "Lata de Fanta naranja.",
+      "price": 2500,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b6",
+      "name": "Sprite 350ml",
+      "description": "Lata de Sprite lima-limón.",
+      "price": 2500,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b7",
+      "name": "Coca Cola 600ml",
+      "description": "Botella individual.",
+      "price": 3000,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [
+        "popular"
+      ],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b8",
+      "name": "Fanta 600ml",
+      "description": "Botella individual de Fanta.",
+      "price": 3000,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b9",
+      "name": "Sprite 600ml",
+      "description": "Botella individual de Sprite.",
+      "price": 3000,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "b10",
+      "name": "Monster Energy",
+      "description": "Cualquier sabor disponible (Original, Mango Loco, Ultra, etc).",
+      "price": 6500,
+      "category": "Bebidas",
+      "image": "",
+      "tags": [],
+      "active": true,
+      "usePhoto": false,
+      "promo": false
+    },
+    {
+      "id": "nuevo-1",
+      "name": "Pollo Entero + Papas",
+      "description": "Pollo entero al spiedo con una guarnición de papas al horno incluida.",
+      "price": 21000,
+      "category": "Pollo",
+      "image": "",
+      "tags": [],
+      "promo": true,
+      "active": true,
+      "usePhoto": false
+    }
+  ]
+}
