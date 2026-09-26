@@ -114,8 +114,9 @@ boot();
 
 async function boot() {
   try {
-    let response = await fetch("/api/catalog", { cache: "no-store" });
-    if (!response.ok) response = await fetch("./catalog.json", { cache: "no-store" });
+    const localAdminHost = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+    let response = await fetch(localAdminHost ? "/api/catalog" : "./catalog.json", { cache: "no-store" });
+    if (!response.ok && localAdminHost) response = await fetch("./catalog.json", { cache: "no-store" });
     if (response.ok) {
       const catalog = await response.json();
       if (Array.isArray(catalog.products)) {
