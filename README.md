@@ -76,6 +76,14 @@ node server.cjs
 
 Después abrí `http://127.0.0.1:4173/admin`. Cada guardado modifica `catalog.json`, crea un commit solo para ese archivo y hace `git push origin main`. El workflow de GitHub Pages publica el catálogo actualizado.
 
+En Windows también podés ejecutar directamente:
+
+```powershell
+.\admin-local.ps1
+```
+
+El script levanta el servidor únicamente en `127.0.0.1`, abre el panel en Chrome y lo apaga cuando presionás Enter en la consola. El panel no forma parte del artefacto público de GitHub Pages.
+
 ## Funcionalidades públicas
 
 - Hero editorial con identidad naranja y fotografía oficial de Delicias Urbanas.
