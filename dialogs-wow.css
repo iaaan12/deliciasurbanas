@@ -1,0 +1,676 @@
+/*
+ * DELICIAS URBANAS · Carta de pedidos.
+ * Diseño único para carrito, historial, personalización, checkout y confirmación.
+ * Se apoya en la estructura real del sitio: no sustituye formularios ni lógica.
+ */
+body.du-site {
+  --du-d-ink: #29190f;
+  --du-d-red: #b94524;
+  --du-d-gold: #e9c749;
+  --du-d-paper: #fff5e5;
+  --du-d-muted: #775d49;
+  --du-d-line: #e3c9a5;
+  --du-d-ease: cubic-bezier(.18,.84,.24,1);
+}
+body.du-site dialog::backdrop {
+  background:rgba(19,9,4,.72);
+  -webkit-backdrop-filter:blur(9px);
+  backdrop-filter:blur(9px);
+}
+body.du-site dialog:focus-visible {outline:none;}
+body.du-site dialog:is(.cart-drawer,.orders-dialog,.customize-dialog,.checkout-dialog,.success-dialog) {
+  color:var(--du-d-ink);
+}
+
+/* Papel mate con grano, bordes como carta y detalle de tinta. */
+body.du-site dialog :is(.drawer-shell,.customize-shell,.checkout-shell,.success-shell) {
+  position:relative;
+  isolation:isolate;
+  background:#fff5e5;
+  color:var(--du-d-ink);
+  border:2px solid #dcb771;
+  box-shadow:10px 12px 0 rgba(14,7,3,.33),0 28px 65px rgba(14,6,2,.23);
+}
+body.du-site dialog :is(.drawer-shell,.customize-shell,.checkout-shell,.success-shell)::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0;
+  pointer-events:none;
+  opacity:.11;
+  background:radial-gradient(#be8a4c .65px,transparent 1px) 0 0 / 19px 19px;
+  -webkit-mask-image:linear-gradient(180deg,black,transparent 45%);
+  mask-image:linear-gradient(180deg,black,transparent 45%);
+}
+body.du-site dialog .eyebrow {
+  color:#a94321;
+  font:400 .79rem/1.2 "Lilita One",Inter,sans-serif;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+body.du-site dialog :is(h2,h3) {
+  color:var(--du-d-ink);
+  font-family:"Lilita One",Inter,sans-serif;
+  font-weight:400;
+  letter-spacing:-.024em;
+}
+body.du-site dialog .drawer-header,
+body.du-site dialog .checkout-header {
+  position:relative;
+  z-index:4;
+  align-items:center;
+  min-height:95px;
+  padding:19px 23px 18px;
+  border-bottom:2px dotted #dec29a;
+  background:#fff5e5;
+  flex:0 0 auto;
+}
+body.du-site dialog .drawer-header h2,
+body.du-site dialog .checkout-header h2 {
+  margin:0;
+  font-size:clamp(1.65rem,2.65vw,2.18rem);
+  line-height:1.07;
+  text-wrap:balance;
+}
+body.du-site dialog .icon-button {
+  display:grid;
+  place-items:center;
+  flex:0 0 42px;
+  width:42px;
+  height:42px;
+  border:1.5px solid #cfa774;
+  border-radius:50%;
+  background:#fff9ef;
+  color:#2b180e;
+  box-shadow:0 3px 0 rgba(59,27,8,.12);
+  font:400 1.65rem/1 Inter,sans-serif;
+  transition:transform .4s var(--du-d-ease),background-color .25s ease,color .25s ease,box-shadow .3s ease;
+}
+body.du-site dialog .icon-button:hover {
+  transform:rotate(90deg);
+  background:var(--du-d-gold);
+  color:var(--du-d-ink);
+  box-shadow:0 5px 0 rgba(59,27,8,.15);
+}
+body.du-site dialog :is(a,button,input,select,textarea):focus-visible {
+  outline:3px solid var(--du-d-red);
+  outline-offset:3px;
+}
+body.du-site dialog .drawer-content {
+  min-height:0;
+  overscroll-behavior:contain;
+  padding:18px 20px 25px;
+}
+body.du-site dialog .drawer-footer {
+  z-index:3;
+  border-top:2px dotted #dcbf97;
+  background:#fcebcf;
+  padding:16px 20px max(18px,env(safe-area-inset-bottom));
+  box-shadow:0 -8px 19px rgba(42,21,6,.055);
+}
+body.du-site dialog .button {
+  border-radius:999px;
+  font:400 .91rem/1 "Lilita One",Inter,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.005em;
+  transition:transform .35s var(--du-d-ease),background .26s ease,color .26s ease,box-shadow .3s ease;
+}
+body.du-site dialog .button-primary {
+  min-height:48px;
+  border:2px solid #2b190f;
+  background:#2b190f;
+  color:#fff5e5;
+  box-shadow:0 4px 0 #ab672f;
+}
+body.du-site dialog .button-primary:hover {
+  transform:translateY(-2px);
+  background:#a94122;
+  color:white;
+  border-color:#a94122;
+  box-shadow:0 6px 0 #2b190f;
+}
+body.du-site dialog .button-primary:disabled {opacity:.52;box-shadow:none;transform:none;cursor:not-allowed;}
+body.du-site dialog .button-secondary {
+  border:1.5px solid #b94a26;
+  background:#fff7e9;
+  color:#8b341c;
+  box-shadow:none;
+}
+body.du-site dialog .button-secondary:hover {
+  transform:translateY(-2px);
+  color:#fff;
+  background:#b94a26;
+  border-color:#b94a26;
+}
+
+/* Historial: tickets reales y estados discretos, nunca urgencias inventadas. */
+body.du-site .orders-dialog [data-orders-list] {padding:17px 19px 23px;}
+body.du-site .orders-dialog .cart-empty {
+  min-height:250px;
+  padding:28px 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  color:var(--du-d-ink);
+  text-align:center;
+}
+body.du-site .orders-dialog .cart-empty::before {
+  content:"✦";
+  display:grid;
+  place-items:center;
+  width:75px;
+  height:75px;
+  border:2px solid #d6af70;
+  border-radius:20px;
+  background:#f7e2ae;
+  color:#a94220;
+  font:400 2.5rem/1 "Lilita One",serif;
+  transform:rotate(-5deg);
+  box-shadow:4px 5px 0 rgba(65,30,8,.12);
+}
+body.du-site .orders-dialog .cart-empty strong {
+  font:400 1.45rem/1.1 "Lilita One",sans-serif;
+}
+body.du-site .orders-dialog .cart-empty p {max-width:310px;color:#806750;font-size:.87rem;line-height:1.5;}
+body.du-site .orders-dialog .order-card {
+  position:relative;
+  overflow:hidden;
+  margin:0 0 13px;
+  padding:17px 17px 16px;
+  border:1.5px solid #ddbf94;
+  border-radius:15px;
+  background:#fffaf0;
+  color:var(--du-d-ink);
+  box-shadow:3px 4px 0 rgba(80,40,14,.1);
+  transition:transform .4s var(--du-d-ease),box-shadow .3s ease,border-color .28s ease;
+}
+body.du-site .orders-dialog .order-card::before {
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:var(--du-d-gold);
+}
+body.du-site .orders-dialog .order-card:hover {
+  transform:translateY(-3px);
+  border-color:#d39b5d;
+  box-shadow:5px 8px 0 rgba(80,40,14,.13);
+}
+body.du-site .orders-dialog .order-card::after,
+body.du-site .cart-drawer .cart-item::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:radial-gradient(190px circle at var(--du-dialog-x,50%) var(--du-dialog-y,50%),rgba(233,199,73,.12),transparent 80%);
+  opacity:0;
+  transition:opacity .3s ease;
+}
+body.du-site .orders-dialog .order-card:hover::after,
+body.du-site .cart-drawer .cart-item:hover::after {opacity:1;}
+body.du-site .orders-dialog .order-card-head {align-items:baseline;gap:10px;}
+body.du-site .orders-dialog .order-card-head strong {
+  color:var(--du-d-ink);
+  font:400 clamp(.95rem,1.25vw,1.15rem)/1.17 "Lilita One",sans-serif;
+}
+body.du-site .orders-dialog .order-card-head small {
+  color:#9c4122;
+  white-space:nowrap;
+  font:400 1.05rem/1 "Lilita One",sans-serif;
+}
+body.du-site .orders-dialog .order-card p {
+  margin:9px 0 14px;
+  color:#745b48;
+  line-height:1.48;
+  font-size:.79rem;
+}
+body.du-site .orders-dialog .order-card-foot {align-items:center;gap:10px;flex-wrap:wrap;}
+body.du-site .orders-dialog .order-status {
+  min-height:28px;
+  align-items:center;
+  padding:6px 10px;
+  background:#eee4d1;
+  border:1px solid #d2bc98;
+  border-radius:999px;
+  color:#5b4533;
+  font:700 .65rem/1.2 Inter,sans-serif;
+}
+body.du-site .orders-dialog .order-status.is-sent {
+  background:#e5edda;
+  border-color:#b3cda7;
+  color:#38582e;
+}
+body.du-site .orders-dialog .order-status.is-pending {
+  background:#fff0d1;
+  border-color:#e6b875;
+  color:#8e4d13;
+}
+body.du-site .orders-dialog .order-card .text-button {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:35px;
+  padding:7px 13px;
+  border:1px solid #b94a26;
+  border-radius:999px;
+  background:#fff7eb;
+  color:#a43e21;
+  font:400 .82rem/1 "Lilita One",sans-serif;
+  text-decoration:none;
+  transition:background .25s ease,color .25s ease,transform .35s var(--du-d-ease);
+}
+body.du-site .orders-dialog .order-card .text-button span {transition:transform .35s var(--du-d-ease);}
+body.du-site .orders-dialog .order-card .text-button:hover {transform:translateY(-2px);background:#b94524;color:white;}
+body.du-site .orders-dialog .order-card .text-button:hover span {transform:translateX(3px);}
+
+/* Carrito: vacío con símbolo limpio y ticket de cada artículo. */
+body.du-site .cart-drawer .cart-empty {
+  min-height:clamp(290px,47dvh,440px);
+  padding:40px 20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:13px;
+  background:transparent;
+  text-align:center;
+}
+body.du-site .cart-drawer .du-empty-icon {
+  display:grid;
+  place-items:center;
+  width:105px;
+  height:105px;
+  margin-bottom:5px;
+  border:2px solid #e1be83;
+  border-radius:30px;
+  background:#fce5ad;
+  color:#aa4825;
+  box-shadow:6px 7px 0 rgba(71,35,11,.13);
+  transform:rotate(-5deg);
+}
+body.du-site .cart-drawer .du-empty-icon svg {width:67px;height:67px;}
+body.du-site .cart-drawer .cart-empty strong {
+  color:var(--du-d-ink);
+  font:400 1.75rem/1.09 "Lilita One",sans-serif;
+}
+body.du-site .cart-drawer .cart-empty p {max-width:295px;color:#856a56;font-size:.91rem;line-height:1.55;}
+body.du-site .cart-drawer .cart-empty .button {margin-top:8px;min-height:43px;padding:0 24px;}
+body.du-site .cart-drawer .cart-empty .button span {margin-left:7px;}
+body.du-site .cart-drawer .cart-item {
+  grid-template-columns:72px minmax(0,1fr);
+  gap:12px;
+  margin-bottom:11px;
+  padding:13px;
+  border:1.5px solid #e3c69f;
+  border-radius:14px;
+  background:#fffaf0;
+  box-shadow:3px 4px 0 rgba(74,33,8,.09);
+  transition:border-color .3s ease,transform .35s var(--du-d-ease);
+}
+body.du-site .cart-drawer .cart-item:hover {border-color:#d7a75c;transform:translateY(-2px);}
+body.du-site .cart-drawer .cart-item > :first-child {
+  width:72px;
+  height:72px;
+  border-radius:10px;
+  overflow:hidden;
+  background:#e8ba5f;
+}
+body.du-site .cart-drawer .cart-item img {width:100%;height:100%;object-fit:cover;border-radius:10px;}
+body.du-site .cart-drawer .cart-item-top strong {color:var(--du-d-ink);font:400 1.07rem/1.15 "Lilita One",sans-serif;}
+body.du-site .cart-drawer .cart-item-bottom > strong {color:#a43f22;font:400 1.16rem/1 "Lilita One",sans-serif;}
+body.du-site .cart-drawer .cart-customization {color:#79614f;line-height:1.45;}
+body.du-site .cart-drawer .remove-button {color:#a34225;font:700 .72rem/1.3 Inter,sans-serif;}
+body.du-site .cart-drawer .remove-button:hover {text-decoration:underline;}
+body.du-site dialog .qty-control {
+  min-height:39px;
+  grid-template-columns:36px minmax(30px,auto) 36px;
+  border:1.5px solid #dfba87;
+  border-radius:12px;
+  overflow:hidden;
+  background:#fffaf1;
+  color:var(--du-d-ink);
+}
+body.du-site dialog .qty-control button {
+  height:38px;
+  min-width:35px;
+  color:var(--du-d-ink);
+  background:transparent;
+  transition:background .2s ease,transform .2s ease,color .2s ease;
+}
+body.du-site dialog .qty-control button:hover:not(:disabled) {
+  background:#f8dfae;
+  color:#a63e21;
+}
+body.du-site dialog .qty-control button:disabled {opacity:.32;cursor:not-allowed;}
+body.du-site dialog .qty-control span {font:700 .86rem/1 Inter,sans-serif;color:var(--du-d-ink);}
+body.du-site .cart-drawer .cross-sell {margin-top:24px;}
+body.du-site .cart-drawer .cross-sell h3 {font:400 1.3rem/1.1 "Lilita One",sans-serif;margin-bottom:13px;}
+body.du-site .cart-drawer .cross-sell-item {
+  border:1px solid #dfc59c;
+  border-radius:12px;
+  background:#fffaf0;
+  color:var(--du-d-ink);
+}
+body.du-site .cart-drawer .cross-sell-item span {font-weight:700;color:var(--du-d-ink);}
+body.du-site .cart-drawer .cross-sell-item small {color:#856750;}
+body.du-site .cart-drawer .cross-sell-item button {
+  min-height:36px;
+  border:1px solid #b74524;
+  border-radius:999px;
+  background:#fff5e6;
+  color:#a83f22;
+  font:400 .75rem/1 "Lilita One",sans-serif;
+  transition:transform .3s var(--du-d-ease),background .25s ease,color .25s ease;
+}
+body.du-site .cart-drawer .cross-sell-item button:hover {background:#b74524;color:#fff;transform:translateY(-2px);}
+body.du-site .cart-drawer .total-row {margin:0 0 12px;}
+body.du-site .cart-drawer .total-row span {font:400 1.03rem/1 "Lilita One",sans-serif;}
+body.du-site .cart-drawer .total-row strong {color:#a53e1e;font:400 1.65rem/1 "Lilita One",sans-serif;}
+
+/* Personalización: cada cantidad se refleja en la barra de progreso REAL. */
+body.du-site .customize-dialog .customize-body {
+  min-height:0;
+  padding:20px 20px 24px;
+  overscroll-behavior:contain;
+}
+body.du-site .customize-dialog .customize-group {padding:2px 0 21px;}
+body.du-site .customize-dialog .customize-group + .customize-group {padding-top:20px;border-top:2px dotted #ddbd90;}
+body.du-site .customize-dialog .customize-group h3 {
+  font:400 1.3rem/1.1 "Lilita One",sans-serif;
+  color:var(--du-d-ink);
+}
+body.du-site .customize-dialog .customize-group > p {margin:5px 0 14px;color:#7f6452;font-size:.84rem;}
+body.du-site .customize-dialog .option-list {gap:9px;}
+body.du-site .customize-dialog .option-row {
+  min-height:57px;
+  padding:8px 12px;
+  border:1.5px solid #dfc49e;
+  border-radius:13px;
+  background:#fffaf2;
+  color:var(--du-d-ink);
+  transition:background .3s ease,border-color .3s ease,transform .36s var(--du-d-ease),box-shadow .3s ease;
+}
+body.du-site .customize-dialog .option-row > span {font-size:.88rem;line-height:1.35;color:#301f13;}
+body.du-site .customize-dialog .option-row:hover,
+body.du-site .customize-dialog .option-row:focus-within {
+  border-color:#d7a65a;
+  background:#fff0d4;
+  box-shadow:3px 4px 0 rgba(78,31,7,.08);
+  transform:translateY(-2px);
+}
+body.du-site .customize-dialog .choice-row input {accent-color:#b84927;}
+body.du-site .customize-dialog .choice-row:has(input:checked) {
+  background:#f8e3b4;
+  border-color:#ba742f;
+}
+body.du-site .customize-dialog .group-progress {
+  height:9px;
+  margin-top:16px;
+  border-radius:100px;
+  background:#e9d6b5;
+  overflow:hidden;
+  box-shadow:inset 0 1px 3px rgba(46,20,5,.1);
+}
+body.du-site .customize-dialog .group-progress i {
+  border-radius:100px;
+  background:linear-gradient(90deg,#e9c749,#b74723);
+  box-shadow:0 0 10px rgba(186,73,37,.15);
+  transition:width .55s var(--du-d-ease),background .35s ease;
+}
+body.du-site .customize-dialog .customize-group.is-complete .group-progress i {background:#8ca55d;}
+body.du-site .customize-dialog .group-total {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  color:#886d55;
+  margin-top:9px;
+  font-size:.78rem;
+}
+body.du-site .customize-dialog .group-total strong {color:#a44022;font:400 .92rem/1 "Lilita One",sans-serif;}
+body.du-site .customize-dialog .customize-group.is-complete .group-total strong {color:#3d6730;}
+body.du-site .customize-dialog .customize-group.du-completed .group-total strong {color:#3d6730;}
+body.du-site .customize-dialog .customize-group.du-completed .choice-row:has(input:checked) {border-color:#8a9f61;}
+body.du-site .customize-dialog .drawer-footer [type="submit"].du-ready {
+  background:#b74723;
+  border-color:#b74723;
+  color:#fff;
+  box-shadow:0 4px 0 #6b2b17;
+}
+body.du-site .customize-dialog .drawer-footer .submit-error:not(:empty) {display:block;margin:0 0 10px;color:#9b301b;}
+
+/* Checkout legible hasta el último paso y sin tarjetas ajenas a la marca. */
+body.du-site .checkout-dialog .checkout-layout {min-height:0;}
+body.du-site .checkout-dialog .checkout-main {padding:0 24px 28px;}
+body.du-site .checkout-dialog .checkout-section {border-bottom:2px dotted #dfc49c;}
+body.du-site .checkout-dialog .checkout-section h3,
+body.du-site .checkout-dialog .checkout-summary h3 {font:400 1.35rem/1.1 "Lilita One",sans-serif;color:var(--du-d-ink);}
+body.du-site .checkout-dialog .field {color:#3c2919;}
+body.du-site .checkout-dialog .field input,
+body.du-site .checkout-dialog .field select,
+body.du-site .checkout-dialog .field textarea {
+  border:1.5px solid #d6b88e;
+  border-radius:11px;
+  background:#fffbf3;
+  color:#29190f;
+  transition:border-color .24s ease,box-shadow .3s ease;
+}
+body.du-site .checkout-dialog .field input::placeholder,
+body.du-site .checkout-dialog .field textarea::placeholder {color:#99816c;}
+body.du-site .checkout-dialog .field :is(input,select,textarea):focus {
+  outline:none;
+  border-color:#be722d;
+  box-shadow:0 0 0 3px rgba(233,199,73,.19);
+}
+body.du-site .checkout-dialog .payment-card {
+  border:1.5px solid #ddc296;
+  background:#fffaf0;
+  border-radius:13px;
+  color:var(--du-d-ink);
+  transition:transform .3s var(--du-d-ease),background .3s ease,border-color .3s ease;
+}
+body.du-site .checkout-dialog .payment-card:has(input:checked) {background:#f8e6be;border-color:#b8893f;box-shadow:inset 0 0 0 1px #b8893f;}
+body.du-site .checkout-dialog .payment-card:hover {transform:translateY(-2px);}
+body.du-site .checkout-dialog .payment-card input {accent-color:#aa4525;}
+body.du-site .checkout-dialog .payment-card strong {color:#2e1c12;}
+body.du-site .checkout-dialog .payment-card small {color:#826a57;}
+body.du-site .checkout-dialog .checkout-summary {
+  background:#fceacb;
+  color:#2e1b0f;
+  border-left:2px dotted #e1c198;
+}
+body.du-site .checkout-dialog .checkout-summary-item {border-bottom:1px dashed #d8b886;}
+body.du-site .checkout-dialog .checkout-summary-item small {color:#806651;}
+body.du-site .checkout-dialog .checkout-total strong {font:400 1.65rem/1 "Lilita One",sans-serif;color:#a13c1d;}
+body.du-site .checkout-dialog .checkout-warning {color:#735842;line-height:1.5;}
+body.du-site .checkout-dialog .transfer-details,
+body.du-site .checkout-dialog .forced-transfer {
+  background:#fff6e3;
+  color:#49301b;
+  border-color:#d8b883;
+}
+body.du-site .checkout-dialog .transfer-details > div,
+body.du-site .checkout-dialog .transfer-details p {border-color:#e1c59d;}
+body.du-site .checkout-dialog .transfer-details span,
+body.du-site .checkout-dialog .transfer-details p {color:#725b48;}
+
+/* Confirmación: comprobante con gesto de sello, CTA WhatsApp intacto. */
+body.du-site .success-dialog .success-shell {
+  padding:31px clamp(20px,4vw,35px) 25px;
+  border-radius:23px;
+}
+body.du-site .success-dialog .success-icon {
+  background:var(--du-d-gold);
+  color:var(--du-d-ink);
+  border:2px solid #2e1b10;
+  box-shadow:4px 5px 0 #aa4b25;
+  transform:rotate(-7deg);
+}
+body.du-site .success-dialog .success-shell > p:not(.eyebrow) {color:#735946;line-height:1.55;}
+body.du-site .success-dialog .success-order {
+  background:#fffaf0;
+  border:1.5px dashed #d5b37f;
+  border-radius:12px;
+  padding:14px 16px;
+  color:var(--du-d-ink);
+}
+body.du-site .success-dialog .success-order strong {color:#a74222;}
+body.du-site .success-dialog .button-whatsapp {
+  border:2px solid #315b32;
+  border-radius:999px;
+  color:white;
+  background:#315b32;
+  font-family:"Lilita One",sans-serif;
+  letter-spacing:.01em;
+}
+body.du-site .success-dialog .button-whatsapp:hover {background:#427943;transform:translateY(-2px);}
+body.du-site .success-dialog [data-close-success] {margin-top:14px;color:#a23e20;}
+
+/* Feedback de apertura, sin romper el cierre ni el gesto swipe existente. */
+@media(prefers-reduced-motion:no-preference) {
+  body.du-site dialog.dialog-enter:not(.dialog-closing) :is(.drawer-shell,.customize-shell,.checkout-shell,.success-shell) {
+    animation:du-dialog-entrance .45s var(--du-d-ease) both;
+  }
+  body.du-site dialog.dialog-enter .order-card {
+    animation:du-order-entrance .42s var(--du-d-ease) both;
+    animation-delay:calc(var(--du-order-index,0) * 55ms);
+  }
+  @keyframes du-dialog-entrance {
+    from {opacity:0;transform:translate3d(0,17px,0) scale(.985);}
+    to {opacity:1;transform:translate3d(0,0,0) scale(1);}
+  }
+  @keyframes du-order-entrance {
+    from {opacity:0;transform:translate3d(0,10px,0);}
+    to {opacity:1;transform:translate3d(0,0,0);}
+  }
+  body.du-site .success-dialog.dialog-enter .success-icon {
+    animation:du-success-stamp .65s cubic-bezier(.2,1.2,.26,1.15) both;
+  }
+  @keyframes du-success-stamp {
+    from {opacity:0;transform:scale(.75) rotate(-20deg);}
+    to {opacity:1;transform:scale(1) rotate(-7deg);}
+  }
+}
+
+@media(min-width:700px) {
+  body.du-site dialog.cart-drawer {
+    position:fixed;
+    inset:0;
+    width:min(530px,calc(100vw - 42px));
+    height:min(83dvh,765px);
+    max-height:calc(100dvh - 38px);
+    margin:auto;
+  }
+  body.du-site dialog.customize-dialog {
+    position:fixed;
+    inset:0;
+    width:min(570px,calc(100vw - 42px));
+    height:min(82dvh,750px);
+    max-height:calc(100dvh - 36px);
+    margin:auto;
+  }
+  body.du-site dialog.orders-dialog {
+    position:fixed;
+    inset:0;
+    width:min(560px,calc(100vw - 42px));
+    height:min(79dvh,715px);
+    max-height:calc(100dvh - 38px);
+    margin:auto;
+  }
+  body.du-site dialog.orders-dialog:has(.cart-empty) {height:min(435px,calc(100dvh - 38px));}
+  body.du-site dialog :is(.drawer-shell,.customize-shell) {height:100%;border-radius:22px;}
+  body.du-site dialog.checkout-dialog {height:min(93dvh,850px);}
+  body.du-site dialog.checkout-dialog .checkout-shell {border-radius:22px;}
+}
+@media(max-width:699px) {
+  body.du-site dialog:is(.cart-drawer,.orders-dialog,.customize-dialog) {
+    width:100%;
+    height:min(91dvh,790px);
+    margin:auto 0 0;
+  }
+  body.du-site dialog:is(.cart-drawer,.orders-dialog,.customize-dialog) :is(.drawer-shell,.customize-shell) {
+    height:100%;
+    border-radius:22px 22px 0 0;
+    border-bottom:0;
+    box-shadow:0 -18px 50px rgba(10,4,1,.28);
+  }
+  body.du-site dialog:is(.cart-drawer,.orders-dialog,.customize-dialog) .drawer-header {
+    padding:26px 17px 14px;
+    min-height:88px;
+  }
+  body.du-site dialog:is(.cart-drawer,.orders-dialog,.customize-dialog) .drawer-header h2 {
+    font-size:clamp(1.5rem,7.2vw,2.05rem);
+  }
+  body.du-site dialog .drawer-content {padding:16px 13px 24px;}
+  body.du-site .orders-dialog [data-orders-list] {padding:14px 13px 25px;}
+  body.du-site .orders-dialog .order-card {padding:15px 13px;}
+  body.du-site .orders-dialog .order-card-foot {gap:8px;}
+  body.du-site .orders-dialog .order-card .text-button {font-size:.76rem;}
+  body.du-site .cart-drawer .cart-item {grid-template-columns:62px minmax(0,1fr);padding:10px;gap:10px;}
+  body.du-site .cart-drawer .cart-item > :first-child {width:62px;height:62px;}
+  body.du-site .cart-drawer .cart-empty {min-height:min(53dvh,420px);}
+  body.du-site .customize-dialog .customize-body {padding:17px 14px 22px;}
+  body.du-site .customize-dialog .option-row {padding:8px 10px;}
+  body.du-site .customize-dialog .option-row > span {font-size:.83rem;}
+  body.du-site dialog .drawer-footer {padding:14px 14px max(17px,env(safe-area-inset-bottom));}
+  body.du-site dialog.checkout-dialog {width:100%;height:100dvh;margin:0;}
+  body.du-site dialog.checkout-dialog .checkout-shell {border:0;border-radius:0;box-shadow:none;}
+  body.du-site .checkout-dialog .checkout-main {padding:0 17px 20px;}
+  body.du-site .checkout-dialog .checkout-summary {border-left:0;border-top:2px dotted #ddbd8d;}
+  body.du-site .success-dialog .success-shell {max-height:calc(100dvh - 35px);overflow-y:auto;}
+}
+@media(max-width:359px) {
+  body.du-site .orders-dialog .order-card-head {flex-wrap:wrap;gap:4px;}
+  body.du-site .orders-dialog .order-status {font-size:.59rem;}
+  body.du-site .cart-drawer .cart-item-bottom {flex-wrap:wrap;}
+  body.du-site .customize-dialog .option-row {gap:5px;}
+}
+@media(prefers-reduced-motion:reduce) {
+  body.du-site dialog *,body.du-site dialog *::before,body.du-site dialog *::after {
+    animation:none !important;transition:none !important;
+  }
+}
+
+/* Paneles proporcionales al contenido: el carrito vacío y una docena con
+   pocas opciones no tienen por qué ocupar casi toda la pantalla. */
+@media(min-width:700px) {
+  body.du-site dialog.cart-drawer:has(.cart-empty) {
+    height:min(545px,calc(100dvh - 40px));
+  }
+  body.du-site dialog.customize-dialog {
+    height:fit-content;
+    max-height:min(84dvh,750px);
+  }
+  body.du-site dialog.customize-dialog .customize-shell {
+    height:auto;
+    max-height:min(84dvh,750px);
+  }
+  body.du-site dialog.customize-dialog .customize-body {
+    flex:0 1 auto;
+    max-height:calc(84dvh - 205px);
+  }
+}
+@media(max-width:699px) {
+  body.du-site dialog.cart-drawer:has(.cart-empty) {
+    height:min(535px,calc(100dvh - 35px));
+  }
+  body.du-site dialog.customize-dialog {
+    height:fit-content;
+    max-height:min(91dvh,790px);
+  }
+  body.du-site dialog.customize-dialog .customize-shell {
+    height:auto;
+    max-height:min(91dvh,790px);
+  }
+  body.du-site dialog.customize-dialog .customize-body {
+    flex:0 1 auto;
+    max-height:calc(91dvh - 203px);
+  }
+  body.du-site .cart-drawer:has(.cart-empty) .cart-empty {
+    min-height:min(330px,44dvh);
+    padding:18px 16px;
+  }
+}

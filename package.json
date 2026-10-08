@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node server.cjs",
     "start": "node server.cjs",
-    "check": "node --check app.js && node --check admin.js && node --check server.cjs"
+    "check": "node --check app.js && node --check admin.js && node --check server.cjs && node --check scripts/build-public.mjs && node --check scripts/seo-check.mjs",
+    "build": "node scripts/build-public.mjs",
+    "check:seo": "node scripts/seo-check.mjs _site"
   },
   "engines": {
     "node": ">=18"

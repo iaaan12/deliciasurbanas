@@ -5141,3 +5141,208 @@ dialog.dialog-enter .success-shell {
   }
   .brand-mark { flex-basis: 50px !important; }
 }
+
+/* Ubicación — mapa vectorial real del centro de Salta (OpenStreetMap). */
+.map-wrap.du-location-map {
+  position: relative;
+  isolation: isolate;
+  min-height: 398px;
+  border: 10px solid #ffbd48;
+  border-radius: 28px;
+  background: #29190f;
+  box-shadow: 0 20px 50px rgba(80, 38, 9, .16);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.du-map-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.du-map-svg {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* Antes de entrar en pantalla, ningún trazo se dibuja. Una vez visible,
+   las calles se revelan en grupos, con pequeños desfases por segmento. */
+.du-location-map.is-enhanced .du-map-svg .local path,
+.du-location-map.is-enhanced .du-map-svg .main path,
+.du-location-map.is-enhanced .du-map-svg .san-base path,
+.du-location-map.is-enhanced .du-map-svg .san path {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+.du-location-map.is-enhanced.is-visible .du-map-svg .local path {
+  animation: du-map-street-draw 1.15s cubic-bezier(.24,.69,.3,1) both;
+  animation-delay: calc(.07s + var(--road-step, 0) * .046s);
+}
+.du-location-map.is-enhanced.is-visible .du-map-svg .main path {
+  animation: du-map-street-draw 1.4s cubic-bezier(.25,.75,.25,1) both;
+  animation-delay: calc(.16s + var(--road-step, 0) * .05s);
+}
+.du-location-map.is-enhanced.is-visible .du-map-svg .san-base path,
+.du-location-map.is-enhanced.is-visible .du-map-svg .san path {
+  animation: du-map-street-draw 1.7s cubic-bezier(.25,.73,.28,1) both;
+  animation-delay: calc(.22s + var(--road-step, 0) * .07s);
+}
+.du-location-map.is-enhanced .du-map-svg .map-labels { opacity: 0; }
+.du-location-map.is-enhanced.is-visible .du-map-svg .map-labels {
+  animation: du-map-street-labels .7s ease 1.25s both;
+}
+@keyframes du-map-street-draw { to { stroke-dashoffset: 0; } }
+@keyframes du-map-street-labels { to { opacity: 1; } }
+
+/* El logo camina sobre el trazado auténtico de San Martín. */
+.du-map-svg .du-map-walker { opacity: 0; pointer-events: none; }
+.du-location-map.is-enhanced.is-walking .du-map-walker { opacity: 1; }
+.du-map-svg .du-walker-bounce {
+  animation: du-logo-step .3s ease-in-out infinite alternate;
+}
+.du-map-svg .du-walker-leg {
+  transform-box: view-box;
+  transform-origin: center;
+}
+.du-map-svg .du-walker-leg-back {
+  animation: du-logo-leg-back .4s ease-in-out infinite alternate;
+}
+.du-map-svg .du-walker-leg-front {
+  animation: du-logo-leg-front .4s ease-in-out infinite alternate;
+}
+@keyframes du-logo-step {
+  to { transform: translateY(-5px) rotate(-2deg); }
+}
+@keyframes du-logo-leg-back {
+  to { transform: translate(8px, 0); }
+}
+@keyframes du-logo-leg-front {
+  to { transform: translate(-8px, 0); }
+}
+
+.du-location-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(15, 8, 4, .04) 40%, rgba(15, 8, 4, .42) 100%);
+}
+
+.du-map-open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.du-map-marker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: 72px;
+  height: 90px;
+  text-decoration: none;
+  transform: translate(-50%, -100%);
+  filter: drop-shadow(0 10px 4px rgba(12, 6, 3, .22));
+}
+
+.du-map-pin { position: absolute; inset: 0; }
+.du-map-pin svg { display: block; width: 100%; height: 100%; }
+.du-map-pin img {
+  position: absolute;
+  top: 19px;
+  left: 17px;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.du-map-label {
+  position: absolute;
+  top: 7px;
+  left: 78px;
+  min-width: 194px;
+  padding: 11px 16px;
+  border: 2px solid #29190f;
+  border-radius: 16px;
+  background: #fff5e7;
+  box-shadow: 0 6px 0 rgba(23, 12, 6, .25);
+  text-align: left;
+  white-space: nowrap;
+  color: #29190f;
+}
+.du-map-label strong,
+.du-map-label small { display: block; }
+.du-map-label strong {
+  font: 900 15px/1.2 Poppins, Inter, sans-serif;
+  letter-spacing: -.025em;
+}
+.du-map-label small {
+  margin-top: 4px;
+  font: 700 12px/1.3 Inter, sans-serif;
+  color: #80533a;
+}
+.du-map-marker:hover .du-map-label,
+.du-map-marker:focus-visible .du-map-label { background: #fff; }
+.du-map-marker:focus-visible,
+.du-map-open:focus-visible,
+.du-map-credit:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+
+.du-map-credit {
+  position: absolute;
+  z-index: 3;
+  bottom: 12px;
+  right: 14px;
+  color: rgba(255, 248, 235, .84);
+  font: 500 10px/1.2 Inter, sans-serif;
+  text-decoration: none;
+  text-shadow: 0 1px 4px #29190f;
+}
+.du-map-credit:hover { color: #fff; text-decoration: underline; }
+
+.du-location-map.is-enhanced .du-map-marker {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.du-location-map.is-enhanced.is-complete .du-map-marker {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  animation: du-marker-arrive .72s cubic-bezier(.18, 1.3, .3, 1) both;
+}
+@keyframes du-marker-arrive {
+  from { opacity: 0; transform: translate(-50%, -85%) scale(.78); }
+  to { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+}
+
+@media (max-width: 699px) {
+  .map-wrap.du-location-map { min-height: 365px; border-width: 8px; border-radius: 24px; }
+  .du-map-label {
+    top: -76px;
+    left: 36px;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .du-map-credit { right: 10px; bottom: 10px; font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .du-location-map.is-enhanced .du-map-svg path,
+  .du-location-map.is-enhanced .du-map-svg .map-labels {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+  }
+  .du-location-map.is-enhanced .du-map-walker { display: none; }
+  .du-location-map.is-enhanced.is-complete .du-map-marker { animation: none; }
+}

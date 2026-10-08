@@ -24,13 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build public artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p _site
-          cp index.html styles.css app.js catalog.json robots.txt sitemap.xml CNAME _site/
-          cp -R assets _site/assets
+      - name: Build safe public artifact with indexable menu
+        run: node scripts/build-public.mjs
+
+      - name: SEO and artifact integrity checks
+        run: node scripts/seo-check.mjs _site
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

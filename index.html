@@ -3,38 +3,63 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Delicias Urbanas | Pollos al spiedo y sándwiches en Salta</title>
-    <meta name="description" content="Pedí comidas al paso en Delicias Urbanas, Salta. Pollos al spiedo, sándwiches, guarniciones y bebidas para retirar en Av. San Martín 532." />
-    <meta name="theme-color" content="#ff6b00" />
+    <title>Delicias Urbanas Salta | Torta salada, pollos y sándwiches</title>
+    <meta name="description" content="Tortas saladas, pollos al spiedo, sándwiches y guarniciones en Salta. Elegí tu pedido online y retiralo en Delicias Urbanas, Av. San Martín 532." />
+    <meta name="theme-color" content="#29190f" />
     <meta name="robots" content="index,follow" />
     <link rel="canonical" href="https://deliciasurbanas.com.ar/" />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_AR" />
-    <meta property="og:title" content="Delicias Urbanas | Comidas al paso en Salta" />
-    <meta property="og:description" content="Elegí qué comer, armá tu pedido y coordiná el retiro por WhatsApp." />
+    <meta property="og:site_name" content="Delicias Urbanas" />
+    <meta property="og:title" content="Delicias Urbanas | Torta salada y comidas al paso en Salta" />
+    <meta property="og:description" content="Pollos al spiedo, sándwiches y tortas saladas. Armá tu pedido y retiralo en Av. San Martín 532, Salta." />
     <meta property="og:url" content="https://deliciasurbanas.com.ar/" />
-    <meta property="og:image" content="https://i.imgur.com/ibEvRnc.jpeg" />
+    <meta property="og:image" content="https://deliciasurbanas.com.ar/assets/og-delicias-urbanas.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Delicias Urbanas en Salta: torta salada sobre un fondo amarillo de marca" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Delicias Urbanas | Comidas al paso en Salta" />
+    <meta name="twitter:description" content="Tortas saladas, pollos y sándwiches. Pedí online y retirá en Av. San Martín 532, Salta." />
+    <meta name="twitter:image" content="https://deliciasurbanas.com.ar/assets/og-delicias-urbanas.jpg" />
 
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="./assets/favicon-48.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="preload" as="image" href="./assets/torta-scroll.webp" type="image/webp" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;600;700;800;900&family=Lobster&family=Lilita+One&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./menu-editorial.css" />
+    <link rel="stylesheet" href="./site-editorial.css" />
+    <link rel="stylesheet" href="./poster-compact.css" />
+    <link rel="stylesheet" href="./header-polish.css" />
+    <link rel="stylesheet" href="./featured-polish.css" />
+    <link rel="stylesheet" href="./menu-wow.css" />
+    <link rel="stylesheet" href="./location-wow.css" />
+    <link rel="stylesheet" href="./dialogs-wow.css" />
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Restaurant",
         "name": "Delicias Urbanas",
+        "@id": "https://deliciasurbanas.com.ar/#restaurante",
         "url": "https://deliciasurbanas.com.ar/",
         "telephone": "+54 9 387 502-0884",
-        "image": "https://i.imgur.com/ibEvRnc.jpeg",
+        "image": "https://deliciasurbanas.com.ar/assets/og-delicias-urbanas.jpg",
+        "menu": "https://deliciasurbanas.com.ar/#menu",
+        "hasMenu": {"@id": "https://deliciasurbanas.com.ar/#carta"},
+        "sameAs": ["https://instagram.com/delicias.urbanas"],
+        "hasMap": "https://www.google.com/maps/search/?api=1&query=Av.%20San%20Mart%C3%ADn%20532%2C%20Salta%2C%20Argentina",
         "servesCuisine": "Comidas al paso",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": -24.7936666,
+          "longitude": -65.4104919
+        },
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Av. San Martín 532",
@@ -59,9 +84,17 @@
       }
     </script>
     <script src="./app.js" defer></script>
+    <script src="./location-map.js" defer></script>
+    <script src="./site-editorial.js" defer></script>
+    <script src="./poster-scroll.js" defer></script>
+    <script src="./header-polish.js" defer></script>
+    <script src="./featured-polish.js" defer></script>
+    <script src="./menu-wow.js" defer></script>
+    <script src="./location-wow.js" defer></script>
+    <script src="./dialogs-wow.js" defer></script>
   </head>
 
-  <body>
+  <body class="du-site">
     <a class="skip-link" href="#menu">Ir al menú</a>
 
     <a class="announcement-bar" href="https://wa.me/5493875020884" target="_blank" rel="noopener">
@@ -72,7 +105,7 @@
       <div class="header-inner shell">
         <a class="brand" href="#inicio" aria-label="Delicias Urbanas, inicio">
           <span class="brand-mark" aria-hidden="true">
-            <img src="./assets/delicias-logo-clean.png" alt="" width="512" height="512" />
+            <img src="./assets/delicias-logo-clean.webp" alt="" width="512" height="512" />
           </span>
           <span>
             <strong>DELICIAS URBANAS</strong>
@@ -80,7 +113,8 @@
           </span>
         </a>
 
-        <nav class="main-nav desktop-only" aria-label="Navegación principal">
+        <nav class="main-nav desktop-only du-nav-track" aria-label="Navegación principal">
+          <span class="du-nav-indicator" aria-hidden="true"></span>
           <a href="#promos">Promos</a>
           <a href="#menu">Menú</a>
           <a href="#ubicacion">Ubicación</a>
@@ -88,47 +122,43 @@
 
         <nav class="header-actions" aria-label="Acciones principales">
           <button class="text-button desktop-only" type="button" data-open-orders>Mis pedidos</button>
+          <button class="du-mobile-nav-toggle" type="button" aria-expanded="false" aria-label="Abrir navegación" aria-controls="du-mobile-navigation">
+            <span class="du-toggle-lines" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="du-toggle-label">Menú</span>
+          </button>
           <button class="cart-button" type="button" data-open-cart aria-label="Abrir carrito">
+            <svg class="du-cart-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M5.5 8.5h13l1.2 11.1H4.3L5.5 8.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 9V6a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             <span>Tu pedido</span>
             <strong data-cart-total>$0</strong>
             <span class="cart-count" data-cart-count hidden>0</span>
           </button>
         </nav>
+        <span class="du-header-progress" aria-hidden="true"></span>
       </div>
+      <nav class="du-mobile-navigation" id="du-mobile-navigation" aria-label="Secciones del sitio" hidden>
+        <a href="#promos"><span>01</span> Promos <span aria-hidden="true">→</span></a>
+        <a href="#menu"><span>02</span> Menú <span aria-hidden="true">→</span></a>
+        <a href="#ubicacion"><span>03</span> Ubicación <span aria-hidden="true">→</span></a>
+        <button type="button" data-open-orders><span>04</span> Mis pedidos <span aria-hidden="true">→</span></button>
+      </nav>
     </header>
 
     <main>
-      <section class="hero-v3 shell" aria-labelledby="hero-title">
-        <div class="hero-v3-copy">
-          <div class="hero-brand-line">
-            <img src="./assets/delicias-logo-clean.png" alt="" width="512" height="512" />
-            <div>
-              <span class="open-status" data-store-status>Cargando horario…</span>
-              <small>Retiro en Av. San Martín 532</small>
+      <section class="hero-v3 du-poster-hero" aria-labelledby="hero-title">
+        <div class="du-poster-stage">
+          <span class="du-poster-spark du-poster-spark-one" aria-hidden="true">✦</span>
+          <span class="du-poster-spark du-poster-spark-two" aria-hidden="true">✦</span>
+          <span class="du-poster-spark du-poster-spark-three" aria-hidden="true">✦</span>
+          <p class="du-poster-kicker">La auténtica</p>
+          <h1 id="hero-title" class="du-poster-title"><span>TORTA</span><span>SALADA</span><span class="sr-only"> de Delicias Urbanas en Salta</span></h1>
+          <img class="du-poster-product" data-scroll-product src="./assets/torta-scroll.webp" alt="Torta salada de Delicias Urbanas con jamón, queso y verduras" width="1376" height="760" fetchpriority="high" decoding="async" />
+          <div class="du-poster-bottom">
+            <div class="du-poster-actions">
+              <a class="button button-primary" href="#menu">Ver el menú <span aria-hidden="true">→</span></a>
+              <a class="button button-ghost" href="#ubicacion">Cómo llegar</a>
             </div>
-          </div>
-
-          <p class="eyebrow">Comidas al paso · Salta</p>
-          <h1 id="hero-title">Comé rico. Pedí fácil. <em>Pasá a buscarlo.</em></h1>
-          <p class="hero-lead">Pollos al spiedo, sándwiches, guarniciones y bebidas. Armá todo desde la web y mandá el pedido listo por WhatsApp.</p>
-
-          <div class="hero-actions">
-            <a class="button button-primary" href="#menu">Ver menú</a>
-            <a class="button button-ghost" href="#promos">Ver promos</a>
-          </div>
-
-          <div class="hero-proof" aria-label="Información del local">
-            <span><b>Lun–sáb</b><small>08–15 · 17:30–21</small></span>
-            <span><b>Retiro</b><small>Av. San Martín 532</small></span>
-            <span><b>Pago</b><small>Efectivo o transferencia</small></span>
-          </div>
-        </div>
-
-        <div class="hero-v3-media">
-          <img src="./assets/delicias-hero.jpeg" alt="Una preparación de Delicias Urbanas" width="1376" height="760" fetchpriority="high" />
-          <div class="hero-media-stamp">
-            <span>Delicias Urbanas</span>
-            <strong>Hecho para compartir</strong>
+            <p>Av. San Martín 532 · Salta Capital</p>
+            <span class="du-poster-status open-status" data-store-status>Cargando horario…</span>
           </div>
         </div>
       </section>
@@ -146,32 +176,33 @@
         </div>
       </section>
 
-      <section class="menu-section" id="menu" aria-labelledby="menu-title">
+      <section class="menu-section du-editorial-menu" id="menu" aria-labelledby="menu-title">
         <div class="shell">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Todo el menú</p>
-              <h2 id="menu-title">Elegí por antojo.</h2>
-            </div>
-            <p>Explorá por categoría o buscá tu favorito. Todo está pensado para elegir rápido y armar el pedido sin perderte entre opciones.</p>
+          <div class="du-menu-heading">
+            <h2 id="menu-title">Menú</h2>
+            <button class="du-menu-all" type="button" data-show-all-menu>Ver menú completo <span aria-hidden="true">→</span></button>
           </div>
 
           <div class="menu-tools" data-menu-tools>
+            <div class="category-strip" data-categories aria-label="Categorías del menú"></div>
             <label class="search-field">
               <span class="sr-only">Buscar productos</span>
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.3-4.3m2.3-5.2a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" /></svg>
               <input type="search" placeholder="Buscar pollo, sándwich, arroz..." autocomplete="off" data-search />
               <button type="button" class="clear-search" data-clear-search hidden aria-label="Limpiar búsqueda">×</button>
             </label>
-            <div class="category-strip" data-categories aria-label="Categorías del menú"></div>
           </div>
+          <div class="du-subcategory-strip" data-subcategories aria-label="Tipos de productos" hidden></div>
 
           <div class="menu-results-meta" aria-live="polite">
             <span data-results-count></span>
             <button type="button" class="text-button mobile-only" data-open-orders>Mis pedidos</button>
           </div>
 
-          <div class="product-grid" data-products></div>
+          <div class="du-menu-board">
+            <div class="product-grid du-menu-list" data-products></div>
+            <aside class="du-menu-ticket" data-menu-preview aria-label="Detalle del producto destacado"></aside>
+          </div>
           <div class="empty-state" data-empty-state hidden>
             <strong>No encontramos ese producto.</strong>
             <span>Probá con otra palabra o mirá todo el menú.</span>
@@ -182,21 +213,34 @@
 
       <section class="pickup-section shell" id="ubicacion" aria-labelledby="pickup-title">
         <div class="pickup-copy">
-          <p class="eyebrow">Nuestro local</p>
           <h2 id="pickup-title">Dónde estamos</h2>
           <p>Preparás el pedido desde la web y lo retirás en nuestro local del centro de Salta.</p>
           <dl class="location-details">
-            <div><dt>Dirección</dt><dd>Av. San Martín 532, Salta</dd></div>
+            <div>
+              <dt>Dirección</dt>
+              <dd><span>Av. San Martín 532, Salta</span><button type="button" class="du-copy-address" data-copy-address aria-label="Copiar dirección Av. San Martín 532, Salta" title="Copiar dirección"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none"><rect x="8" y="8" width="11" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></dd>
+            </div>
             <div><dt>Horarios</dt><dd>Lunes a sábado · 08:00–15:00 y 17:30–21:00</dd></div>
-            <div><dt>WhatsApp</dt><dd>+54 9 387 502-0884</dd></div>
+            <div><dt>WhatsApp</dt><dd><a href="https://wa.me/5493875020884" target="_blank" rel="noopener">+54 9 387 502-0884 <span aria-hidden="true">→</span></a></dd></div>
           </dl>
+          <span class="sr-only" data-address-feedback aria-live="polite"></span>
           <div class="pickup-actions">
-            <a class="button button-primary" href="https://www.google.com/maps/search/?api=1&query=Av.%20San%20Mart%C3%ADn%20532%2C%20Salta%2C%20Argentina" target="_blank" rel="noopener">Cómo llegar</a>
-            <a class="button button-secondary" href="https://instagram.com/delicias.urbanas" target="_blank" rel="noopener">Instagram</a>
+            <a class="button button-primary" href="https://www.google.com/maps/search/?api=1&query=Av.%20San%20Mart%C3%ADn%20532%2C%20Salta%2C%20Argentina" target="_blank" rel="noopener">Cómo llegar <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="https://instagram.com/delicias.urbanas" target="_blank" rel="noopener">Instagram <span aria-hidden="true">→</span></a>
           </div>
         </div>
-        <div class="map-wrap">
-          <iframe title="Mapa de Delicias Urbanas" src="https://www.google.com/maps?q=Av.%20San%20Mart%C3%ADn%20532%2C%20Salta%2C%20Argentina&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="map-wrap du-location-map" aria-label="Mapa ilustrado de la ubicación de Delicias Urbanas en el centro de Salta">
+          <button type="button" class="du-map-replay" data-map-replay aria-label="Repetir animación del recorrido del logo hasta el local" disabled hidden><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 1-2.7-5.9M20 4v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Repetir recorrido</span></button>
+          <img class="du-map-art" src="./assets/location-map.svg" width="1080" height="620" alt="Calles del centro de Salta alrededor de Avenida San Martín 532" loading="lazy" decoding="async" />
+          <a class="du-map-open" href="https://www.google.com/maps/search/?api=1&amp;query=Av.%20San%20Mart%C3%ADn%20532%2C%20Salta%2C%20Argentina" target="_blank" rel="noopener" aria-label="Abrir ubicación de Delicias Urbanas en Google Maps"></a>
+          <a class="du-map-marker" href="https://www.google.com/maps/search/?api=1&amp;query=Av.%20San%20Mart%C3%ADn%20532%2C%20Salta%2C%20Argentina" target="_blank" rel="noopener" aria-label="Cómo llegar a Delicias Urbanas, Avenida San Martín 532">
+            <span class="du-map-pin" aria-hidden="true">
+              <svg viewBox="0 0 72 90" focusable="false"><path d="M36 85C23 66 5 51 5 34a31 31 0 0 1 62 0c0 17-18 32-31 51Z" fill="#ff6a00" stroke="#fff4e6" stroke-width="5"/><circle cx="36" cy="34" r="24" fill="#fff4e6"/></svg>
+              <img src="./assets/delicias-logo-clean.webp" width="38" height="38" alt="" decoding="async" />
+            </span>
+            <span class="du-map-label"><strong>Delicias Urbanas</strong><small>Av. San Martín 532</small></span>
+          </a>
+          <a class="du-map-credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© colaboradores de OpenStreetMap</a>
         </div>
       </section>
     </main>
@@ -205,7 +249,7 @@
       <div class="shell footer-grid">
         <div>
           <div class="footer-brand-lockup">
-            <img src="./assets/delicias-logo-clean.png" alt="Delicias Urbanas" width="512" height="512" loading="lazy" decoding="async" />
+            <img src="./assets/delicias-logo-clean.webp" alt="Delicias Urbanas" width="512" height="512" loading="lazy" decoding="async" />
             <div>
               <strong class="footer-brand">DELICIAS URBANAS</strong>
               <p>Sabores auténticos en el corazón de Salta.</p>
@@ -239,7 +283,7 @@
           </div>
           <button class="icon-button" type="button" data-close-cart aria-label="Cerrar carrito">×</button>
         </header>
-        <div class="drawer-content">
+        <div class="drawer-content" data-cart-content>
           <div data-cart-items></div>
           <section class="cross-sell" data-cross-sell-section>
             <h3>¿Le sumamos algo?</h3>

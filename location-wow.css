@@ -1,0 +1,394 @@
+/*
+ * Delicias Urbanas · Escena de ubicación
+ * Una postal interactiva de Salta con mapa real y recibo de datos del local.
+ * No altera el SVG de OSM, coordenadas, precios ni destino de los enlaces.
+ */
+body.du-site #ubicacion.pickup-section {
+  --loc-paper: #fff4e0;
+  --loc-yellow: #e9c749;
+  --loc-ink: #29190f;
+  --loc-coral: #bf4b27;
+  --loc-ease: cubic-bezier(.19,.84,.22,1);
+  width: min(calc(100% - 48px),1210px);
+  margin: 0 auto;
+  padding: clamp(76px,8vw,122px) 0 clamp(72px,8vw,110px);
+  gap: clamp(30px,5vw,76px);
+  scroll-margin-top: 110px;
+  isolation: isolate;
+  position: relative;
+  color: var(--loc-paper);
+}
+body.du-site #ubicacion.pickup-section::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:10% -9% 12%;
+  opacity:.2;
+  pointer-events:none;
+  background-image:radial-gradient(#d7a35e .8px,transparent 1px);
+  background-size:24px 24px;
+  -webkit-mask-image:linear-gradient(90deg,transparent,black 30%,black 70%,transparent);
+  mask-image:linear-gradient(90deg,transparent,black 30%,black 70%,transparent);
+}
+body.du-site #ubicacion .pickup-copy {
+  align-self: center;
+  min-width: 0;
+}
+body.du-site #ubicacion .pickup-copy > h2 {
+  position:relative;
+  width:max-content;
+  max-width:100%;
+  margin: 0 0 27px;
+  color:var(--loc-yellow);
+  font:400 clamp(3.7rem,5.75vw,6.25rem)/.99 "Lobster",Georgia,cursive;
+  letter-spacing:-.058em;
+  text-wrap:balance;
+}
+body.du-site #ubicacion .pickup-copy > h2::after {
+  content:"";
+  position:absolute;
+  left: 4%;
+  width:87%;
+  bottom:-11px;
+  height:5px;
+  border-radius:999px;
+  background: var(--loc-yellow);
+  transform: rotate(-2deg);
+  transform-origin:left center;
+}
+body.du-site #ubicacion .pickup-copy > p:not(.eyebrow) {
+  max-width:455px;
+  color:#d6b9a0;
+  font:400 clamp(.92rem,1.3vw,1.04rem)/1.75 Inter,system-ui,sans-serif;
+  margin: 0 0 27px;
+}
+
+/* Recibo de datos: claridad inmediata y un guiño gastronómico. */
+body.du-site #ubicacion .location-details {
+  position:relative;
+  isolation:isolate;
+  margin:0 0 29px;
+  padding:10px 19px;
+  border:1.5px solid #ddbd82;
+  border-radius:12px;
+  color:var(--loc-ink);
+  background:var(--loc-paper);
+  box-shadow:5px 6px 0 #a8532b,10px 12px 0 rgba(10,4,1,.22);
+  transform:rotate(-.7deg);
+  transition: transform .65s var(--loc-ease),box-shadow .5s ease;
+}
+body.du-site #ubicacion .location-details::before,
+body.du-site #ubicacion .location-details::after {
+  content:"";
+  position:absolute;
+  left:13px;
+  right:13px;
+  height:0;
+  border-top:2px dotted #d4b78b;
+  pointer-events:none;
+  opacity:.6;
+}
+body.du-site #ubicacion .location-details::before { top:6px; }
+body.du-site #ubicacion .location-details::after { bottom:6px; }
+body.du-site #ubicacion .location-details:hover {
+  transform:rotate(0deg) translateY(-3px);
+  box-shadow:6px 9px 0 #a8532b,11px 16px 0 rgba(10,4,1,.22);
+}
+body.du-site #ubicacion .location-details > div {
+  display:grid;
+  grid-template-columns:minmax(80px,.26fr) minmax(0,.74fr);
+  align-items:center;
+  gap:14px;
+  min-height:65px;
+  padding:12px 0;
+  border:0;
+  border-bottom:1.5px dashed #ddc5a8;
+}
+body.du-site #ubicacion .location-details > div:last-child { border-bottom:0; }
+body.du-site #ubicacion .location-details dt {
+  margin:0;
+  color:#a7401f;
+  font:400 .83rem/1.2 "Lilita One",Inter,sans-serif;
+  text-transform:uppercase;
+}
+body.du-site #ubicacion .location-details dd {
+  margin:0;
+  color:#322014;
+  font:650 clamp(.76rem,1vw,.86rem)/1.5 Inter,system-ui,sans-serif;
+}
+body.du-site #ubicacion .location-details dd:has(.du-copy-address) {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+body.du-site #ubicacion .location-details dd a {
+  display:inline-flex;
+  gap:7px;
+  color:#322014;
+  text-decoration:none;
+  border-bottom:1px dotted #8f563b;
+  transition:color .25s ease,border-color .25s ease;
+}
+body.du-site #ubicacion .location-details dd a:hover { color:#b24123;border-color:#b24123; }
+body.du-site #ubicacion .location-details dd a span { color:#b24123; }
+body.du-site #ubicacion .du-copy-address {
+  display:inline-grid;
+  place-items:center;
+  flex:0 0 34px;
+  width:34px;
+  height:34px;
+  padding:0;
+  border:1.5px solid #cda77c;
+  border-radius:8px;
+  background: #fffaf0;
+  color:#9e3e23;
+  cursor:pointer;
+  transition:background .25s ease,color .25s ease,transform .36s var(--loc-ease);
+}
+body.du-site #ubicacion .du-copy-address svg { width:17px;height:17px; }
+body.du-site #ubicacion .du-copy-address:hover {
+  background:var(--loc-yellow);
+  color:var(--loc-ink);
+  transform:translateY(-2px) rotate(-5deg);
+}
+body.du-site #ubicacion .du-copy-address.is-copied { background:#d9ecc6;color:#254220;border-color:#8ba96f; }
+body.du-site #ubicacion .du-copy-address:focus-visible { outline:3px solid #b34924;outline-offset:3px; }
+
+body.du-site #ubicacion .pickup-actions {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+body.du-site #ubicacion .pickup-actions .button {
+  min-height:50px;
+  border:2px solid var(--loc-paper);
+  padding:0 22px;
+  border-radius:999px;
+  box-shadow:0 4px 0 rgba(12,5,1,.28);
+  transition:transform .43s var(--loc-ease),box-shadow .3s ease,background-color .3s ease,color .3s ease;
+}
+body.du-site #ubicacion .pickup-actions .button span {
+  display:inline-block;
+  transition:transform .38s var(--loc-ease);
+}
+body.du-site #ubicacion .pickup-actions .button:hover {
+  transform:translateY(-3px);
+  box-shadow:0 7px 0 rgba(12,5,1,.28);
+}
+body.du-site #ubicacion .pickup-actions .button:hover span { transform:translate(3px,-3px); }
+body.du-site #ubicacion .pickup-actions .button:active {transform:translateY(1px);box-shadow:0 1px 0 rgba(12,5,1,.28);}
+body.du-site #ubicacion .pickup-actions .button-primary {background:var(--loc-yellow);border-color:var(--loc-yellow);color:var(--loc-ink);}
+body.du-site #ubicacion .pickup-actions .button-primary:hover {background:#ffdb5e;border-color:#ffdb5e;color:var(--loc-ink);}
+body.du-site #ubicacion .pickup-actions .button-secondary {background:transparent;border-color:var(--loc-paper);color:var(--loc-paper);}
+body.du-site #ubicacion .pickup-actions .button-secondary:hover {background:var(--loc-paper);color:var(--loc-ink);}
+
+/* La postal/mapa es el foco de la escena. El transform depende del puntero,
+   como máximo 1° por eje, nunca una inclinación 3D exagerada. */
+body.du-site #ubicacion .map-wrap.du-location-map {
+  position:relative;
+  width:100%;
+  height:clamp(395px,36vw,520px);
+  min-height:395px;
+  overflow:hidden;
+  border:clamp(7px, .8vw,10px) solid var(--loc-yellow);
+  border-radius:clamp(20px,2.4vw,28px);
+  background:var(--loc-ink);
+  box-shadow: 12px 13px 0 #140b07,20px 28px 34px rgba(8,3,1,.25);
+  transform:perspective(1400px) rotateX(var(--loc-tilt-x,0deg)) rotateY(var(--loc-tilt-y,0deg));
+  transform-style:flat;
+  transition:transform .55s var(--loc-ease),box-shadow .45s ease,border-color .3s ease;
+}
+body.du-site #ubicacion .map-wrap.du-location-map:hover {
+  box-shadow:14px 17px 0 #140b07,24px 34px 43px rgba(8,3,1,.3);
+  border-color:#ffd76b;
+}
+body.du-site #ubicacion .map-wrap.du-location-map::before {
+  content:"";
+  position:absolute;
+  z-index:2;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(380px circle at var(--loc-light-x,50%) var(--loc-light-y,50%),rgba(255,208,107,.095),transparent 82%);
+  opacity:0;
+  transition:opacity .4s ease;
+}
+body.du-site #ubicacion .map-wrap.du-location-map:hover::before { opacity:1; }
+body.du-site #ubicacion .map-wrap.du-location-map::after {
+  background:linear-gradient(180deg,rgba(7,4,2,.04) 30%,rgba(10,5,2,.35) 100%);
+}
+body.du-site #ubicacion .du-map-art {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  transform:scale(1.025);
+  transition:transform 1.5s var(--loc-ease);
+}
+body.du-site #ubicacion.du-loc-visible .du-map-art { transform:scale(1); }
+body.du-site #ubicacion .du-map-marker { z-index:4; }
+body.du-site #ubicacion .du-map-marker::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:6px;
+  top:5px;
+  width:59px;
+  height:59px;
+  border:2px solid #ffe2a1;
+  border-radius:50%;
+  opacity:0;
+  pointer-events:none;
+}
+@media(prefers-reduced-motion:no-preference){
+  body.du-site #ubicacion .du-location-map.is-enhanced.is-complete .du-map-marker::before {
+    animation:du-loc-arrival-ring .88s cubic-bezier(.18,.85,.24,1) .35s both;
+  }
+  @keyframes du-loc-arrival-ring {
+    from { opacity:.85;transform:scale(.8); }
+    to {opacity:0;transform:scale(2.15);}
+  }
+}
+body.du-site #ubicacion .du-map-pin { transition:filter .3s ease; }
+body.du-site #ubicacion .du-map-marker:hover .du-map-pin { filter:drop-shadow(0 0 9px rgba(255,219,123,.8)); }
+body.du-site #ubicacion .du-map-label {
+  border:2px solid #2e1b0e;
+  border-radius:13px;
+  background:#fff4e2;
+  box-shadow:4px 5px 0 rgba(10,5,2,.35);
+  transition:background .3s ease,transform .45s var(--loc-ease),box-shadow .35s ease;
+}
+body.du-site #ubicacion .du-map-marker:hover .du-map-label {
+  background:#fff;
+  box-shadow:5px 7px 0 rgba(10,5,2,.35);
+  transform:translateY(-2px);
+}
+body.du-site #ubicacion .du-map-label strong { font-family:"Lilita One",Poppins,sans-serif;font-weight:400;letter-spacing:0;font-size:1.03rem; }
+body.du-site #ubicacion .du-map-credit { z-index:5;color:#fcebd9; }
+body.du-site #ubicacion .du-map-replay {
+  position:absolute;
+  bottom:15px;
+  left:15px;
+  z-index:6;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:36px;
+  padding:0 13px;
+  border:1.5px solid #fff4df;
+  border-radius:999px;
+  background:#fff4df;
+  color:#321d10;
+  box-shadow:3px 4px 0 rgba(10,5,2,.32);
+  font:400 .8rem/1 "Lilita One",sans-serif;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:transform .4s var(--loc-ease),background .25s ease,box-shadow .25s ease;
+}
+body.du-site #ubicacion .du-map-replay[hidden] { display:none !important; }
+body.du-site #ubicacion .du-map-replay svg { width:17px;height:17px;transition:transform .5s var(--loc-ease); }
+body.du-site #ubicacion .du-map-replay:hover { transform:translateY(-2px);background:var(--loc-yellow);box-shadow:4px 6px 0 rgba(10,5,2,.32); }
+body.du-site #ubicacion .du-map-replay:hover svg { transform:rotate(-35deg); }
+body.du-site #ubicacion .du-map-replay:disabled { opacity:.65;cursor:default;transform:none; }
+body.du-site #ubicacion .du-map-replay:focus-visible { outline:3px solid #fff;outline-offset:3px; }
+body.du-site #ubicacion .du-location-map.is-enhanced.is-complete .du-map-marker {
+  animation:du-marker-arrive .76s cubic-bezier(.18,1.25,.26,1) both;
+}
+
+/* Animación de entrada en una sola secuencia. Se habilita únicamente
+   cuando el observer está instalado y no se solicita reducir movimiento. */
+@media(prefers-reduced-motion:no-preference) {
+  body.du-site #ubicacion.du-loc-ready:not(.du-loc-visible) .pickup-copy > h2,
+  body.du-site #ubicacion.du-loc-ready:not(.du-loc-visible) .pickup-copy > p,
+  body.du-site #ubicacion.du-loc-ready:not(.du-loc-visible) .location-details,
+  body.du-site #ubicacion.du-loc-ready:not(.du-loc-visible) .pickup-actions {
+    opacity:0;
+    transform:translate3d(0,22px,0);
+  }
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .pickup-copy > h2,
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .pickup-copy > p,
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .location-details,
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .pickup-actions {
+    animation:du-loc-appear .82s var(--loc-ease) both;
+  }
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .pickup-copy > h2 { animation-delay:0s; }
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .pickup-copy > p { animation-delay:.08s; }
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .location-details { animation-delay:.19s; }
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .pickup-actions { animation-delay:.33s; }
+  body.du-site #ubicacion.du-loc-ready.du-loc-visible .pickup-copy > h2::after {
+    animation:du-loc-line .83s var(--loc-ease) .3s both;
+  }
+  @keyframes du-loc-appear {
+    from { opacity:0;filter:blur(4px);transform:translate3d(0,22px,0); }
+    to { opacity:1;filter:blur(0);transform:translate3d(0,0,0); }
+  }
+  @keyframes du-loc-line {
+    from {transform:rotate(-2deg) scaleX(0);opacity:0;}
+    to {transform:rotate(-2deg) scaleX(1);opacity:1;}
+  }
+}
+
+@media(max-width:1050px) and (min-width:700px){
+  body.du-site #ubicacion.pickup-section {gap:27px;}
+  body.du-site #ubicacion .pickup-copy > h2 { font-size:clamp(3.15rem,5.8vw,4.8rem); }
+  body.du-site #ubicacion .location-details {padding-inline:12px;}
+  body.du-site #ubicacion .location-details > div {grid-template-columns:76px minmax(0,1fr);gap:8px;}
+  body.du-site #ubicacion .location-details dd {font-size:.75rem;}
+  body.du-site #ubicacion .pickup-actions .button {min-height:44px;padding-inline:14px;font-size:.83rem;}
+  body.du-site #ubicacion .du-map-label {
+    top:-81px;
+    left:35px;
+    min-width:189px;
+    text-align:center;
+    transform:translateX(-50%);
+  }
+  body.du-site #ubicacion .du-map-marker:hover .du-map-label {transform:translateX(-50%);}
+}
+@media(max-width:699px){
+  body.du-site #ubicacion.pickup-section {
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:43px;
+    width:min(calc(100% - 30px),600px);
+    padding:70px 0 83px;
+    scroll-margin-top:112px;
+  }
+  body.du-site #ubicacion .pickup-copy > h2 { font-size:clamp(3.8rem,15vw,5.3rem);line-height:1.07;margin-bottom:29px; }
+  body.du-site #ubicacion .pickup-copy > p:not(.eyebrow) {max-width:470px;font-size:.92rem;margin-bottom:23px;}
+  body.du-site #ubicacion .location-details { padding:7px 12px;margin-bottom:27px;transform:none; }
+  body.du-site #ubicacion .location-details > div {grid-template-columns:86px minmax(0,1fr);gap:9px;min-height:60px;padding:10px 0;}
+  body.du-site #ubicacion .location-details dt {font-size:.77rem;}
+  body.du-site #ubicacion .location-details dd {font-size:.77rem;}
+  body.du-site #ubicacion .pickup-actions .button {min-height:46px;padding-inline:17px;font-size:.86rem;}
+  body.du-site #ubicacion .map-wrap.du-location-map {
+    height:clamp(355px,105vw,450px);
+    min-height:355px;
+    border-width:7px;
+    box-shadow:7px 9px 0 #140b07,11px 17px 24px rgba(8,3,1,.25);
+    transform:none !important;
+  }
+  body.du-site #ubicacion .du-map-replay {bottom:10px;left:10px;font-size:.72rem;min-height:33px;padding-inline:10px;}
+  body.du-site #ubicacion .du-map-label {top:-80px;left:35px;transform:translateX(-50%);padding:9px 11px;min-width:185px;}
+  body.du-site #ubicacion .du-map-marker:hover .du-map-label {transform:translateX(-50%);}
+}
+@media(max-width:359px){
+  body.du-site #ubicacion .pickup-copy > h2 {font-size:3.45rem;}
+  body.du-site #ubicacion .location-details > div {grid-template-columns:75px minmax(0,1fr);gap:7px;}
+  body.du-site #ubicacion .location-details dd {font-size:.71rem;}
+  body.du-site #ubicacion .du-copy-address {width:30px;height:30px;flex-basis:30px;}
+  body.du-site #ubicacion .pickup-actions {gap:8px;}
+  body.du-site #ubicacion .pickup-actions .button {min-height:44px;padding-inline:13px;font-size:.78rem;}
+  /* En 320 px el botón de repetir y el crédito legal no deben cruzarse. */
+  body.du-site #ubicacion .du-map-replay {bottom:35px;}
+}
+@media(prefers-reduced-motion:reduce) {
+  body.du-site #ubicacion *,body.du-site #ubicacion *::before,body.du-site #ubicacion *::after {
+    animation:none !important;
+    transition:none !important;
+  }
+  body.du-site #ubicacion .location-details,
+  body.du-site #ubicacion .map-wrap.du-location-map,
+  body.du-site #ubicacion .du-map-art {transform:none !important;}
+  body.du-site #ubicacion .du-map-replay {display:none !important;}
+}

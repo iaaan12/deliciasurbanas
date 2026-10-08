@@ -1,0 +1,349 @@
+/* Poster gastronómico + carta compacta. Capa final del sitio público. */
+:root { --poster-yellow:#e9c749; --poster-red:#bb411c; --poster-dark:#2b1a10; }
+body.du-site { background:var(--poster-dark); }
+
+/* La navegación flotante pertenece al mismo afiche amarillo que el hero. */
+body.du-site .announcement-bar { display:none; }
+body.du-site .site-header {
+  position:sticky;
+  top:0;
+  z-index:90;
+  padding:12px 20px 8px;
+  background:var(--poster-yellow);
+  border:0;
+  box-shadow:none;
+  transition:background-color .35s ease, padding .35s ease;
+}
+body.du-site .site-header.du-header-scrolled { background:var(--poster-dark); }
+body.du-site .header-inner.shell {
+  width:min(100%, 1220px);
+  min-height:60px;
+  border:3px solid var(--poster-dark);
+  border-radius:999px;
+  padding:5px 12px 5px 16px;
+  background:#fff7e8;
+  box-shadow:0 6px 0 var(--poster-dark);
+}
+body.du-site .brand strong,body.du-site .main-nav a,
+body.du-site .header-actions .text-button { color:var(--poster-dark); }
+body.du-site .brand strong { font-size:.91rem; }
+body.du-site .brand small { color:#70503c; }
+body.du-site .main-nav a { font-size:.91rem; }
+body.du-site .main-nav a:hover { color:var(--poster-red); }
+body.du-site .main-nav a::after { background:var(--poster-red); }
+body.du-site .header-actions .text-button { color:var(--poster-dark); }
+body.du-site .header-actions .text-button:hover { color:var(--poster-red); }
+body.du-site .cart-button {
+  min-height:40px;
+  padding:0 17px;
+  background:var(--poster-red);
+  border:2px solid var(--poster-dark);
+  color:white;
+  box-shadow:0 3px 0 var(--poster-dark);
+}
+body.du-site .cart-button:hover { background:#d45025; color:white; }
+
+/* Hero de afiche: tipografía atrás, torta transparente delante. */
+body.du-site .hero-v3.du-poster-hero {
+  display:block;
+  width:100%;
+  max-width:none;
+  min-height:0;
+  padding:0;
+  margin:0;
+  background:var(--poster-yellow);
+  border:0;
+  overflow:clip;
+  position:relative;
+}
+.du-poster-stage {
+  position:relative;
+  isolation:isolate;
+  width:min(100%, 1600px);
+  min-height:clamp(640px, calc(100svh - 87px), 860px);
+  margin:0 auto;
+  padding:20px 20px 38px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  color:var(--poster-dark);
+}
+.du-poster-kicker {
+  position:absolute;
+  z-index:2;
+  top:4%;
+  left:50%;
+  width:max-content;
+  max-width:95%;
+  margin:0;
+  color:var(--poster-red);
+  font:400 clamp(3.1rem,5.7vw,6rem)/1.1 "Lobster",Georgia,cursive;
+  letter-spacing:-.04em;
+  transform:translateX(-50%) rotate(-3deg);
+}
+body.du-site .hero-v3.du-poster-hero #hero-title {
+  position:absolute;
+  z-index:1;
+  left:0;
+  top:17%;
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:0;
+  color:var(--poster-dark);
+  font:400 clamp(9rem,18vw,19rem)/.77 "Lilita One",Impact,sans-serif;
+  letter-spacing:-.075em;
+  text-align:center;
+  text-transform:uppercase;
+  transform:rotate(-3deg);
+}
+.du-poster-title span { display:block; white-space:nowrap; }
+.du-poster-title span:last-child {
+  font-size:1.14em;
+  color:#fff7e8;
+  text-shadow:5px 7px 0 var(--poster-dark);
+  margin-top:16px;
+  transform:scaleX(1.06);
+}
+.du-poster-product {
+  position:absolute;
+  z-index:5;
+  width:min(80vw,980px);
+  max-width:none;
+  height:auto;
+  left:50%;
+  top:52%;
+  transform:translate(-50%,-50%) rotate(-4deg);
+  object-fit:contain;
+  filter:drop-shadow(0 22px 17px rgba(61,36,11,.28));
+  pointer-events:none;
+  user-select:none;
+}
+html.du-flight-active .du-poster-product { visibility:hidden; }
+.du-product-flight {
+  position:fixed;
+  z-index:65;
+  inset:0 auto auto 0;
+  width:auto;
+  height:auto;
+  max-width:none;
+  pointer-events:none;
+  user-select:none;
+  transform-origin:0 0;
+  will-change:transform,opacity;
+  filter:drop-shadow(0 20px 16px rgba(52,30,9,.23));
+  backface-visibility:hidden;
+}
+.du-poster-bottom {
+  position:relative;
+  z-index:10;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  margin-top:auto;
+  padding-top:24px;
+  color:var(--poster-dark);
+}
+.du-poster-actions { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:12px; }
+body.du-site .du-poster-actions .button {
+  min-height:53px;
+  padding:0 27px;
+  border:3px solid var(--poster-dark);
+  border-radius:999px;
+  font-size:1rem;
+  box-shadow:0 6px 0 var(--poster-dark);
+  transition:transform .34s cubic-bezier(.17,.88,.2,1.35),box-shadow .3s ease,background-color .25s ease;
+}
+body.du-site .du-poster-actions .button:hover { transform:translateY(-4px); box-shadow:0 10px 0 var(--poster-dark); }
+body.du-site .du-poster-actions .button-primary { background:var(--poster-red); color:#fff7ec; }
+body.du-site .du-poster-actions .button-primary:hover { background:#a93917; color:white; }
+body.du-site .du-poster-actions .button-ghost { background:#fff7e8; color:var(--poster-dark); }
+body.du-site .du-poster-actions .button-ghost:hover { background:#fff1cf; color:var(--poster-dark); }
+.du-poster-bottom > p { margin:4px 0 0; font:400 .87rem/1.25 "Lilita One",Inter,sans-serif; text-transform:uppercase; letter-spacing:.025em; }
+.du-poster-status {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  color:var(--poster-dark);
+  font:700 .72rem/1.3 Inter,sans-serif;
+}
+body.du-site .hero-v3.du-poster-hero .du-poster-status,
+body.du-site .hero-v3.du-poster-hero .du-poster-status.is-closed {
+  color:var(--poster-dark);
+  font:700 .72rem/1.3 Inter,sans-serif;
+}
+.du-poster-status::before { background:var(--poster-red); }
+.du-poster-spark {
+  position:absolute;
+  z-index:0;
+  color:#fff8e2;
+  line-height:1;
+  user-select:none;
+  pointer-events:none;
+}
+.du-poster-spark-one { top:13%;left:7%;font-size:2rem; }
+.du-poster-spark-two { top:17%;right:12%;font-size:1.1rem; }
+.du-poster-spark-three { top:46%;right:3%;font-size:2.25rem;color:var(--poster-red); }
+
+/* Compactación: grupos y filtros siempre con datos existentes del catálogo. */
+body.du-site #menu.du-editorial-menu { padding:clamp(48px,5vw,72px) 0 clamp(58px,6vw,80px); }
+body.du-site #menu .du-menu-heading { margin-bottom:14px; }
+body.du-site #menu #menu-title { font-size:clamp(3.7rem,6.4vw,5.7rem); }
+body.du-site #menu .menu-results-meta { min-height:31px;margin:8px 0; }
+.du-subcategory-strip {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  min-height:40px;
+  margin:15px 0 2px;
+}
+.du-subcategory-strip[hidden] { display:none !important; }
+.du-subcategory-button {
+  min-height:37px;
+  padding:0 17px;
+  border:1px solid rgba(250,231,202,.34);
+  border-radius:999px;
+  background:transparent;
+  color:#ead5b9;
+  font:400 .88rem/1 "Lilita One",Inter,sans-serif;
+  cursor:pointer;
+  transition:background .22s ease,color .22s ease,transform .25s ease;
+}
+.du-subcategory-button:hover { background:rgba(255,255,255,.09); }
+.du-subcategory-button[aria-pressed="true"] { background:var(--du-gold);color:var(--du-ink);border-color:var(--du-gold); }
+.du-subcategory-button:focus-visible { outline:3px solid var(--du-gold);outline-offset:2px; }
+body.du-site #menu .du-menu-list {
+  display:block;
+  min-height:0;
+}
+.du-menu-group { min-width:0; margin:0 0 20px; }
+.du-menu-group-title {
+  width:max-content;
+  max-width:100%;
+  position:relative;
+  margin:15px 0 17px;
+  padding-bottom:11px;
+  color:var(--du-gold) !important;
+  font:400 clamp(1.55rem,2.6vw,2.4rem)/1.1 "Lobster",Georgia,cursive;
+  letter-spacing:-.03em;
+}
+.du-menu-group-title::after {
+  content:"﹏﹏﹏﹏";
+  position:absolute;
+  left:0;bottom:-5px;
+  color:var(--du-gold);
+  font:400 .7rem/1 serif;
+  letter-spacing:1px;
+}
+.du-menu-group-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(26px,4vw,66px);row-gap:0; }
+body.du-site #menu .du-menu-item {
+  min-width:0;
+  padding:13px 0 12px;
+  border-bottom:1px solid rgba(255,238,211,.17);
+}
+body.du-site #menu .du-menu-item:last-child { border-bottom:1px solid rgba(255,238,211,.17); }
+body.du-site #menu .du-menu-line { align-items:baseline;gap:9px; }
+body.du-site #menu .du-menu-name {
+  max-width:68%;
+  font:400 clamp(1.14rem,1.8vw,1.9rem)/1.09 "Lilita One",Impact,sans-serif;
+  letter-spacing:-.025em;
+  color:#fff6e9;
+  overflow-wrap:normal;
+  word-break:normal;
+}
+body.du-site #menu .du-menu-price {
+  font:400 clamp(1.15rem,1.9vw,1.86rem)/1 "Lilita One",Impact,sans-serif;
+  font-style:italic;
+  color:var(--du-gold);
+}
+body.du-site #menu .du-menu-dots {
+  min-width:10px;
+  border-bottom-width:3px;
+  border-color:rgba(232,202,160,.4);
+  transform:translateY(-3px);
+}
+body.du-site #menu .du-menu-details { min-height:24px;gap:8px;margin-top:5px; }
+body.du-site #menu .du-menu-details p {
+  display:-webkit-box;
+  -webkit-line-clamp:1;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  max-width:80%;
+  color:#c2ab96;
+  font-size:.75rem;
+  line-height:1.5;
+}
+body.du-site #menu .du-menu-add {
+  min-height:28px;
+  padding:3px 10px;
+  font-size:.68rem;
+  opacity:.72;
+  transition:opacity .2s ease, background .2s ease,transform .2s ease;
+}
+body.du-site #menu .du-menu-item:hover .du-menu-add,
+body.du-site #menu .du-menu-item:focus-within .du-menu-add { opacity:1; }
+body.du-site #menu .du-menu-add:hover { color:var(--du-ink); }
+body.du-site #menu .du-menu-board { min-height:0; }
+body.du-site #menu .du-menu-ticket { pointer-events:none; }
+@media (min-width:920px) and (hover:hover) and (pointer:fine) {
+  body.du-site #menu .du-menu-board.du-ticket-ready .du-menu-ticket {
+    top:0;left:0;opacity:0;visibility:hidden;transition:opacity .16s ease,visibility .16s ease;
+  }
+  body.du-site #menu .du-menu-board.du-ticket-ready.is-hovering-ticket .du-menu-ticket {
+    opacity:1;visibility:visible;
+  }
+}
+
+@media(max-width:919px) {
+  body.du-site #menu .du-menu-ticket { display:none !important; }
+  .du-menu-group-grid { gap:0 28px; }
+}
+@media(max-width:699px) {
+  body.du-site .site-header { padding:9px 9px 6px; }
+  body.du-site .header-inner.shell { min-height:54px;padding:4px 9px;border-width:2px;box-shadow:0 4px 0 var(--poster-dark); }
+  body.du-site .brand strong { font-size:.7rem; }
+  body.du-site .brand small { display:none; }
+  body.du-site .cart-button { min-height:38px;padding:0 12px; }
+  .du-poster-stage { min-height:clamp(610px,calc(100svh - 70px),780px); padding:30px 8px 30px; }
+  .du-poster-kicker { top:6%;font-size:clamp(2.8rem,12vw,4.5rem); }
+  body.du-site .hero-v3.du-poster-hero #hero-title {
+    top:22%;
+    font-size:clamp(5.25rem,24vw,9.8rem);
+    letter-spacing:-.063em;
+    line-height:.82;
+  }
+  .du-poster-title span:last-child { margin-top:92px;text-shadow:3px 5px 0 var(--poster-dark);font-size:1.14em;transform:scaleX(1.25); }
+  .du-poster-product { width:clamp(520px,145vw,850px);top:49%; }
+  .du-poster-bottom { padding-top:20px; gap:9px; }
+  body.du-site .du-poster-actions .button { min-height:48px;padding:0 17px;font-size:.82rem;box-shadow:0 4px 0 var(--poster-dark); }
+  .du-poster-bottom > p { font-size:.73rem; }
+  .du-poster-spark-one { top:20%;left:5%; }
+  .du-poster-spark-three { top:60%;right:5%; }
+  body.du-site #menu .du-menu-heading { margin-bottom:13px; }
+  body.du-site #menu #menu-title { font-size:3.7rem; }
+  .du-subcategory-strip { flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-top:12px; }
+  .du-subcategory-strip::-webkit-scrollbar { display:none; }
+  .du-subcategory-button { white-space:nowrap;min-height:35px;padding:0 14px;font-size:.77rem; }
+  .du-menu-group-grid { grid-template-columns:1fr; }
+  body.du-site #menu .du-menu-item { padding:11px 0 10px; }
+  body.du-site #menu .du-menu-name { font-size:clamp(1.17rem,4.8vw,1.45rem);max-width:66%; }
+  body.du-site #menu .du-menu-price { font-size:clamp(1.17rem,4.9vw,1.5rem); }
+  body.du-site #menu .du-menu-details { margin-top:4px; }
+  body.du-site #menu .du-menu-details p { font-size:.71rem; }
+  body.du-site #menu .du-menu-add { min-height:29px;opacity:1; }
+}
+@media(max-width:359px) {
+  body.du-site .hero-v3.du-poster-hero #hero-title { font-size:24vw; }
+  .du-poster-kicker { font-size:2.65rem; }
+  body.du-site #menu .du-menu-name { font-size:1.12rem; }
+  body.du-site #menu .du-menu-price { font-size:1.13rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .du-product-flight { display:none; }
+  .du-poster-product { visibility:visible !important; }
+  .du-subcategory-button,body.du-site .du-poster-actions .button { transition:none; }
+}

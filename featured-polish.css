@@ -1,0 +1,517 @@
+/* Delicias Urbanas | segunda escena: afiches de favoritos.
+   Las gráficas son tipográficas, no fotos ficticias de los platos.
+   El producto real y su precio siguen viniendo de catalog.json. */
+
+/* Los ingredientes de los bordes del PNG original terminan cortados.
+   El velo de alfa elimina el filo rectangular sin quitar detalle a la torta. */
+body.du-site .du-poster-product,
+body.du-site .du-product-flight {
+  -webkit-mask-image: radial-gradient(ellipse 53% 68% at 50% 51%, #000 0%, #000 62%, rgba(0,0,0,.94) 73%, transparent 100%);
+  mask-image: radial-gradient(ellipse 53% 68% at 50% 51%, #000 0%, #000 62%, rgba(0,0,0,.94) 73%, transparent 100%);
+}
+
+/* La continuación del póster amarillo abre con un borde orgánico. */
+body.du-site #promos.featured-section {
+  --du-promos-ink: #29190f;
+  --du-promos-paper: #fff4df;
+  --du-promos-yellow: #e9c749;
+  --du-promos-red: #b94423;
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  padding: clamp(70px,8vw,105px) 0 clamp(64px,7vw,92px);
+  background: #352216;
+  border: none;
+  scroll-margin-top: 102px;
+}
+body.du-site #promos.featured-section::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: .11;
+  background-image: radial-gradient(#f2cb8c .7px, transparent 1px);
+  background-size: 21px 21px;
+  pointer-events: none;
+}
+body.du-site #promos.featured-section::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: -32px;
+  height: 68px;
+  background: #352216;
+  clip-path: polygon(0 46%,4% 39%,8% 44%,12% 33%,16% 35%,20% 31%,25% 37%,30% 26%,35% 32%,41% 25%,46% 32%,52% 22%,58% 31%,64% 27%,70% 31%,77% 25%,84% 35%,91% 28%,96% 37%,100% 32%,100% 100%,0 100%);
+  pointer-events: none;
+}
+body.du-site #promos > .shell {
+  position: relative;
+  z-index: 1;
+  width: min(calc(100% - 48px), 1210px);
+}
+body.du-site #promos .featured-heading {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: clamp(26px,3vw,42px);
+}
+body.du-site #promos .featured-heading h2 {
+  max-width: 650px;
+  margin: 0;
+  color: #fff3de;
+  font: 400 clamp(3.4rem,6vw,6.2rem)/.97 "Lilita One",Poppins,sans-serif;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+body.du-site #promos .featured-heading > a {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 10px;
+  color: var(--du-promos-yellow);
+  border: 0;
+  border-bottom: 2px dotted rgba(233,199,73,.6);
+  font: 400 .95rem/1.2 "Lilita One", Inter,sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .025em;
+  transition: color .28s ease, gap .28s cubic-bezier(.18,.9,.2,1);
+}
+body.du-site #promos .featured-heading > a:hover {
+  gap: 18px;
+  color: var(--du-promos-paper);
+}
+
+body.du-site #promos .featured-grid {
+  display: grid;
+  grid-template-columns: minmax(0,1.06fr) minmax(0,.94fr);
+  grid-template-rows: repeat(2,minmax(222px,1fr));
+  align-items: stretch;
+  gap: 17px;
+  min-height: 510px;
+}
+body.du-site #promos .featured-card {
+  --du-card-angle: 0deg;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0,.39fr) minmax(0,.61fr);
+  min-height: 0;
+  overflow: hidden;
+  border: 2px solid #89603a;
+  border-radius: 19px;
+  background: #fff2df;
+  box-shadow: 7px 8px 0 rgba(19,10,5,.33),0 15px 35px rgba(17,7,2,.12);
+  transform-style: flat;
+  transition: border-color .28s ease, box-shadow .36s ease;
+}
+body.du-site #promos .featured-card::before {
+  content: "";
+  display: block;
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(300px circle at var(--mx,50%) var(--my,50%),rgba(255,243,214,.24), transparent 72%);
+  transition: opacity .36s ease;
+}
+body.du-site #promos .featured-card:hover {
+  border-color: var(--du-promos-yellow);
+  box-shadow: 9px 12px 0 rgba(19,10,5,.32),0 22px 42px rgba(17,7,2,.2);
+}
+body.du-site #promos .featured-card:hover::before { opacity: 1; }
+body.du-site #promos .featured-card-main {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  grid-template-columns: minmax(0,1fr);
+  grid-template-rows: minmax(270px,1.1fr) minmax(0,.9fr);
+}
+
+body.du-site #promos .featured-media {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: auto;
+  overflow: hidden;
+  background: #b94423;
+}
+body.du-site #promos .featured-media::after {
+  display: none;
+}
+body.du-site #promos .featured-media > img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain; /* nunca recortar fotos cargadas en admin */
+  object-position: center;
+  background: #d8a14d;
+  transition: transform .8s cubic-bezier(.2,.79,.24,1);
+}
+body.du-site #promos .featured-card:hover .featured-media > img { transform: scale(1.045); }
+body.du-site #promos .du-feature-poster {
+  --du-poster-move-x: 0px;
+  --du-poster-move-y: 0px;
+  position: absolute;
+  inset: 0;
+  min-width: 0;
+  background: #b94423;
+  overflow: hidden;
+  transform: translate3d(var(--du-poster-move-x),var(--du-poster-move-y),0) scale(1.025);
+  transition: transform .65s cubic-bezier(.19,.84,.2,1);
+}
+body.du-site #promos .du-feature-poster--sandwich { background: #e8c44b; }
+body.du-site #promos .du-feature-poster--pollo { background: #bd4c2a; }
+body.du-site #promos .du-feature-poster--bebida { background: #ae6735; }
+body.du-site #promos .du-feature-poster--otro { background: #b57838; }
+
+body.du-site #promos .du-feature-poster::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(153deg,transparent 0,transparent 33px,rgba(255,247,221,.10) 34px,rgba(255,247,221,.10) 35px);
+  opacity: .5;
+}
+body.du-site #promos .du-feature-poster-ring {
+  position: absolute;
+  width: min(90%,360px);
+  aspect-ratio: 1;
+  top: 50%;
+  left: 50%;
+  border: clamp(2px,.3vw,4px) solid rgba(255,246,221,.42);
+  border-radius: 50%;
+  transform: translate(-50%,-50%) rotate(-12deg);
+}
+body.du-site #promos .du-feature-poster-ring::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 2px dashed rgba(255,245,227,.3);
+  border-radius: inherit;
+}
+body.du-site #promos .du-feature-poster-number {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: #fff4dc;
+  font: 400 clamp(6rem,11vw,12rem)/.7 "Lilita One",Impact,sans-serif;
+  letter-spacing: -.075em;
+  transform: translate(-53%,-49%) rotate(-11deg);
+  text-shadow: 6px 8px 0 rgba(70,27,15,.4);
+}
+body.du-site #promos .featured-card-main .du-feature-poster-number {
+  font-size: clamp(10rem,20vw,18rem);
+}
+body.du-site #promos .du-feature-poster--sandwich .du-feature-poster-number {
+  color: #3d2213;
+  text-shadow: 5px 7px 0 #fff2cb;
+}
+body.du-site #promos .du-feature-poster-swoop {
+  position: absolute;
+  right: 8%;
+  top: 10%;
+  color: #f7d36b;
+  font-size: clamp(1.8rem,4vw,4.1rem);
+  transform: rotate(-12deg);
+}
+body.du-site #promos .du-feature-poster--sandwich .du-feature-poster-swoop { color: #b64021; }
+body.du-site #promos .du-feature-poster-seal {
+  position: absolute;
+  bottom: 12%;
+  right: 10%;
+  display: grid;
+  align-content: center;
+  width: clamp(58px,6.5vw,92px);
+  aspect-ratio: 1;
+  border: 3px solid #352116;
+  border-radius: 50%;
+  background: #fff4db;
+  color: #b94423;
+  box-shadow: 3px 3px 0 #29190f;
+  text-align: center;
+  transform: rotate(12deg);
+  font: 400 clamp(1.2rem,2vw,1.8rem)/.85 "Lilita One",sans-serif;
+}
+body.du-site #promos .du-feature-poster-seal span {
+  display: block;
+  font: 800 .62rem/1.4 Inter,sans-serif;
+  text-transform: uppercase;
+}
+body.du-site #promos .product-badges {
+  z-index: 3;
+  top: 12px;
+  left: 12px;
+  gap: 5px;
+  pointer-events: none;
+}
+body.du-site #promos .product-badge {
+  min-height: 24px;
+  border: 1px solid rgba(36,21,11,.8);
+  border-radius: 3px;
+  padding: 5px 8px;
+  background: #fff4dd;
+  color: #352116;
+  font: 400 .68rem/1 "Lilita One",sans-serif;
+  letter-spacing: .015em;
+  box-shadow: 2px 2px 0 #29190f;
+}
+body.du-site #promos .product-badge-promo {
+  background: #eac34d;
+}
+
+body.du-site #promos .featured-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(18px,2.5vw,32px);
+  background: #fff4e2;
+  color: #2c1b11;
+}
+body.du-site #promos .featured-card-main .featured-copy {
+  padding: clamp(22px,3.3vw,38px);
+}
+body.du-site #promos .featured-copy > span {
+  margin-bottom: 12px;
+  color: #b44a22;
+  font: 400 .85rem/1 "Lilita One",sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .045em;
+}
+body.du-site #promos .featured-copy h3 {
+  color: #2b1a10;
+  margin: 0 0 9px;
+  font: 400 clamp(1.28rem,2vw,2.1rem)/1.04 "Lilita One",Poppins,sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -.028em;
+  text-wrap: balance;
+}
+body.du-site #promos .featured-card-main .featured-copy h3 {
+  font-size: clamp(1.7rem,2.8vw,2.75rem);
+}
+body.du-site #promos .featured-copy p {
+  margin: 0 0 20px;
+  color: #6f5140;
+  font: 500 clamp(.78rem,1.1vw,.91rem)/1.55 Inter,sans-serif;
+  text-wrap: pretty;
+}
+body.du-site #promos .featured-copy > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 2px dotted rgba(99,62,39,.27);
+}
+body.du-site #promos .featured-copy > div strong {
+  color: #a63d1f;
+  font: 400 clamp(1.25rem,2vw,1.9rem)/1 "Lilita One",sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+body.du-site #promos .featured-copy > div button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 39px;
+  padding: 0 16px;
+  border: 2px solid #29190f;
+  border-radius: 999px;
+  background: #e9c749;
+  color: #29190f;
+  font: 400 .81rem/1 "Lilita One",sans-serif;
+  box-shadow: 0 3px 0 #29190f;
+  cursor: pointer;
+  transition: transform .35s cubic-bezier(.18,.85,.25,1),box-shadow .25s ease,background-color .25s ease;
+}
+body.du-site #promos .featured-copy > div button span {
+  font-size: 1rem;
+  transition: transform .3s cubic-bezier(.18,.85,.25,1);
+}
+body.du-site #promos .featured-copy > div button:hover {
+  background: #fff2c4;
+  color: #29190f;
+  box-shadow: 0 5px 0 #29190f;
+  transform: translateY(-2px);
+}
+body.du-site #promos .featured-copy > div button:hover span { transform: translate(3px,-2px); }
+body.du-site #promos .featured-copy > div button.is-added {
+  background: #d9ecc1;
+  border-color: #29190f;
+  color: #29190f;
+}
+
+/* Los elementos entran por etapas al llegar a la sección. */
+@media (prefers-reduced-motion: no-preference) {
+  body.du-site #promos .featured-card .du-feature-poster-ring,
+  body.du-site #promos .featured-card .du-feature-poster-number,
+  body.du-site #promos .featured-card .du-feature-poster-seal {
+    transition: transform .9s cubic-bezier(.2,.79,.22,1);
+  }
+  body.du-site #promos .featured-card:not(.du-feature-in-view) .du-feature-poster-number {
+    transform: translate(-53%,-25%) rotate(-19deg) scale(.86);
+  }
+  body.du-site #promos .featured-card:not(.du-feature-in-view) .du-feature-poster-ring {
+    transform: translate(-50%,-45%) rotate(-27deg) scale(.89);
+  }
+  body.du-site #promos .featured-card:not(.du-feature-in-view) .du-feature-poster-seal {
+    transform: translate(20px,14px) rotate(26deg) scale(.7);
+  }
+  body.du-site #promos .featured-card.du-feature-in-view .du-feature-poster-number,
+  body.du-site #promos .featured-card.du-feature-in-view .du-feature-poster-ring,
+  body.du-site #promos .featured-card.du-feature-in-view .du-feature-poster-seal {
+    transition-delay: calc(var(--du-feature-order,0) * .09s);
+  }
+}
+
+/* "Mis pedidos" es una tarjeta centrada en escritorio, no un cajón 100vh. */
+@media (min-width: 891px) {
+  body.du-site dialog.orders-dialog {
+    position: fixed;
+    inset: 0;
+    width: min(520px,calc(100vw - 48px));
+    height: min(76dvh,700px);
+    max-height: min(78dvh,700px);
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 22px;
+    box-shadow: 0 24px 75px rgba(15,6,2,.36),7px 9px 0 #2b190f;
+  }
+  body.du-site dialog.orders-dialog .drawer-shell {
+    width: 100%;
+    height: 100%;
+    border: 2px solid #bc8d4c;
+    border-radius: 22px;
+    box-shadow: none;
+  }
+  body.du-site dialog.orders-dialog .drawer-content {
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+  body.du-site dialog.orders-dialog:has(.cart-empty) {
+    height: min(415px,calc(100dvh - 48px));
+  }
+}
+
+@media (max-width: 1020px) and (min-width: 700px) {
+  body.du-site #promos .featured-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    grid-template-rows: auto auto;
+  }
+  body.du-site #promos .featured-card-main {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    grid-template-columns: minmax(0,.43fr) minmax(0,.57fr);
+    grid-template-rows: minmax(235px,auto);
+  }
+  body.du-site #promos .featured-card:not(.featured-card-main) {
+    grid-template-columns: 1fr;
+    grid-template-rows: 190px auto;
+  }
+}
+@media (max-width: 699px) {
+  body.du-site #promos.featured-section { padding: 62px 0 70px; }
+  body.du-site #promos > .shell { width: min(calc(100% - 34px),600px); }
+  body.du-site #promos .featured-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 17px;
+    margin-bottom: 26px;
+  }
+  body.du-site #promos .featured-heading h2 {
+    font-size: clamp(2.7rem,11.8vw,4.4rem);
+    line-height: .98;
+  }
+  body.du-site #promos .featured-grid {
+    grid-template-columns: minmax(0,1fr);
+    grid-template-rows: auto;
+    gap: 14px;
+    min-height: 0;
+  }
+  body.du-site #promos .featured-card,
+  body.du-site #promos .featured-card-main {
+    grid-column: auto;
+    grid-row: auto;
+    grid-template-columns: minmax(0,.36fr) minmax(0,.64fr);
+    grid-template-rows: minmax(212px,auto);
+    border-radius: 15px;
+    min-height: 212px;
+    box-shadow: 4px 5px 0 rgba(17,8,3,.32);
+  }
+  body.du-site #promos .featured-media {
+    min-height: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+  }
+  body.du-site #promos .du-feature-poster-number,
+  body.du-site #promos .featured-card-main .du-feature-poster-number {
+    font-size: clamp(5.5rem,27vw,8.5rem);
+  }
+  body.du-site #promos .du-feature-poster-ring { width: 185%; }
+  body.du-site #promos .du-feature-poster-seal {
+    right: -9px;
+    bottom: 20px;
+    width: 54px;
+    border-width: 2px;
+    font-size: 1.1rem;
+  }
+  body.du-site #promos .du-feature-poster-seal span { font-size: .52rem; }
+  body.du-site #promos .du-feature-poster-swoop { right: 4%; font-size: 1.5rem; }
+  body.du-site #promos .product-badges { top: 8px;left: 7px;gap: 4px; }
+  body.du-site #promos .product-badge { font-size: .56rem;min-height: 20px;padding: 4px 5px; }
+  body.du-site #promos .featured-copy,
+  body.du-site #promos .featured-card-main .featured-copy { min-height: 0;padding: clamp(13px,3.5vw,20px); }
+  body.du-site #promos .featured-copy > span { font-size: .71rem; margin-bottom: 6px; }
+  body.du-site #promos .featured-copy h3,
+  body.du-site #promos .featured-card-main .featured-copy h3 {
+    font-size: clamp(1.15rem,4.4vw,1.55rem);
+    line-height: 1.03;
+    margin-bottom: 8px;
+  }
+  body.du-site #promos .featured-copy p {
+    margin-bottom: 12px;
+    font-size: .71rem;
+    line-height: 1.42;
+  }
+  body.du-site #promos .featured-copy > div { align-items: flex-start; gap: 8px;padding-top: 9px; }
+  body.du-site #promos .featured-copy > div strong { font-size: 1.16rem; }
+  body.du-site #promos .featured-copy > div button {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: .72rem;
+    box-shadow: 0 2px 0 #29190f;
+  }
+}
+@media (max-width: 359px) {
+  body.du-site #promos .featured-card,
+  body.du-site #promos .featured-card-main { grid-template-columns: minmax(0,.33fr) minmax(0,.67fr); }
+  body.du-site #promos .featured-copy,
+  body.du-site #promos .featured-card-main .featured-copy { padding: 12px 10px; }
+  body.du-site #promos .featured-copy h3,
+  body.du-site #promos .featured-card-main .featured-copy h3 { font-size: 1.07rem; }
+  body.du-site #promos .featured-copy p { font-size: .66rem; }
+  body.du-site #promos .product-badge { font-size: .51rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.du-site #promos .featured-card *,
+  body.du-site #promos .featured-card,
+  body.du-site #promos .featured-heading > a {
+    animation: none !important;
+    transition: none !important;
+  }
+  body.du-site #promos .du-feature-poster {
+    transform: none !important;
+  }
+}

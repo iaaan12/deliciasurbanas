@@ -58,6 +58,7 @@ const state = {
   cart: safeParse(localStorage.getItem(STORAGE.cart), []),
   orders: safeParse(localStorage.getItem(STORAGE.orders), []),
   category: "Todos",
+  subcategory: "Todos",
   query: "",
   customizing: null,
   customizationValues: {},
@@ -71,7 +72,9 @@ const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selec
 const els = {
   featuredProducts: $("[data-featured-products]"),
   products: $("[data-products]"),
+  menuPreview: $("[data-menu-preview]"),
   categories: $("[data-categories]"),
+  subcategories: $("[data-subcategories]"),
   search: $("[data-search]"),
   clearSearch: $("[data-clear-search]"),
   resultsCount: $("[data-results-count]"),
@@ -129,13 +132,22 @@ async function boot() {
     console.warn("No se pudo cargar catalog.json; se usa el catálogo embebido.", error);
   }
 
+  // El menú editorial abre en una categoría concreta como la carta de referencia.
+  state.category = MENU.some((product) => product.category === "Pollo") ? "Pollo" : "Todos";
+  state.subcategory = "Todos";
   init();
+  // El catálogo se inyecta luego del primer render. Reposicionar anclas
+  // iniciales evita que #menu y #ubicacion apunten a coordenadas antiguas.
+  if (["#menu", "#promos", "#ubicacion"].includes(location.hash)) {
+    requestAnimationFrame(() => document.querySelector(location.hash)?.scrollIntoView({ behavior: "instant", block: "start" }));
+  }
 }
 
 function init() {
   sanitizeStoredCart();
   renderFeaturedProducts();
   renderCategories();
+  renderSubcategories();
   renderProducts();
   renderCart();
   renderOrders();
@@ -150,9 +162,16 @@ function renderFeaturedProducts() {
   if (!els.featuredProducts) return;
   const products = FEATURED_IDS.map((id) => MENU.find((item) => item.id === id)).filter(Boolean);
   els.featuredProducts.innerHTML = products.map((product, index) => `
-    <article class="featured-card ${index === 0 ? "featured-card-main" : ""}">
+    <article class="featured-card ${index === 0 ? "featured-card-main" : ""}" style="--du-feature-order:${index}" data-featured-product="${escapeHtml(product.id)}">
       <div class="featured-media">
-        ${renderProductVisual(product, "featured")}
+        ${PHOTO_SAFE_IDS.has(product.id) ? renderProductVisual(product, "featured") : `
+          <div class="du-feature-poster du-feature-poster--${product.category === "Pollo" ? "pollo" : product.category === "Sándwiches" ? "sandwich" : product.category === "Bebidas" ? "bebida" : "otro"}" aria-hidden="true">
+            <div class="du-feature-poster-ring"></div>
+            <span class="du-feature-poster-number">${String(index + 1).padStart(2,"0")}</span>
+            <span class="du-feature-poster-swoop" aria-hidden="true">✦</span>
+            <span class="du-feature-poster-seal">DU<span>Salta</span></span>
+          </div>
+        `}
         ${renderProductBadges(product, "featured")}
       </div>
       <div class="featured-copy">
@@ -161,7 +180,7 @@ function renderFeaturedProducts() {
         <p>${escapeHtml(product.description)}</p>
         <div>
           <strong>${formatMoney(product.price)}</strong>
-          <button type="button" data-add-product="${product.id}">${product.customization ? "Elegir" : "Agregar"}</button>
+          <button type="button" data-add-product="${escapeHtml(product.id)}" aria-label="${product.customization ? "Elegir opciones de" : "Agregar"} ${escapeHtml(product.name)} al pedido">${product.customization ? "Elegir" : "Agregar"} <span aria-hidden="true">→</span></button>
         </div>
       </div>
     </article>
@@ -172,6 +191,12 @@ function bindEvents() {
   els.search.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     els.clearSearch.hidden = !state.query;
+    if (state.query && state.category !== "Todos") {
+      state.category = "Todos";
+      state.subcategory = "Todos";
+      renderCategories();
+      renderSubcategories();
+    }
     renderProducts();
     if (state.query.length >= 2) track("search_product", { search_term: event.target.value.trim() });
   });
@@ -184,12 +209,35 @@ function bindEvents() {
     els.search.focus();
   });
 
-  $("[data-reset-filters]").addEventListener("click", () => {
-    state.query = "";
+  const showAllMenu = $("[data-show-all-menu]");
+  showAllMenu?.addEventListener("click", () => {
     state.category = "Todos";
+    state.subcategory = "Todos";
+    state.query = "";
     els.search.value = "";
     els.clearSearch.hidden = true;
     renderCategories();
+    renderSubcategories();
+    renderProducts();
+    document.querySelector(".du-menu-board")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  const previewFromEvent = (event) => {
+    const row = event.target.closest("[data-preview-id]");
+    if (!row || !els.products.contains(row)) return;
+    selectMenuPreview(row.dataset.previewId);
+  };
+  els.products.addEventListener("pointerover", previewFromEvent);
+  els.products.addEventListener("focusin", previewFromEvent);
+
+  $("[data-reset-filters]").addEventListener("click", () => {
+    state.query = "";
+    state.category = "Todos";
+    state.subcategory = "Todos";
+    els.search.value = "";
+    els.clearSearch.hidden = true;
+    renderCategories();
+    renderSubcategories();
     renderProducts();
   });
 
@@ -197,9 +245,21 @@ function bindEvents() {
     const category = event.target.closest("[data-category]");
     if (category) {
       state.category = category.dataset.category;
+      state.subcategory = defaultSubcategory(state.category);
+      state.query = "";
+      els.search.value = "";
+      els.clearSearch.hidden = true;
       renderCategories();
+      renderSubcategories();
       renderProducts();
       track("select_category", { item_category: state.category });
+      return;
+    }
+    const subcategory = event.target.closest("[data-subcategory]");
+    if (subcategory) {
+      state.subcategory = subcategory.dataset.subcategory;
+      renderSubcategories();
+      renderProducts();
       return;
     }
 
@@ -294,20 +354,62 @@ function setupStickyObserver() {
 }
 
 function renderCategories() {
-  const categories = ["Todos", ...new Set(MENU.map((item) => item.category))];
-  els.categories.innerHTML = categories.map((category) => `
-    <button class="category-button" type="button" data-category="${escapeHtml(category)}" aria-pressed="${String(state.category === category)}">
-      ${escapeHtml(category)}
-    </button>
-  `).join("");
+  const categories = [...new Set(MENU.map((item) => item.category)), "Todos"];
+  const currentButtons = [...els.categories.querySelectorAll("[data-category]")];
+  const sameCategories = currentButtons.length === categories.length
+    && currentButtons.every((button, index) => button.dataset.category === categories[index]);
+  // Mantener los nodos de los botones evita que la píldora activa salte.
+  if (!sameCategories) {
+    els.categories.innerHTML = `<span class="du-tabs-glider" aria-hidden="true"></span>` + categories.map((category) => `
+      <button class="category-button" type="button" data-category="${escapeHtml(category)}" aria-pressed="${String(state.category === category)}">
+        ${escapeHtml(category)}
+      </button>
+    `).join("");
+  } else currentButtons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.category === state.category)));
+  document.dispatchEvent(new CustomEvent("du:menu:tabs"));
+}
+
+function productSubcategory(product) {
+  if (product.category === "Sándwiches") return /^docena\b/i.test(product.name) ? "Docenas" : "Por unidad";
+  if (product.category === "Bebidas") {
+    const size = product.name.match(/(250|350|600)\s*ml\b/i);
+    return size ? `${size[1]} ml` : "Otras bebidas";
+  }
+  return null;
+}
+
+function subcategoryOptions(category) {
+  if (category === "Sándwiches") return ["Docenas", "Por unidad"];
+  if (category === "Bebidas") return ["250 ml", "350 ml", "600 ml", "Otras bebidas"];
+  return [];
+}
+
+function defaultSubcategory(category) {
+  if (category === "Sándwiches") return "Docenas";
+  if (category === "Bebidas") return "600 ml";
+  return "Todos";
+}
+
+function renderSubcategories() {
+  if (!els.subcategories) return;
+  const options = subcategoryOptions(state.category).filter(name => MENU.some(p => p.category === state.category && productSubcategory(p) === name));
+  els.subcategories.hidden = options.length < 2 || Boolean(state.query);
+  const existing = [...els.subcategories.querySelectorAll("[data-subcategory]")];
+  if (existing.length !== options.length || existing.some((el, i) => el.dataset.subcategory !== options[i])) {
+    els.subcategories.innerHTML = options.map(name => `
+      <button type="button" class="du-subcategory-button" data-subcategory="${escapeHtml(name)}" aria-pressed="${String(state.subcategory === name)}">${escapeHtml(name)}</button>
+    `).join("");
+  } else existing.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.subcategory === state.subcategory)));
+  document.dispatchEvent(new CustomEvent("du:menu:subtabs"));
 }
 
 function filteredProducts() {
   return MENU.filter((product) => {
     const categoryOk = state.category === "Todos" || product.category === state.category;
+    const subcategoryOk = state.category === "Todos" || state.subcategory === "Todos" || productSubcategory(product) === state.subcategory;
     const haystack = `${product.name} ${product.sourceName || ""} ${product.description} ${product.category}`.toLowerCase();
     const queryOk = !state.query || haystack.includes(state.query);
-    return categoryOk && queryOk;
+    return categoryOk && subcategoryOk && queryOk;
   });
 }
 
@@ -317,25 +419,62 @@ function renderProducts() {
   els.emptyState.hidden = products.length > 0;
   els.products.hidden = products.length === 0;
 
-  els.products.innerHTML = products.map((product, index) => {
-    return `
-      <article class="product-card" data-product-card="${product.id}" style="--card-index:${Math.min(index, 12)}">
-        <div class="product-image ${PHOTO_SAFE_IDS.has(product.id) ? "has-photo" : "has-graphic"}">
-          ${renderProductVisual(product, "card")}
-          ${renderProductBadges(product, "card")}
+  const grouped = new Map();
+  products.forEach(product => {
+    const group = state.category === "Todos"
+      ? product.category
+      : state.category === "Sándwiches" || state.category === "Bebidas"
+        ? productSubcategory(product) : "";
+    if (!grouped.has(group)) grouped.set(group, []);
+    grouped.get(group).push(product);
+  });
+
+  els.products.innerHTML = [...grouped.entries()].map(([group, items]) => `
+    <section class="du-menu-group" aria-label="${escapeHtml(group || state.category)}">
+      ${group && (state.category === "Todos" || grouped.size > 1) ? `<h3 class="du-menu-group-title">${escapeHtml(group)}</h3>` : ""}
+      <div class="du-menu-group-grid">
+      ${items.map((product, index) => `
+      <article class="du-menu-item ${index === 0 ? "is-current du-menu-pick" : ""}" style="--du-item-index:${Math.min(index, 9)}" data-product-card="${escapeHtml(product.id)}" data-preview-id="${escapeHtml(product.id)}">
+        <div class="du-menu-line">
+          <h4 class="du-menu-name">${escapeHtml(product.name)}</h4>
+          <span class="du-menu-dots" aria-hidden="true"></span>
+          <strong class="du-menu-price">${formatMoney(product.price)}</strong>
         </div>
-        <div class="product-body">
-          <span class="product-category">${escapeHtml(product.category)}</span>
-          <h3 class="product-title">${escapeHtml(product.name)}</h3>
-          <p class="product-description">${escapeHtml(product.description)}</p>
-          <div class="product-footer">
-            <strong class="product-price">${formatMoney(product.price)}</strong>
-            <button class="add-button" type="button" data-add-product="${product.id}" aria-label="Agregar ${escapeHtml(product.name)} al pedido">${product.customization ? "Elegir" : "Agregar"}</button>
-          </div>
+        <div class="du-menu-details">
+          <p>${escapeHtml(product.description)}</p>
+          <button class="du-menu-add" type="button" data-add-product="${escapeHtml(product.id)}" aria-label="${product.customization ? "Personalizar" : "Agregar"} ${escapeHtml(product.name)} al pedido"><span aria-hidden="true">+</span> ${product.customization ? "Elegir opciones" : "Agregar"}</button>
         </div>
       </article>
-    `;
-  }).join("");
+    `).join("")}
+      </div>
+    </section>
+  `).join("");
+  els.products.closest(".du-menu-board")?.classList.toggle("is-empty", products.length === 0);
+  if (products.length) selectMenuPreview(products[0].id);
+  else if (els.menuPreview) {
+    els.menuPreview.innerHTML = "";
+    delete els.menuPreview.dataset.productId;
+  }
+  document.dispatchEvent(new CustomEvent("du:menu:render", { detail: { count: products.length, category: state.category, query: state.query } }));
+}
+
+function selectMenuPreview(id) {
+  const product = MENU.find((item) => item.id === id);
+  const preview = els.menuPreview;
+  if (!product || !preview || !els.products.querySelector(`[data-preview-id="${CSS.escape(id)}"]`)) return;
+  if (preview.dataset.productId === id) return;
+  els.products.querySelectorAll("[data-preview-id]").forEach((row) => row.classList.toggle("is-current", row.dataset.previewId === id));
+  preview.dataset.productId = id;
+  const badge = product.tags?.includes("popular") ? "Uno de los más elegidos" : product.category;
+  preview.innerHTML = `
+    <div class="du-ticket-paper">
+      <span class="du-ticket-heading">${escapeHtml(badge)}</span>
+      <strong class="du-ticket-name">${escapeHtml(product.name)}</strong>
+      <p class="du-ticket-description">${escapeHtml(product.description)}</p>
+      <div class="du-ticket-rule" aria-hidden="true"></div>
+      <strong class="du-ticket-price">${formatMoney(product.price)}</strong>
+    </div>
+  `;
 }
 
 function handleAddProduct(id, button) {
@@ -545,7 +684,7 @@ function renderCart() {
   els.drawerTotal.textContent = formatMoney(total);
 
   if (!state.cart.length) {
-    els.cartItems.innerHTML = `<div class="cart-empty"><strong>Tu pedido está vacío.</strong><p>Elegí algo del menú y lo vas a ver acá.</p><button class="button button-secondary" type="button" data-go-menu>Ir al menú</button></div>`;
+    els.cartItems.innerHTML = `<div class="cart-empty"><span class="du-empty-icon" aria-hidden="true"><svg viewBox="0 0 88 88" fill="none"><path d="M21 31h46l5 40H16l5-40Z" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/><path d="M32 34V25c0-17 24-17 24 0v9" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><path d="m35 53 7 7 14-15" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><strong>Tu pedido está vacío.</strong><p>Elegí algo del menú y lo vas a ver acá.</p><button class="button button-secondary" type="button" data-go-menu>Ir al menú <span aria-hidden="true">→</span></button></div>`;
     els.cartFooter.hidden = true;
     els.crossSellSection.hidden = true;
     return;
@@ -557,7 +696,7 @@ function renderCart() {
     const product = MENU.find((entry) => entry.id === item.productId);
     if (!product) return "";
     return `
-      <article class="cart-item">
+      <article class="cart-item du-cart-ticket">
         ${renderCartVisual(product)}
         <div class="cart-item-main">
           <div class="cart-item-top"><strong>${escapeHtml(product.name)}</strong><button class="remove-button" type="button" data-remove-cart="${escapeHtml(item.key)}">Eliminar</button></div>
@@ -828,10 +967,10 @@ function renderOrders() {
       return product ? `${item.quantity} × ${product.name}` : null;
     }).filter(Boolean).join(" · ");
     return `
-      <article class="order-card">
+      <article class="order-card" style="--du-order-index:${Math.min(state.orders.indexOf(order),8)}">
         <div class="order-card-head"><strong>Pedido ${formatShortDate(order.createdAt)}</strong><small>${formatMoney(order.total)}</small></div>
         <p>${escapeHtml(summary)}</p>
-        <div class="order-card-foot"><span class="order-status">${escapeHtml(order.status || "Guardado")}</span><button class="text-button" type="button" data-resend-order="${order.id}">Enviar de nuevo</button></div>
+        <div class="order-card-foot"><span class="order-status ${order.status === "Enviado a WhatsApp" ? "is-sent" : order.status === "Pendiente de enviar por WhatsApp" ? "is-pending" : ""}">${escapeHtml(order.status || "Guardado")}</span><button class="text-button" type="button" data-resend-order="${order.id}">Enviar de nuevo <span aria-hidden="true">→</span></button></div>
       </article>
     `;
   }).join("");
